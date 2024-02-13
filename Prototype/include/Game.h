@@ -11,6 +11,7 @@
 #include "ScreenSize.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "CollisionDetection.h"
 
 /// <summary>
 /// @brief Main class for the SFML Playground project.

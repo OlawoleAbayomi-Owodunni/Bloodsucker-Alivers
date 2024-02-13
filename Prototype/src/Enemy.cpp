@@ -5,10 +5,10 @@ Enemy::Enemy()
 {
 	m_speed = 2.0f;
 
-	m_sprite.setSize(sf::Vector2f(40.0f, 40.0f));
-	m_sprite.setOrigin(m_sprite.getSize().x / 2.0f, m_sprite.getSize().y / 2.0f);
-	m_sprite.setFillColor(sf::Color::Red);
-	m_sprite.setPosition(m_position);
+	m_rectangle.setSize(sf::Vector2f(40.0f, 40.0f));
+	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
+	m_rectangle.setFillColor(sf::Color::Red);
+	m_rectangle.setPosition(m_position);
 }
 
 Enemy::~Enemy()
@@ -22,7 +22,7 @@ void Enemy::update(double dt, Player& t_player)
 
 void Enemy::render(sf::RenderWindow& t_window)
 {
-	t_window.draw(m_sprite);
+	t_window.draw(m_rectangle);
 }
 
 void Enemy::initialisePosition()
@@ -62,7 +62,7 @@ void Enemy::move(Player& t_player)
 		m_position.y -= m_speed;
 	}
 
-	m_sprite.setPosition(m_position);
+	m_rectangle.setPosition(m_position);
 }
 
 void Enemy::setPosition(float t_x, float t_y)
@@ -73,4 +73,9 @@ void Enemy::setPosition(float t_x, float t_y)
 sf::Vector2f Enemy::getPosition()
 {
 	return m_position;
+}
+
+sf::RectangleShape Enemy::getRectangle()
+{
+	return m_rectangle;
 }

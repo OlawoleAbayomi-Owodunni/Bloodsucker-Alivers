@@ -117,6 +117,14 @@ void Game::update(double dt)
 	{
 		m_enemies[i].update(dt, m_player);
 	}
+
+	for (int i = 0; i < NO_OF_ENEMIES; i++)
+	{
+		if (CollisionDetection::playerEnemyCollision(m_player, m_enemies[i]))
+		{
+			m_player.decreaseHealth();
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////

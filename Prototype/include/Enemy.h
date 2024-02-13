@@ -18,9 +18,11 @@ public:
 	void setPosition(float t_x, float t_y);
 	sf::Vector2f getPosition();
 
+	sf::RectangleShape getRectangle();
+
 private:
 	float m_speed;
 	sf::Vector2f m_position;
 
-	sf::RectangleShape m_sprite;
+	sf::RectangleShape m_rectangle;
 };

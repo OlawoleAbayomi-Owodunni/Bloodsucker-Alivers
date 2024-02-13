@@ -4,7 +4,7 @@
 Player::Player()
 {
 	m_health = 100.0f;
-	m_speed = 2.0f;
+	m_speed = 3.0f;
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
 	m_sprite.setSize(sf::Vector2f(40.0f, 40.0f));

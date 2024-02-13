@@ -8,8 +8,8 @@ static double const FPS{ 60.0f };
 Game::Game()
 	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Prototype", sf::Style::Default)
 {
+	srand(time(nullptr));
 	init();
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -18,12 +18,15 @@ void Game::init()
 	// Really only necessary is our target FPS is greater than 60.
 	m_window.setVerticalSyncEnabled(true);
 
+	for (int i = 0; i < NO_OF_ENEMIES; i++)
+	{
+		m_enemies[i].initialisePosition();
+	}
+
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
 	{
 		std::cout << "Error loading font file";
 	}
-
-	srand(time(nullptr));
 
 #ifdef TEST_FPS
 	x_updateFPS.setFont(m_arialFont);
@@ -110,7 +113,7 @@ void Game::processGameEvents(sf::Event& event)
 void Game::update(double dt)
 {
 	m_player.update(dt);
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < NO_OF_ENEMIES; i++)
 	{
 		m_enemies[i].update(dt, m_player);
 	}
@@ -121,7 +124,7 @@ void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < NO_OF_ENEMIES; i++)
 	{
 		m_enemies[i].render(m_window);
 	}

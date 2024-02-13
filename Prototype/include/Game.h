@@ -78,6 +78,8 @@ protected:
 	// main window
 	sf::RenderWindow m_window;
 
+	static const int NO_OF_ENEMIES = 6;
+
 	Player m_player;
 	Enemy m_enemies[6];
 

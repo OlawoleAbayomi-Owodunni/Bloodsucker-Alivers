@@ -13,7 +13,10 @@ public:
 	void update(double dt, Player& t_player);
 	void render(sf::RenderWindow& t_window);
 
+	void initialisePosition();
 	void move(Player& t_player);
+	void setPosition(float t_x, float t_y);
+	sf::Vector2f getPosition();
 
 private:
 	float m_speed;

@@ -13,6 +13,12 @@ public:
 	Weapon();
 	~Weapon();
 
+	void update(double dt, sf::Vector2f t_playerPos);
+	void render(sf::RenderWindow& t_window);
+
 private:
+	sf::Clock m_timer;
 	Type m_type;
+	Bullet m_bullet;
+	bool m_firing;
 };

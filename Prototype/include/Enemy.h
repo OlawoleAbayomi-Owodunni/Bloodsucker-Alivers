@@ -9,7 +9,7 @@ class Enemy
 public:
 	Enemy();
 	~Enemy();
-
+	
 	void update(double dt, Player& t_player);
 	void render(sf::RenderWindow& t_window);
 

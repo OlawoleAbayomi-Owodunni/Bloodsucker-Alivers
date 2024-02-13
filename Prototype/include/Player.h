@@ -30,4 +30,6 @@ private:
 	sf::RectangleShape m_rectangle;
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
+
+	Weapon m_weapon;
 };

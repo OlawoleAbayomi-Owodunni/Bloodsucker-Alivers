@@ -31,7 +31,7 @@ void Player::update(double dt)
 {
 	handleKeyInput();
 
-	
+	m_weapon.update(dt, m_position);
 
 	setHealth();
 	setPosition(m_position.x, m_position.y);
@@ -42,6 +42,8 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_rectangle);
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
+
+	m_weapon.render(t_window);
 }
 
 void Player::handleKeyInput()

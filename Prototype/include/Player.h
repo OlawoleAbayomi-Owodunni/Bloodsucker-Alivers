@@ -21,6 +21,7 @@ public:
 	void decreaseHealth();
 
 	sf::RectangleShape getRectangle();
+	Weapon getWeapon();
 
 private:
 	float m_health;

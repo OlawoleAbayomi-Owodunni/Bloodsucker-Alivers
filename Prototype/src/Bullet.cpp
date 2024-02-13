@@ -65,3 +65,8 @@ void Bullet::render(sf::RenderWindow& t_window)
 {
 	t_window.draw(m_circle);
 }
+
+sf::CircleShape Bullet::getCircle()
+{
+	return m_circle;
+}

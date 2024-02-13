@@ -98,3 +98,8 @@ sf::RectangleShape Player::getRectangle()
 {
 	return m_rectangle;
 }
+
+Weapon Player::getWeapon()
+{
+	return m_weapon;
+}

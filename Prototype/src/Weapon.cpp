@@ -39,3 +39,8 @@ void Weapon::render(sf::RenderWindow& t_window)
 {
 	m_bullet.render(t_window);
 }
+
+Bullet Weapon::getBullet()
+{
+	return m_bullet;
+}

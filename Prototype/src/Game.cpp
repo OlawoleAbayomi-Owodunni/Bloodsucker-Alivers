@@ -124,6 +124,11 @@ void Game::update(double dt)
 		{
 			m_player.decreaseHealth();
 		}
+
+		if (CollisionDetection::bulletEnemyCollision(m_player.getWeapon().getBullet(), m_enemies[i]))
+		{
+			m_enemies[i].initialisePosition();
+		}
 	}
 }
 

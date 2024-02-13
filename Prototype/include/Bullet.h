@@ -11,6 +11,8 @@ public:
 	void update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_enemies[]);
 	void render(sf::RenderWindow& t_window);
 
+	sf::CircleShape getCircle();
+
 private:
 	sf::CircleShape m_circle;
 	sf::Vector2f m_position;

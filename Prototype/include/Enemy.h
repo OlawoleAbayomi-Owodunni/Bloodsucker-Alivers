@@ -2,14 +2,15 @@
 
 #include <SFML/Graphics.hpp>
 #include "ScreenSize.h"
-#include "Player.h"
+
+class Player;
 
 class Enemy
 {
 public:
 	Enemy();
 	~Enemy();
-	
+
 	void update(double dt, Player& t_player);
 	void render(sf::RenderWindow& t_window);
 

@@ -15,11 +15,15 @@ Bullet::~Bullet()
 {
 }
 
-void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos)
+void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_enemies[])
 {
 	if (!t_firing)
 	{
 		m_position = t_playerPos;
+	}
+	else if (t_firing)
+	{
+
 	}
 
 	m_circle.setPosition(m_position);

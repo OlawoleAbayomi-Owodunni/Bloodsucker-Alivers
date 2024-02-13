@@ -13,7 +13,7 @@ public:
 	Weapon();
 	~Weapon();
 
-	void update(double dt, sf::Vector2f t_playerPos);
+	void update(double dt, sf::Vector2f t_playerPos, Enemy t_enemies[]);
 	void render(sf::RenderWindow& t_window);
 
 private:

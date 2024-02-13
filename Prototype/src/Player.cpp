@@ -27,11 +27,11 @@ Player::~Player()
 {
 }
 
-void Player::update(double dt)
+void Player::update(double dt, Enemy t_enemies[])
 {
 	handleKeyInput();
 
-	m_weapon.update(dt, m_position);
+	m_weapon.update(dt, m_position, t_enemies);
 
 	setHealth();
 	setPosition(m_position.x, m_position.y);

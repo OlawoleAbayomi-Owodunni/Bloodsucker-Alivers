@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Enemy.h"
 
 class Bullet
 {
@@ -7,7 +8,7 @@ public:
 	Bullet();
 	~Bullet();
 
-	void update(double dt, bool t_firing, sf::Vector2f t_playerPos);
+	void update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_enemies[]);
 	void render(sf::RenderWindow& t_window);
 
 private:

@@ -1,4 +1,5 @@
 #include "Weapon.h"
+#include <iostream>
 
 Weapon::Weapon()
 {
@@ -10,11 +11,28 @@ Weapon::~Weapon()
 {
 }
 
-void Weapon::update(double dt, sf::Vector2f t_playerPos)
-{
+void Weapon::update(double dt, sf::Vector2f t_playerPos, Enemy t_enemies[])
+{	
+	if (!m_firing)
+	{
+		if (m_timer.getElapsedTime().asSeconds() > 1)
+		{
+			m_firing = true;
+			m_timer.restart();
+		}
+	}
+	else if (m_firing)
+	{
+		if (m_timer.getElapsedTime().asSeconds() > 3)
+		{
+			m_firing = false;
+			m_timer.restart();
+		}
+	}
 
+	std::cout << m_timer.getElapsedTime().asSeconds() << std::endl;
 
-	m_bullet.update(dt, m_firing, t_playerPos);
+	m_bullet.update(dt, m_firing, t_playerPos, t_enemies);
 }
 
 void Weapon::render(sf::RenderWindow& t_window)

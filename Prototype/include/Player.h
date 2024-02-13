@@ -10,7 +10,7 @@ public:
 	Player();
 	~Player();
 
-	void update(double dt);
+	void update(double dt, Enemy t_enemies[]);
 	void render(sf::RenderWindow& t_window);
 	void handleKeyInput();
 	

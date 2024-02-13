@@ -112,7 +112,7 @@ void Game::processGameEvents(sf::Event& event)
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
-	m_player.update(dt);
+	m_player.update(dt, m_enemies);
 	for (int i = 0; i < NO_OF_ENEMIES; i++)
 	{
 		m_enemies[i].update(dt, m_player);

@@ -20,10 +20,42 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_
 	if (!t_firing)
 	{
 		m_position = t_playerPos;
+		
+		float distance;
+		float shortestDistance;
+		sf::Vector2f displacement;
+		sf::Vector2f shortestDisplacement;
+
+		for (int i = 0; i < 6; i++)
+		{
+			displacement.x = t_enemies[i].getPosition().x - t_playerPos.x;
+			displacement.y = t_enemies[i].getPosition().y - t_playerPos.y;
+
+			distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+			
+			if (i == 0)
+			{
+				shortestDistance = distance;
+				shortestDisplacement.x = t_enemies[i].getPosition().x - t_playerPos.x;
+				shortestDisplacement.y = t_enemies[i].getPosition().y - t_playerPos.y;
+			}
+			
+			if (distance < shortestDistance)
+			{
+				shortestDistance = distance;
+				shortestDisplacement.x = t_enemies[i].getPosition().x - t_playerPos.x;
+				shortestDisplacement.y = t_enemies[i].getPosition().y - t_playerPos.y;
+			}
+		}
+
+		shortestDisplacement = shortestDisplacement / shortestDistance;
+		shortestDisplacement = shortestDisplacement * 20.0f;
+		m_velocity = shortestDisplacement;
+		
 	}
 	else if (t_firing)
 	{
-
+		m_position += m_velocity;
 	}
 
 	m_circle.setPosition(m_position);

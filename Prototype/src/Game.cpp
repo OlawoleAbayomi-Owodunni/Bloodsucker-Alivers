@@ -28,6 +28,8 @@ void Game::init()
 		std::cout << "Error loading font file";
 	}
 
+	m_currentOrbs = 0;
+
 #ifdef TEST_FPS
 	x_updateFPS.setFont(m_arialFont);
 	x_updateFPS.setPosition(20, 300);
@@ -109,15 +111,8 @@ void Game::processGameEvents(sf::Event& event)
 	}
 }
 
-////////////////////////////////////////////////////////////
-void Game::update(double dt)
+void Game::checkCollisions()
 {
-	m_player.update(dt, m_enemies);
-	for (int i = 0; i < NO_OF_ENEMIES; i++)
-	{
-		m_enemies[i].update(dt, m_player);
-	}
-
 	for (int i = 0; i < NO_OF_ENEMIES; i++)
 	{
 		if (CollisionDetection::playerEnemyCollision(m_player, m_enemies[i]))
@@ -127,15 +122,51 @@ void Game::update(double dt)
 
 		if (CollisionDetection::bulletEnemyCollision(m_player.getWeapon().getBullet(), m_enemies[i]))
 		{
+			if (rand() % 4 != 0)
+			{
+				m_xpOrbs.push_back(new XPOrb(m_enemies[i].getPosition()));
+			}
+
 			m_enemies[i].initialisePosition();
 		}
 	}
+
+	for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
+	{
+		if (CollisionDetection::playerOrbCollision(m_player, *it))
+		{
+			// Collision detected
+			delete* it; // Delete the orb object
+			it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
+		}
+		else 
+		{
+			++it;
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////
+void Game::update(double dt)
+{
+	m_player.update(dt, m_enemies);
+	for (int i = 0; i < NO_OF_ENEMIES; i++)
+	{
+		m_enemies[i].update(dt, m_player);
+	}
+
+	checkCollisions();
 }
 
 ////////////////////////////////////////////////////////////
 void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
+
+	for (auto orb : m_xpOrbs)
+	{
+		orb->render(m_window);
+	}
 
 	for (int i = 0; i < NO_OF_ENEMIES; i++)
 	{

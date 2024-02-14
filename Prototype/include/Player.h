@@ -4,6 +4,8 @@
 #include "ScreenSize.h"
 #include "Weapon.h"
 
+
+
 class Player
 {
 public:
@@ -33,4 +35,7 @@ private:
 	sf::RectangleShape m_currentHealthBar;
 
 	Weapon m_weapon;
+
+	Texture m_playerTexture;
+	Sprite m_playerSprite;
 };

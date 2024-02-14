@@ -23,4 +23,7 @@ private:
 	Type m_type;
 	Bullet m_bullet;
 	bool m_firing;
+
+	Texture m_weaponTexture;
+	Sprite m_weaponSprite;
 };

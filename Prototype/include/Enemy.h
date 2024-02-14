@@ -3,6 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include "ScreenSize.h"
 
+using namespace std;
+using namespace sf;
+
 class Player;
 
 class Enemy
@@ -26,4 +29,7 @@ private:
 	sf::Vector2f m_position;
 
 	sf::RectangleShape m_rectangle;
+
+	Texture m_enemyTexture;
+	Sprite m_enemySprite;
 };

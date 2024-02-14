@@ -91,7 +91,7 @@ void Player::setHealth()
 
 void Player::decreaseHealth()
 {
-	m_health -= 0.2f;
+	m_health -= 1.0f;
 }
 
 sf::RectangleShape Player::getRectangle()

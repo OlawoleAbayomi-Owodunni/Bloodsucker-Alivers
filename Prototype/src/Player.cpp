@@ -5,6 +5,10 @@ Player::Player()
 {
 	m_health = 100.0f;
 	m_speed = 3.0f;
+	m_level = 1;
+	m_xp = 0;
+	m_xpRequired = 10.0f;
+
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
 	m_rectangle.setSize(sf::Vector2f(40.0f, 40.0f));
@@ -21,6 +25,11 @@ Player::Player()
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
+	m_xpBar.setFillColor(sf::Color::Green);
+	m_xpBar.setPosition(800.0f, 40.0f);
 }
 
 Player::~Player()
@@ -30,11 +39,13 @@ Player::~Player()
 void Player::update(double dt, Enemy t_enemies[])
 {
 	handleKeyInput();
-
 	m_weapon.update(dt, m_position, t_enemies);
 
 	setHealth();
 	setPosition(m_position.x, m_position.y);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	checkXP();
 }
 
 void Player::render(sf::RenderWindow& t_window)
@@ -42,6 +53,8 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_rectangle);
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
+
+	t_window.draw(m_xpBar);
 
 	m_weapon.render(t_window);
 }
@@ -92,6 +105,21 @@ void Player::setHealth()
 void Player::decreaseHealth()
 {
 	m_health -= 1.0f;
+}
+
+void Player::increaseXP()
+{
+	m_xp += 2;
+}
+
+void Player::checkXP()
+{
+	if (m_xp >= m_xpRequired)
+	{
+		m_level++;
+		m_xpRequired *= 2;
+		m_xp = 0;
+	}
 }
 
 sf::RectangleShape Player::getRectangle()

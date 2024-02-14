@@ -135,7 +135,8 @@ void Game::checkCollisions()
 	{
 		if (CollisionDetection::playerOrbCollision(m_player, *it))
 		{
-			// Collision detected
+			m_player.increaseXP();
+
 			delete* it; // Delete the orb object
 			it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
 		}

@@ -30,7 +30,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, Enemy t_enemies[])
 		}
 	}
 
-	std::cout << m_timer.getElapsedTime().asSeconds() << std::endl;
+	//std::cout << m_timer.getElapsedTime().asSeconds() << std::endl;
 
 	m_bullet.update(dt, m_firing, t_playerPos, t_enemies);
 }

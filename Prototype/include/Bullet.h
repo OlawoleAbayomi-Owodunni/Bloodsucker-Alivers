@@ -2,13 +2,27 @@
 #include <SFML/Graphics.hpp>
 #include "Enemy.h"
 
+enum class WeaponType
+{
+	Pistol,
+	AssaultRifle
+};
+
+enum class Direction
+{
+	North,
+	West,
+	South,
+	East
+};
+
 class Bullet
 {
 public:
 	Bullet();
 	~Bullet();
 
-	void update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_enemies[]);
+	void update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, WeaponType t_type, Direction t_direction);
 	void render(sf::RenderWindow& t_window);
 
 	sf::CircleShape getCircle();

@@ -2,27 +2,25 @@
 #include <SFML/Graphics.hpp>
 #include "Bullet.h"
 
-enum class Type
-{
-	Pistol
-};
-
 class Weapon
 {
 public:
-	Weapon();
+	Weapon(WeaponType t_type);
 	~Weapon();
 
-	void update(double dt, sf::Vector2f t_playerPos, Enemy t_enemies[]);
+	void update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction);
 	void render(sf::RenderWindow& t_window);
 
-	Bullet getBullet();
+	std::vector<Bullet*> getBullet();
 
 private:
 	sf::Clock m_timer;
-	Type m_type;
-	Bullet m_bullet;
+	WeaponType m_type;
+	std::vector<Bullet*> m_bullets;
 	bool m_firing;
+	float m_fireRate;
+
+	int counter;
 
 	Texture m_weaponTexture;
 	Sprite m_weaponSprite;

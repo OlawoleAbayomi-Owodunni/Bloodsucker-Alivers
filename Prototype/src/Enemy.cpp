@@ -4,7 +4,7 @@
 
 Enemy::Enemy()
 {
-	m_speed = ((rand() % 2) + 2) + ((rand() % 10) / 10);
+	m_speed = 1 + ((rand() % 10) / 10 + 0.1);
 
 	m_rectangle.setSize(sf::Vector2f(40.0f, 40.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);

@@ -4,15 +4,13 @@
 #include "ScreenSize.h"
 #include "Weapon.h"
 
-
-
 class Player
 {
 public:
 	Player();
 	~Player();
 
-	void update(double dt, Enemy t_enemies[]);
+	void update(double dt, std::vector<Enemy*> t_enemies);
 	void render(sf::RenderWindow& t_window);
 	void handleKeyInput();
 	
@@ -22,19 +20,31 @@ public:
 	void setHealth();
 	void decreaseHealth();
 
+	void increaseXP();
+	void checkXP();
+	int getLevel();
+
 	sf::RectangleShape getRectangle();
-	Weapon getWeapon();
+	std::vector<Weapon*> getWeapon();
 
 private:
 	float m_health;
 	float m_speed;
 	sf::Vector2f m_position;
+	
+	int m_level;
+	int m_xp;
+	float m_xpRequired;
+	bool m_levelUp;
+
+	Direction m_direction;
 
 	sf::RectangleShape m_rectangle;
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
+	sf::RectangleShape m_xpBar;
 
-	Weapon m_weapon;
+	std::vector<Weapon*> m_weapons;
 
 	Texture m_playerTexture;
 	Sprite m_playerSprite;

@@ -4,18 +4,32 @@
 Player::Player()
 {
 	m_health = 100.0f;
-	m_speed = 3.0f;
+	m_speed = 2.0f;
+	m_level = 1;
+	m_xp = 0;
+	m_xpRequired = 10.0f;
+	m_levelUp = false;
+	
+	m_weapons.push_back(new Weapon(WeaponType::Pistol));
+	m_direction = Direction::East;
+
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
 	m_rectangle.setSize(sf::Vector2f(40.0f, 40.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position);
-	Texture pTexture;
-	pTexture.loadFromFile("resources/sprites/StarterAtlas.png");
-	m_playerSprite.setTexture(pTexture);
-	IntRect spriteSnP{ 0,320,64,64 };
-	m_playerSprite.setTextureRect(spriteSnP);
+	// Load a sprite to display
+	sf::Texture playerTexture;
+	if (!playerTexture.loadFromFile("./resources/sprites/StarterAtlas.png"));
+	{
+		cout << "Failed to load file\n";
+	}
+
+	Sprite background;
+
+	m_playerSprite.setTextureRect(IntRect{ 0,0,64,64 });
+	m_playerSprite.setOrigin(32, 32);
 	m_playerSprite.setPosition(m_position);
 
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
@@ -27,20 +41,31 @@ Player::Player()
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
+	m_xpBar.setFillColor(sf::Color::Green);
+	m_xpBar.setPosition(800.0f, 40.0f);
 }
 
 Player::~Player()
 {
 }
 
-void Player::update(double dt, Enemy t_enemies[])
+void Player::update(double dt, std::vector<Enemy*> t_enemies)
 {
 	handleKeyInput();
 
-	m_weapon.update(dt, m_position, t_enemies);
-
+	for (auto weapon : m_weapons)
+	{
+		weapon->update(dt, m_position, t_enemies, m_direction);
+	}
+	
 	setHealth();
 	setPosition(m_position.x, m_position.y);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	checkXP();
 }
 
 void Player::render(sf::RenderWindow& t_window)
@@ -48,27 +73,38 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_rectangle);
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
+
+	t_window.draw(m_xpBar);
+
 	t_window.draw(m_playerSprite);
-	m_weapon.render(t_window);
+
+	for (auto weapon : m_weapons)
+	{
+		weapon->render(t_window);
+	}
 }
 
 void Player::handleKeyInput()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
+		m_direction = Direction::West;
 		m_position.x -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
+		m_direction = Direction::East;
 		m_position.x += m_speed;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
+		m_direction = Direction::North;
 		m_position.y -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
+		m_direction = Direction::South;
 		m_position.y += m_speed;
 	}
 }
@@ -100,12 +136,42 @@ void Player::decreaseHealth()
 	m_health -= 1.0f;
 }
 
+void Player::increaseXP()
+{
+	m_xp += 2;
+}
+
+void Player::checkXP()
+{
+	if (m_xp >= m_xpRequired)
+	{
+		m_level++;
+		m_xpRequired *= 2;
+		m_xp = 0;
+		m_levelUp = true;
+	}
+
+	if (m_levelUp)
+	{
+		if (m_level == 2)
+		{
+			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle));
+		}
+		m_levelUp = false;
+	}
+}
+
+int Player::getLevel()
+{
+	return m_level;
+}
+
 sf::RectangleShape Player::getRectangle()
 {
 	return m_rectangle;
 }
 
-Weapon Player::getWeapon()
+std::vector<Weapon*> Player::getWeapon()
 {
-	return m_weapon;
+	return m_weapons;
 }

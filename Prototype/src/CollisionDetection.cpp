@@ -21,9 +21,9 @@ bool CollisionDetection::playerEnemyCollision(Player& t_player, Enemy& t_enemy)
 	return false;
 }
 
-bool CollisionDetection::bulletEnemyCollision(Bullet& t_bullet, Enemy& t_enemy)
+bool CollisionDetection::bulletEnemyCollision(Bullet* t_bullet, Enemy& t_enemy)
 {
-	sf::FloatRect bullet = t_bullet.getCircle().getGlobalBounds();
+	sf::FloatRect bullet = t_bullet->getCircle().getGlobalBounds();
 	sf::FloatRect enemy = t_enemy.getRectangle().getGlobalBounds();
 
 	if (bullet.intersects(enemy))

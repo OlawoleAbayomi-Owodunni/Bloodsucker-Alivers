@@ -120,14 +120,20 @@ void Game::checkCollisions()
 			m_player.decreaseHealth();
 		}
 
-		if (CollisionDetection::bulletEnemyCollision(m_player.getWeapon().getBullet(), m_enemies[i]))
+		for (auto weapon : m_player.getWeapon())
 		{
-			if (rand() % 4 != 0)
+			for (auto bullet : weapon->getBullet())
 			{
-				m_xpOrbs.push_back(new XPOrb(m_enemies[i].getPosition()));
-			}
+				if (CollisionDetection::bulletEnemyCollision(bullet, m_enemies[i]))
+				{
+					if (rand() % 4 != 0)
+					{
+						m_xpOrbs.push_back(new XPOrb(m_enemies[i].getPosition()));
+					}
 
-			m_enemies[i].initialisePosition();
+					m_enemies[i].initialisePosition();
+				}
+			}
 		}
 	}
 

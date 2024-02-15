@@ -4,10 +4,14 @@
 Player::Player()
 {
 	m_health = 100.0f;
-	m_speed = 3.0f;
+	m_speed = 2.0f;
 	m_level = 1;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
+	m_levelUp = false;
+	
+	m_weapons.push_back(new Weapon(WeaponType::Pistol));
+	m_direction = Direction::East;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
@@ -39,8 +43,12 @@ Player::~Player()
 void Player::update(double dt, Enemy t_enemies[])
 {
 	handleKeyInput();
-	m_weapon.update(dt, m_position, t_enemies);
 
+	for (auto weapon : m_weapons)
+	{
+		weapon->update(dt, m_position, t_enemies, m_direction);
+	}
+	
 	setHealth();
 	setPosition(m_position.x, m_position.y);
 
@@ -56,26 +64,33 @@ void Player::render(sf::RenderWindow& t_window)
 
 	t_window.draw(m_xpBar);
 
-	m_weapon.render(t_window);
+	for (auto weapon : m_weapons)
+	{
+		weapon->render(t_window);
+	}
 }
 
 void Player::handleKeyInput()
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
+		m_direction = Direction::West;
 		m_position.x -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
+		m_direction = Direction::East;
 		m_position.x += m_speed;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
+		m_direction = Direction::North;
 		m_position.y -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
+		m_direction = Direction::South;
 		m_position.y += m_speed;
 	}
 }
@@ -119,6 +134,16 @@ void Player::checkXP()
 		m_level++;
 		m_xpRequired *= 2;
 		m_xp = 0;
+		m_levelUp = true;
+	}
+
+	if (m_levelUp)
+	{
+		if (m_level == 2)
+		{
+			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle));
+		}
+		m_levelUp = false;
 	}
 }
 
@@ -127,7 +152,7 @@ sf::RectangleShape Player::getRectangle()
 	return m_rectangle;
 }
 
-Weapon Player::getWeapon()
+std::vector<Weapon*> Player::getWeapon()
 {
-	return m_weapon;
+	return m_weapons;
 }

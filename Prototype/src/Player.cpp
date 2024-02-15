@@ -20,16 +20,16 @@ Player::Player()
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position);
 	// Load a sprite to display
-	sf::Texture playerTexture;
-	if (!playerTexture.loadFromFile("./resources/sprites/StarterAtlas.png"));
+	//sf::Texture playerTexture;
+	if (!m_playerTexture.loadFromFile("./resources/sprites/plyrPh.png"))
 	{
 		cout << "Failed to load file\n";
 	}
 
-	Sprite background;
-
-	m_playerSprite.setTextureRect(IntRect{ 0,0,64,64 });
-	m_playerSprite.setOrigin(32, 32);
+	m_playerSprite.setTexture(m_playerTexture);
+	m_playerSprite.setTextureRect(IntRect{ 0,0,32,32 });
+	m_playerSprite.setOrigin(16, 16);
+	m_playerSprite.setScale(5.0f, 5.0f);
 	m_playerSprite.setPosition(m_position);
 
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
@@ -41,6 +41,11 @@ Player::Player()
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+
+	m_emptyxphBar.setSize(sf::Vector2f(1000.0f, 20.0f));
+	m_emptyxphBar.setOrigin(m_emptyxphBar.getSize().x / 2.0f, m_emptyxphBar.getSize().y / 2.0f);
+	m_emptyxphBar.setFillColor(Color::Black);
+	m_emptyxphBar.setPosition(800.0f, 40.0f);
 
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
@@ -70,18 +75,19 @@ void Player::update(double dt, std::vector<Enemy*> t_enemies)
 
 void Player::render(sf::RenderWindow& t_window)
 {
-	t_window.draw(m_rectangle);
-	t_window.draw(m_emptyHealthBar);
-	t_window.draw(m_currentHealthBar);
-
-	t_window.draw(m_xpBar);
-
-	t_window.draw(m_playerSprite);
-
 	for (auto weapon : m_weapons)
 	{
 		weapon->render(t_window);
 	}
+
+	t_window.draw(m_rectangle);
+	t_window.draw(m_emptyHealthBar);
+	t_window.draw(m_currentHealthBar);
+
+	t_window.draw(m_playerSprite);
+
+	t_window.draw(m_emptyxphBar);
+	t_window.draw(m_xpBar);
 }
 
 void Player::handleKeyInput()
@@ -112,6 +118,7 @@ void Player::handleKeyInput()
 void Player::setPosition(float t_x, float t_y)
 {
 	m_rectangle.setPosition(m_position);
+	m_playerSprite.setPosition(m_position);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
 }

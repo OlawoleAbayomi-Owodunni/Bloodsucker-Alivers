@@ -10,6 +10,17 @@ Enemy::Enemy()
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::Red);
 	m_rectangle.setPosition(m_position);
+
+	if (!m_enemyTexture.loadFromFile("./resources/sprites/enmyPh.png"))
+	{
+		cout << "Failed to load file\n";
+	}
+
+	m_enemySprite.setTexture(m_enemyTexture);
+	m_enemySprite.setTextureRect(IntRect{ 0,0,64,64 });
+	m_enemySprite.setOrigin(32, 32);
+	m_enemySprite.setScale(3.0f, 3.0f);
+	m_enemySprite.setPosition(m_position);
 }
 
 Enemy::~Enemy()
@@ -24,6 +35,7 @@ void Enemy::update(double dt, Player& t_player)
 void Enemy::render(sf::RenderWindow& t_window)
 {
 	t_window.draw(m_rectangle);
+	t_window.draw(m_enemySprite);
 }
 
 void Enemy::initialisePosition()
@@ -64,6 +76,7 @@ void Enemy::move(Player& t_player)
 	}
 
 	m_rectangle.setPosition(m_position);
+	m_enemySprite.setPosition(m_position);
 }
 
 void Enemy::setPosition(float t_x, float t_y)

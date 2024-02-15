@@ -6,18 +6,30 @@ Weapon::Weapon(WeaponType t_type)
 	m_type = t_type;
 	m_firing = false;
 	counter = 0;
-	
+
+	if (!m_weaponTexture.loadFromFile("./resources/sprites/plyrPh.png"))
+	{
+		cout << "Failed to load file\n";
+	}
+
+	m_weaponSprite.setTexture(m_weaponTexture);
+
+	m_weaponSprite.setOrigin(16, 16);
+	m_weaponSprite.setScale(5.0f, 5.0f);
+
 	switch (m_type)
 	{
 	case WeaponType::Pistol:
 		m_fireRate = 3.0f;
 		m_bullets.push_back(new Bullet);
+		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
 		break;
 	case WeaponType::AssaultRifle:
 		m_fireRate = 1.0f;
 		m_bullets.push_back(new Bullet);
 		m_bullets.push_back(new Bullet);
 		m_bullets.push_back(new Bullet);
+		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
 		break;
 	default:
 		break;

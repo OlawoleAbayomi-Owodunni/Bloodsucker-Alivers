@@ -43,6 +43,7 @@ private:
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
 	sf::RectangleShape m_xpBar;
+	sf::RectangleShape m_emptyxphBar;
 
 	std::vector<Weapon*> m_weapons;
 

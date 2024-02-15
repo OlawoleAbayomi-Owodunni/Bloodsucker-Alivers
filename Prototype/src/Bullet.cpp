@@ -10,6 +10,17 @@ Bullet::Bullet()
 	m_circle.setOrigin(m_circle.getRadius(), m_circle.getRadius());
 	m_circle.setFillColor(sf::Color::Blue);
 	m_circle.setPosition(m_position);
+
+	if (!m_bulletTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
+	{
+		cout << "Failed to load file\n";
+	}
+
+	m_bulletSprite.setTexture(m_bulletTexture);
+	m_bulletSprite.setTextureRect(IntRect{ 0,64,64,64 });
+	m_bulletSprite.setOrigin(32, 32);
+	m_bulletSprite.setScale(0.5f, 0.5f);
+	m_bulletSprite.setPosition(m_position);
 }
 
 Bullet::~Bullet()
@@ -94,11 +105,13 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vec
 	}
 
 	m_circle.setPosition(m_position);
+	m_bulletSprite.setPosition(m_position);
 }
 
 void Bullet::render(sf::RenderWindow& t_window)
 {
 	t_window.draw(m_circle);
+	t_window.draw(m_bulletSprite);
 }
 
 sf::CircleShape Bullet::getCircle()

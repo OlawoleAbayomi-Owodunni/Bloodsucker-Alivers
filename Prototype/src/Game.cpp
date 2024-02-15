@@ -35,6 +35,16 @@ void Game::init()
 
 	m_currentLevel = 1;
 
+	//sf::Texture bgTexture;
+	if (!bgTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
+	{
+		cout << "Failed to load file\n";
+	}
+	bgSprite.setTexture(bgTexture);
+	bgSprite.setTextureRect(IntRect{ 0,192,1600,900 });
+	bgSprite.setOrigin(800, 500);
+	bgSprite.setPosition(800, 500);
+
 #ifdef TEST_FPS
 	x_updateFPS.setFont(m_arialFont);
 	x_updateFPS.setPosition(20, 300);
@@ -192,7 +202,7 @@ void Game::update(double dt)
 void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
-
+	m_window.draw(bgSprite);
 	for (auto orb : m_xpOrbs)
 	{
 		orb->render(m_window);

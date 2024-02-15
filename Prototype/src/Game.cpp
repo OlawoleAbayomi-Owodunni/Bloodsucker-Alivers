@@ -18,9 +18,14 @@ void Game::init()
 	// Really only necessary is our target FPS is greater than 60.
 	m_window.setVerticalSyncEnabled(true);
 
-	for (int i = 0; i < NO_OF_ENEMIES; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		m_enemies[i].initialisePosition();
+		m_enemies.push_back(new Enemy);
+	}
+
+	for (auto enemy : m_enemies)
+	{
+		enemy->initialisePosition();
 	}
 
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
@@ -28,7 +33,7 @@ void Game::init()
 		std::cout << "Error loading font file";
 	}
 
-	m_currentOrbs = 0;
+	m_currentLevel = 1;
 
 #ifdef TEST_FPS
 	x_updateFPS.setFont(m_arialFont);
@@ -113,9 +118,10 @@ void Game::processGameEvents(sf::Event& event)
 
 void Game::checkCollisions()
 {
-	for (int i = 0; i < NO_OF_ENEMIES; i++)
+
+	for (auto enemy : m_enemies)
 	{
-		if (CollisionDetection::playerEnemyCollision(m_player, m_enemies[i]))
+		if (CollisionDetection::playerEnemyCollision(m_player, enemy))
 		{
 			m_player.decreaseHealth();
 		}
@@ -124,14 +130,14 @@ void Game::checkCollisions()
 		{
 			for (auto bullet : weapon->getBullet())
 			{
-				if (CollisionDetection::bulletEnemyCollision(bullet, m_enemies[i]))
+				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 				{
 					if (rand() % 4 != 0)
 					{
-						m_xpOrbs.push_back(new XPOrb(m_enemies[i].getPosition()));
+						m_xpOrbs.push_back(new XPOrb(enemy->getPosition()));
 					}
 
-					m_enemies[i].initialisePosition();
+					enemy->initialisePosition();
 				}
 			}
 		}
@@ -153,14 +159,31 @@ void Game::checkCollisions()
 	}
 }
 
+void Game::addEnemies()
+{
+	if (m_player.getLevel() > m_currentLevel)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_enemies.push_back(new Enemy);
+		}
+		m_currentLevel++;
+	}
+}
+
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
 	m_player.update(dt, m_enemies);
-	for (int i = 0; i < NO_OF_ENEMIES; i++)
+
+	for (auto enemy : m_enemies)
 	{
-		m_enemies[i].update(dt, m_player);
+		enemy->update(dt, m_player);
 	}
+
+	std::cout << m_enemies.size() << std::endl;
+
+	addEnemies();
 
 	checkCollisions();
 }
@@ -175,9 +198,9 @@ void Game::render()
 		orb->render(m_window);
 	}
 
-	for (int i = 0; i < NO_OF_ENEMIES; i++)
+	for (auto enemy : m_enemies)
 	{
-		m_enemies[i].render(m_window);
+		enemy->render(m_window);
 	}
 	
 	m_player.render(m_window);

@@ -40,7 +40,7 @@ Player::~Player()
 {
 }
 
-void Player::update(double dt, Enemy t_enemies[])
+void Player::update(double dt, std::vector<Enemy*> t_enemies)
 {
 	handleKeyInput();
 
@@ -145,6 +145,11 @@ void Player::checkXP()
 		}
 		m_levelUp = false;
 	}
+}
+
+int Player::getLevel()
+{
+	return m_level;
 }
 
 sf::RectangleShape Player::getRectangle()

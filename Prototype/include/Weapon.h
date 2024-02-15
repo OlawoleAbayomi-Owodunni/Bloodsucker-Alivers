@@ -8,7 +8,7 @@ public:
 	Weapon(WeaponType t_type);
 	~Weapon();
 
-	void update(double dt, sf::Vector2f t_playerPos, Enemy t_enemies[], Direction t_direction);
+	void update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction);
 	void render(sf::RenderWindow& t_window);
 
 	std::vector<Bullet*> getBullet();

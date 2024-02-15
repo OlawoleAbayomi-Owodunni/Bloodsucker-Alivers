@@ -76,20 +76,18 @@ protected:
 	void processGameEvents(sf::Event&);
 
 	void checkCollisions();
+	void addEnemies();
 
 	// Font used for all text
 	sf::Font m_arialFont;
 	// main window
 	sf::RenderWindow m_window;
 
-	static const int NO_OF_ENEMIES = 6;
-	static const int MAX_ORBS = 20;
-
 	Player m_player;
-	Enemy m_enemies[NO_OF_ENEMIES];
-
+	std::vector<Enemy*> m_enemies;
 	std::vector<XPOrb*> m_xpOrbs;
-	int m_currentOrbs;
+
+	int m_currentLevel;
 
 #ifdef TEST_FPS
 	sf::Text x_updateFPS;					// text used to display updates per second.

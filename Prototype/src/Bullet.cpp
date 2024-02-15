@@ -16,7 +16,7 @@ Bullet::~Bullet()
 {
 }
 
-void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_enemies[], WeaponType t_type, Direction t_direction)
+void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, WeaponType t_type, Direction t_direction)
 {
 	switch (t_type)
 	{
@@ -30,25 +30,25 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, Enemy t_
 			sf::Vector2f displacement;
 			sf::Vector2f shortestDisplacement;
 
-			for (int i = 0; i < 6; i++)
+			for (auto enemy : t_enemies)
 			{
-				displacement.x = t_enemies[i].getPosition().x - t_playerPos.x;
-				displacement.y = t_enemies[i].getPosition().y - t_playerPos.y;
+				displacement.x = enemy->getPosition().x - t_playerPos.x;
+				displacement.y = enemy->getPosition().y - t_playerPos.y;
 
 				distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
 
-				if (i == 0)
+				if (enemy == t_enemies.at(0))
 				{
 					shortestDistance = distance;
-					shortestDisplacement.x = t_enemies[i].getPosition().x - t_playerPos.x;
-					shortestDisplacement.y = t_enemies[i].getPosition().y - t_playerPos.y;
+					shortestDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+					shortestDisplacement.y = enemy->getPosition().y - t_playerPos.y;
 				}
 
 				if (distance < shortestDistance)
 				{
 					shortestDistance = distance;
-					shortestDisplacement.x = t_enemies[i].getPosition().x - t_playerPos.x;
-					shortestDisplacement.y = t_enemies[i].getPosition().y - t_playerPos.y;
+					shortestDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+					shortestDisplacement.y = enemy->getPosition().y - t_playerPos.y;
 				}
 			}
 

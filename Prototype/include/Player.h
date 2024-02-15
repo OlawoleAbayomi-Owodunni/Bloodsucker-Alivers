@@ -10,7 +10,7 @@ public:
 	Player();
 	~Player();
 
-	void update(double dt, Enemy t_enemies[]);
+	void update(double dt, std::vector<Enemy*> t_enemies);
 	void render(sf::RenderWindow& t_window);
 	void handleKeyInput();
 	
@@ -22,6 +22,7 @@ public:
 
 	void increaseXP();
 	void checkXP();
+	int getLevel();
 
 	sf::RectangleShape getRectangle();
 	std::vector<Weapon*> getWeapon();

@@ -28,7 +28,7 @@ Weapon::~Weapon()
 {
 }
 
-void Weapon::update(double dt, sf::Vector2f t_playerPos, Enemy t_enemies[], Direction t_direction)
+void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction)
 {	
 	if (!m_firing)
 	{

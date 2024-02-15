@@ -11,6 +11,12 @@ Player::Player()
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position);
+	Texture pTexture;
+	pTexture.loadFromFile("resources/sprites/StarterAtlas.png");
+	m_playerSprite.setTexture(pTexture);
+	IntRect spriteSnP{ 0,320,64,64 };
+	m_playerSprite.setTextureRect(spriteSnP);
+	m_playerSprite.setPosition(m_position);
 
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
@@ -42,7 +48,7 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_rectangle);
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
-
+	t_window.draw(m_playerSprite);
 	m_weapon.render(t_window);
 }
 

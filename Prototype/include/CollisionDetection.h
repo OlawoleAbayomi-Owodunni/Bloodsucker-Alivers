@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "XPOrb.h"
+#include "Pickup.h"
 
 class CollisionDetection
 {
@@ -14,6 +15,7 @@ public:
 	bool static playerEnemyCollision(Player& t_player, Enemy* t_enemy);
 	bool static bulletEnemyCollision(Bullet* t_bullet, Enemy* t_enemy);
 	bool static playerOrbCollision(Player& t_player, XPOrb* t_orb);
+	bool static playerPickupCollision(Player& t_player, Pickup* t_pickup);
 
 private:
 

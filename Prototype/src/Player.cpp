@@ -7,7 +7,8 @@ Player::Player()
 	m_holder.acquire("enemySprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/enmyPh.png"));
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 
-	m_health = 100.0f;
+	m_maxHealth = 100.0f;
+	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
 	m_xp = 0;
@@ -138,6 +139,10 @@ void Player::setHealth()
 	{
 		m_health = 0;
 	}
+	else if (m_health > m_maxHealth)
+	{
+		m_health = m_maxHealth;
+	}
 
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 }
@@ -145,6 +150,14 @@ void Player::setHealth()
 void Player::decreaseHealth()
 {
 	m_health -= 1.0f;
+}
+
+void Player::increaseHealth()
+{
+	if (m_health < m_maxHealth)
+	{
+		m_health += 25.0f;
+	}
 }
 
 void Player::increaseXP()

@@ -23,6 +23,7 @@
     <ClInclude Include="include\CollisionDetection.h" />
     <ClInclude Include="include\Enemy.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\Pickup.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\ScreenSize.h" />
     <ClInclude Include="include\Weapon.h" />
@@ -34,6 +35,7 @@
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Pickup.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\XPOrb.cpp" />

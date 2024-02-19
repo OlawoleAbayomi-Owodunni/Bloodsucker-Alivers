@@ -143,9 +143,14 @@ void Game::checkCollisions()
 			{
 				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 				{
-					if (rand() % 4 != 0)
+					if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
 					{
 						m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+					}
+
+					if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+					{
+						m_pickups.push_back(new Pickup(enemy->getPosition(), PickupType::Health));
 					}
 
 					enemy->initialisePosition();
@@ -164,6 +169,21 @@ void Game::checkCollisions()
 			it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
 		}
 		else 
+		{
+			++it;
+		}
+	}
+
+	for (auto it = m_pickups.begin(); it != m_pickups.end();)
+	{
+		if (CollisionDetection::playerPickupCollision(m_player, *it))
+		{
+			m_player.increaseHealth();
+
+			delete* it; // Delete the pickup object
+			it = m_pickups.erase(it); // Remove the pickup pointer from the vector
+		}
+		else
 		{
 			++it;
 		}
@@ -204,6 +224,12 @@ void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
 	m_window.draw(bgSprite);
+
+	for (auto pickup : m_pickups)
+	{
+		pickup->render(m_window);
+	}
+
 	for (auto orb : m_xpOrbs)
 	{
 		orb->render(m_window);

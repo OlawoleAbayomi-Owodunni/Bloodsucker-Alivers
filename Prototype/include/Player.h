@@ -20,6 +20,7 @@ public:
 
 	void setHealth();
 	void decreaseHealth();
+	void increaseHealth();
 
 	void increaseXP();
 	void checkXP();
@@ -29,6 +30,7 @@ public:
 	std::vector<Weapon*> getWeapon();
 
 private:
+	float m_maxHealth;
 	float m_health;
 	float m_speed;
 	sf::Vector2f m_position;

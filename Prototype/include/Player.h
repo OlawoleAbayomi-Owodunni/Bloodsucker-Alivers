@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 #include "Weapon.h"
 
@@ -47,6 +48,8 @@ private:
 
 	std::vector<Weapon*> m_weapons;
 
-	Texture m_playerTexture;
+	thor::ResourceHolder<sf::Texture, std::string> m_holder;
+	
+	Texture m_texture;
 	Sprite m_playerSprite;
 };

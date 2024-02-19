@@ -22,6 +22,8 @@ private:
 
 	int counter;
 
+	thor::ResourceHolder<sf::Texture, std::string> m_holder;
+
 	Texture m_weaponTexture;
 	Sprite m_weaponSprite;
 };

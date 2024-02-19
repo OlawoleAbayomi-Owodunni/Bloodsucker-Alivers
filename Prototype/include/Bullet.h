@@ -19,7 +19,7 @@ enum class Direction
 class Bullet
 {
 public:
-	Bullet();
+	Bullet(sf::Texture& t_texture);
 	~Bullet();
 
 	void update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, WeaponType t_type, Direction t_direction);
@@ -32,6 +32,5 @@ private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
 
-	Texture m_bulletTexture;
 	Sprite m_bulletSprite;
 };

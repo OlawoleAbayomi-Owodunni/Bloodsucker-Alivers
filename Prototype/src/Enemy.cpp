@@ -2,7 +2,7 @@
 #include "Player.h"
 #include <iostream>
 
-Enemy::Enemy()
+Enemy::Enemy(sf::Texture& t_texture)
 {
 	m_speed = 1 + ((rand() % 10) / 10 + 0.1);
 
@@ -11,12 +11,7 @@ Enemy::Enemy()
 	m_rectangle.setFillColor(sf::Color::Red);
 	m_rectangle.setPosition(m_position);
 
-	if (!m_enemyTexture.loadFromFile("./resources/sprites/enmyPh.png"))
-	{
-		cout << "Failed to load file\n";
-	}
-
-	m_enemySprite.setTexture(m_enemyTexture);
+	m_enemySprite.setTexture(t_texture);
 	m_enemySprite.setTextureRect(IntRect{ 0,0,64,64 });
 	m_enemySprite.setOrigin(32, 32);
 	m_enemySprite.setScale(3.0f, 3.0f);

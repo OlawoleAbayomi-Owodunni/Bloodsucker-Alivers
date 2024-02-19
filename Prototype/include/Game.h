@@ -7,6 +7,7 @@
 #endif // _DEBUG
 
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
 #include <string>
 #include "ScreenSize.h"
 #include "Player.h"
@@ -89,7 +90,8 @@ protected:
 
 	int m_currentLevel;
 
-	sf::Texture bgTexture;
+	thor::ResourceHolder<sf::Texture, std::string> m_holder;
+
 	Sprite bgSprite;
 
 #ifdef TEST_FPS

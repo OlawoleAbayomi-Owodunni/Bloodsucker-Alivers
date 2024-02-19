@@ -1,7 +1,7 @@
 #include "Bullet.h"
 #include <iostream>
 
-Bullet::Bullet()
+Bullet::Bullet(sf::Texture& t_texture)
 {
 	m_velocity = sf::Vector2f(0.0f, 0.0f);
 	m_position = sf::Vector2f(0.0f, 0.0f);
@@ -11,12 +11,7 @@ Bullet::Bullet()
 	m_circle.setFillColor(sf::Color::Blue);
 	m_circle.setPosition(m_position);
 
-	if (!m_bulletTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
-	{
-		cout << "Failed to load file\n";
-	}
-
-	m_bulletSprite.setTexture(m_bulletTexture);
+	m_bulletSprite.setTexture(t_texture);
 	m_bulletSprite.setTextureRect(IntRect{ 0,64,64,64 });
 	m_bulletSprite.setOrigin(32, 32);
 	m_bulletSprite.setScale(0.5f, 0.5f);

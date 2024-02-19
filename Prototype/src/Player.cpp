@@ -3,6 +3,10 @@
 
 Player::Player()
 {
+	m_holder.acquire("playerSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/plyrPh.png"));
+	m_holder.acquire("enemySprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/enmyPh.png"));
+	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
+
 	m_health = 100.0f;
 	m_speed = 2.0f;
 	m_level = 1;
@@ -19,14 +23,14 @@ Player::Player()
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position);
+	
 	// Load a sprite to display
-	//sf::Texture playerTexture;
-	if (!m_playerTexture.loadFromFile("./resources/sprites/plyrPh.png"))
+	if (!m_texture.loadFromFile("./resources/sprites/plyrPh.png"))
 	{
 		cout << "Failed to load file\n";
 	}
 
-	m_playerSprite.setTexture(m_playerTexture);
+	m_playerSprite.setTexture(m_texture);
 	m_playerSprite.setTextureRect(IntRect{ 0,0,32,32 });
 	m_playerSprite.setOrigin(16, 16);
 	m_playerSprite.setScale(5.0f, 5.0f);

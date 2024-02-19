@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 
 using namespace std;
@@ -11,7 +12,7 @@ class Player;
 class Enemy
 {
 public:
-	Enemy();
+	Enemy(sf::Texture& t_texture);
 	~Enemy();
 
 	void update(double dt, Player& t_player);
@@ -30,6 +31,7 @@ private:
 
 	sf::RectangleShape m_rectangle;
 
-	Texture m_enemyTexture;
+	thor::ResourceHolder<sf::Texture, std::string> m_holder;
+	
 	Sprite m_enemySprite;
 };

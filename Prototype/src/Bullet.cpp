@@ -1,7 +1,7 @@
 #include "Bullet.h"
 #include <iostream>
 
-Bullet::Bullet(sf::Texture& t_texture)
+Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 {
 	m_velocity = sf::Vector2f(0.0f, 0.0f);
 	m_position = sf::Vector2f(0.0f, 0.0f);
@@ -16,6 +16,18 @@ Bullet::Bullet(sf::Texture& t_texture)
 	m_bulletSprite.setOrigin(32, 32);
 	m_bulletSprite.setScale(0.5f, 0.5f);
 	m_bulletSprite.setPosition(m_position);
+
+	switch (t_weaponType)
+	{
+	case WeaponType::Pistol:
+		m_damage = 10.0f;
+		break;
+	case WeaponType::AssaultRifle:
+		m_damage = 20.0f;
+		break;
+	default:
+		break;
+	}
 }
 
 Bullet::~Bullet()
@@ -112,4 +124,9 @@ void Bullet::render(sf::RenderWindow& t_window)
 sf::CircleShape Bullet::getCircle()
 {
 	return m_circle;
+}
+
+float Bullet::getDamage()
+{
+	return m_damage;
 }

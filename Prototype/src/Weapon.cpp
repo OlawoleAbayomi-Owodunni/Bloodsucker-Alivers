@@ -25,14 +25,14 @@ Weapon::Weapon(WeaponType t_type)
 	{
 	case WeaponType::Pistol:
 		m_fireRate = 3.0f;
-		m_bullets.push_back(new Bullet(m_holder["starterAtlas"]));
+		m_bullets.push_back(new Bullet(WeaponType::Pistol, m_holder["starterAtlas"]));
 		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
 		break;
 	case WeaponType::AssaultRifle:
 		m_fireRate = 1.0f;
-		m_bullets.push_back(new Bullet(m_holder["starterAtlas"]));
-		m_bullets.push_back(new Bullet(m_holder["starterAtlas"]));
-		m_bullets.push_back(new Bullet(m_holder["starterAtlas"]));
+		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
+		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
+		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
 		break;
 	default:

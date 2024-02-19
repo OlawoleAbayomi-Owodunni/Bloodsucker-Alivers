@@ -143,17 +143,22 @@ void Game::checkCollisions()
 			{
 				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 				{
-					if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
-					{
-						m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
-					}
+					enemy->decreaseHealth(bullet->getDamage());
 
-					if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+					if (enemy->getHealth() < 0)
 					{
-						m_pickups.push_back(new Pickup(enemy->getPosition(), PickupType::Health));
-					}
+						if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+						{
+							m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+						}
 
-					enemy->initialisePosition();
+						if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+						{
+							m_pickups.push_back(new Pickup(enemy->getPosition(), PickupType::Health));
+						}
+
+						enemy->initialisePosition();
+					}
 				}
 			}
 		}

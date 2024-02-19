@@ -4,12 +4,25 @@
 
 Enemy::Enemy(sf::Texture& t_texture)
 {
+	m_health = 100.0f;
 	m_speed = 1 + ((rand() % 10) / 10 + 0.1);
 
 	m_rectangle.setSize(sf::Vector2f(40.0f, 40.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::Red);
 	m_rectangle.setPosition(m_position);
+
+	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
+	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
+	m_emptyHealthBar.setFillColor(sf::Color::Red);
+	m_emptyHealthBar.setOutlineColor(sf::Color::Black);
+	m_emptyHealthBar.setOutlineThickness(2.0f);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+
+	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
+	m_currentHealthBar.setFillColor(sf::Color::Green);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
 
 	m_enemySprite.setTexture(t_texture);
 	m_enemySprite.setTextureRect(IntRect{ 0,0,64,64 });
@@ -24,6 +37,8 @@ Enemy::~Enemy()
 
 void Enemy::update(double dt, Player& t_player)
 {
+	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+
 	move(t_player);
 }
 
@@ -31,10 +46,14 @@ void Enemy::render(sf::RenderWindow& t_window)
 {
 	t_window.draw(m_rectangle);
 	t_window.draw(m_enemySprite);
+	t_window.draw(m_emptyHealthBar);
+	t_window.draw(m_currentHealthBar);
 }
 
 void Enemy::initialisePosition()
 {
+	m_health = 100.0f;
+
 	float xPos = rand() % 2400 + 100;
 	float yPos = rand() % 1350 + 100;
 	
@@ -72,6 +91,8 @@ void Enemy::move(Player& t_player)
 
 	m_rectangle.setPosition(m_position);
 	m_enemySprite.setPosition(m_position);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
 }
 
 void Enemy::setPosition(float t_x, float t_y)
@@ -87,4 +108,14 @@ sf::Vector2f Enemy::getPosition()
 sf::RectangleShape Enemy::getRectangle()
 {
 	return m_rectangle;
+}
+
+void Enemy::decreaseHealth(float t_damage)
+{
+	m_health -= t_damage;
+}
+
+float Enemy::getHealth()
+{
+	return m_health;
 }

@@ -40,6 +40,8 @@ Player::Player()
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
 	m_emptyHealthBar.setFillColor(sf::Color::Red);
+	m_emptyHealthBar.setOutlineColor(sf::Color::Black);
+	m_emptyHealthBar.setOutlineThickness(2.0f);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
 
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));

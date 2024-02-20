@@ -73,10 +73,12 @@ void Enemy::move(Player& t_player)
 {
 	if (m_position.x < t_player.getPosition().x)
 	{
+		m_enemySprite.setScale(0.5f, 0.5f);
 		m_position.x += m_speed;
 	}
 	else
 	{
+		m_enemySprite.setScale(-0.5f, 0.5f);
 		m_position.x -= m_speed;
 	}
 

@@ -92,6 +92,8 @@ protected:
 
 	int m_currentLevel;
 
+	bool m_inMenu;
+
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 
 	Sprite bgSprite;

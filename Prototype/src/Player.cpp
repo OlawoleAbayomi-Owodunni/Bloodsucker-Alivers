@@ -12,7 +12,10 @@ Player::Player()
 	m_level = 1;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
-	m_levelUp = false;
+
+	m_speedModifier = 1;
+	m_xpModifier = 1;
+	m_armorModifier = 1;
 	
 	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
@@ -105,23 +108,25 @@ void Player::handleKeyInput()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		m_direction = Direction::West;
-		m_position.x -= m_speed;
+		m_playerSprite.setScale(-0.5f, 0.5f);
+		m_position.x -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		m_direction = Direction::East;
-		m_position.x += m_speed;
+		m_playerSprite.setScale(0.5f, 0.5f);
+		m_position.x += m_speed * m_speedModifier;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		m_direction = Direction::North;
-		m_position.y -= m_speed;
+		m_position.y -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		m_direction = Direction::South;
-		m_position.y += m_speed;
+		m_position.y += m_speed * m_speedModifier;
 	}
 }
 
@@ -149,12 +154,12 @@ void Player::setHealth()
 		m_health = m_maxHealth;
 	}
 
-	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+	m_currentHealthBar.setSize(sf::Vector2f((m_health / m_maxHealth) * 50.0f, 6.0f));
 }
 
 void Player::decreaseHealth()
 {
-	m_health -= 1.0f;
+	m_health -= 1.0f * m_armorModifier;
 }
 
 void Player::increaseHealth()
@@ -167,7 +172,7 @@ void Player::increaseHealth()
 
 void Player::increaseXP()
 {
-	m_xp += 2;
+	m_xp += 2 * m_xpModifier;
 }
 
 void Player::checkXP()
@@ -177,16 +182,6 @@ void Player::checkXP()
 		m_level++;
 		m_xpRequired *= 2;
 		m_xp = 0;
-		m_levelUp = true;
-	}
-
-	if (m_levelUp)
-	{
-		if (m_level == 2)
-		{
-			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle));
-		}
-		m_levelUp = false;
 	}
 }
 
@@ -203,4 +198,126 @@ sf::RectangleShape Player::getRectangle()
 std::vector<Weapon*> Player::getWeapon()
 {
 	return m_weapons;
+}
+
+void Player::levelUp(bool& t_menu)
+{
+	int playerChoice;
+	std::string text1;
+	std::string text2;
+	std::string text3;
+
+	PlayerUpgrades choice1 = static_cast<PlayerUpgrades>(rand() % 4);
+	PlayerUpgrades choice2 = static_cast<PlayerUpgrades>(rand() % 4);
+	PlayerUpgrades choice3 = static_cast<PlayerUpgrades>(rand() % 4);
+
+	while (choice2 == choice1)
+	{
+		choice2 = static_cast<PlayerUpgrades>(rand() % 4);
+	}
+	while (choice3 == choice1 || choice3 == choice2)
+	{
+		choice3 = static_cast<PlayerUpgrades>(rand() % 4);
+	}
+
+	std::cout << "Choose an upgrade:\n";
+	
+	switch (choice1)
+	{
+	case PlayerUpgrades::Health:
+		text1 = "1. Health";
+		break;
+	case PlayerUpgrades::Speed:
+		text1 = "1. Speed";
+		break;
+	case PlayerUpgrades::XP:
+		text1 = "1. XP";
+		break;
+	case PlayerUpgrades::Armor:
+		text1 = "1. Armor";
+		break;
+	default:
+		break;
+	}
+
+	switch (choice2)
+	{
+	case PlayerUpgrades::Health:
+		text2 = "2. Health";
+		break;
+	case PlayerUpgrades::Speed:
+		text2 = "2. Speed";
+		break;
+	case PlayerUpgrades::XP:
+		text2 = "2. XP";
+		break;
+	case PlayerUpgrades::Armor:
+		text2 = "2. Armor";
+		break;
+	default:
+		break;
+	}
+
+	switch (choice3)
+	{
+	case PlayerUpgrades::Health:
+		text3 = "3. Health";
+		break;
+	case PlayerUpgrades::Speed:
+		text3 = "3. Speed";
+		break;
+	case PlayerUpgrades::XP:
+		text3 = "3. XP";
+		break;
+	case PlayerUpgrades::Armor:
+		text3 = "3. Armor";
+		break;
+	default:
+		break;
+	}
+
+	std::cout << text1 << "\n";
+	std::cout << text2 << "\n";
+	std::cout << text3 << "\n";
+
+	std::cin >> playerChoice;
+
+	switch (playerChoice)
+	{
+	case 1:
+		upgradePlayer(choice1);
+		break;
+	case 2:
+		upgradePlayer(choice2);
+		break;
+	case 3:
+		upgradePlayer(choice3);
+		break;
+	default:
+		break;
+	}
+
+	t_menu = false;
+}
+
+void Player::upgradePlayer(PlayerUpgrades t_type)
+{
+	switch (t_type)
+	{
+	case PlayerUpgrades::Health:
+		m_maxHealth += 50;
+		//m_health += 50;
+		break;
+	case PlayerUpgrades::Speed:
+		m_speedModifier += 0.5f;
+		break;
+	case PlayerUpgrades::XP:
+		m_xpModifier += 0.5f;
+		break;
+	case PlayerUpgrades::Armor:
+		m_armorModifier -= 0.1;
+		break;
+	default:
+		break;
+	}
 }

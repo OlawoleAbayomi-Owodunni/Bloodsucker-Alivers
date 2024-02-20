@@ -21,7 +21,7 @@ void Game::init()
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 	}
@@ -37,6 +37,7 @@ void Game::init()
 	}
 
 	m_currentLevel = 1;
+	m_inMenu = false;
 
 	sf::Texture& bgTexture = m_holder["mapSprite"];
 
@@ -201,6 +202,7 @@ void Game::addEnemies()
 		for (int i = 0; i < 3; i++)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+			m_inMenu = true;
 		}
 		m_currentLevel++;
 	}
@@ -209,18 +211,26 @@ void Game::addEnemies()
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
-	m_player.update(dt, m_enemies);
-
-	for (auto enemy : m_enemies)
+	if (!m_inMenu)
 	{
-		enemy->update(dt, m_player);
+		m_player.update(dt, m_enemies);
+
+		for (auto enemy : m_enemies)
+		{
+			enemy->update(dt, m_player);
+		}
+
+		//std::cout << m_enemies.size() << std::endl;
+
+		addEnemies();
+
+		checkCollisions();
 	}
-
-	std::cout << m_enemies.size() << std::endl;
-
-	addEnemies();
-
-	checkCollisions();
+	
+	if (m_inMenu)
+	{
+		m_player.levelUp(m_inMenu);
+	}
 }
 
 ////////////////////////////////////////////////////////////

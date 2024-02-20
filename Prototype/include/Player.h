@@ -52,6 +52,6 @@ private:
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 	
-	Texture m_texture;
 	Sprite m_playerSprite;
+	Sprite m_levelBarSprite;
 };

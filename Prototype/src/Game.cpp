@@ -18,13 +18,12 @@ void Game::init()
 	// Really only necessary is our target FPS is greater than 60.
 	m_window.setVerticalSyncEnabled(true);
 
-	m_holder.acquire("playerSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/plyrPh.png"));
-	m_holder.acquire("enemySprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/enmyPh.png"));
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
+	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 
 	for (int i = 0; i < 6; i++)
 	{
-		m_enemies.push_back(new Enemy(m_holder["enemySprite"]));
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 	}
 
 	for (auto enemy : m_enemies)
@@ -39,10 +38,10 @@ void Game::init()
 
 	m_currentLevel = 1;
 
-	sf::Texture& bgTexture = m_holder["starterAtlas"];
+	sf::Texture& bgTexture = m_holder["mapSprite"];
 
 	bgSprite.setTexture(bgTexture);
-	bgSprite.setTextureRect(IntRect{ 0,192,1600,900 });
+	bgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 
@@ -154,7 +153,7 @@ void Game::checkCollisions()
 
 						if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
 						{
-							m_pickups.push_back(new Pickup(enemy->getPosition(), PickupType::Health));
+							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
 						}
 
 						enemy->initialisePosition();
@@ -201,7 +200,7 @@ void Game::addEnemies()
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			m_enemies.push_back(new Enemy(m_holder["enemySprite"]));
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 		}
 		m_currentLevel++;
 	}

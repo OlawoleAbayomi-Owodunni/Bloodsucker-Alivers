@@ -3,9 +3,8 @@
 
 Player::Player()
 {
-	m_holder.acquire("playerSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/plyrPh.png"));
-	m_holder.acquire("enemySprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/enmyPh.png"));
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
+	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 
 	m_maxHealth = 100.0f;
 	m_health = m_maxHealth;
@@ -20,22 +19,25 @@ Player::Player()
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
-	m_rectangle.setSize(sf::Vector2f(40.0f, 40.0f));
+	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position);
-	
-	// Load a sprite to display
-	if (!m_texture.loadFromFile("./resources/sprites/plyrPh.png"))
-	{
-		cout << "Failed to load file\n";
-	}
 
-	m_playerSprite.setTexture(m_texture);
-	m_playerSprite.setTextureRect(IntRect{ 0,0,32,32 });
-	m_playerSprite.setOrigin(16, 16);
-	m_playerSprite.setScale(5.0f, 5.0f);
+	sf::Texture& playerTexture = m_holder["starterAtlas"];
+	sf::Texture& levelBarTexture = m_holder["starterAtlas"];
+
+	m_playerSprite.setTexture(playerTexture);
+	m_playerSprite.setTextureRect(IntRect{ 0,416,160,200 });
+	m_playerSprite.setOrigin(80, 100);
+	m_playerSprite.setScale(0.5f, 0.5f);
 	m_playerSprite.setPosition(m_position);
+
+	m_levelBarSprite.setTexture(levelBarTexture);
+	m_levelBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
+	m_levelBarSprite.setOrigin(250, 16);
+	m_levelBarSprite.setScale(2.25f, 2.0f);
+	m_levelBarSprite.setPosition(800.0f, 40.0f);
 
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
@@ -47,7 +49,7 @@ Player::Player()
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 
 	m_emptyxphBar.setSize(sf::Vector2f(1000.0f, 20.0f));
 	m_emptyxphBar.setOrigin(m_emptyxphBar.getSize().x / 2.0f, m_emptyxphBar.getSize().y / 2.0f);
@@ -87,7 +89,7 @@ void Player::render(sf::RenderWindow& t_window)
 		weapon->render(t_window);
 	}
 
-	t_window.draw(m_rectangle);
+	//t_window.draw(m_rectangle);
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
 
@@ -95,6 +97,7 @@ void Player::render(sf::RenderWindow& t_window)
 
 	t_window.draw(m_emptyxphBar);
 	t_window.draw(m_xpBar);
+	t_window.draw(m_levelBarSprite);
 }
 
 void Player::handleKeyInput()
@@ -126,8 +129,8 @@ void Player::setPosition(float t_x, float t_y)
 {
 	m_rectangle.setPosition(m_position);
 	m_playerSprite.setPosition(m_position);
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 }
 
 sf::Vector2f Player::getPosition()

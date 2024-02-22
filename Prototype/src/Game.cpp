@@ -37,7 +37,6 @@ void Game::init()
 	}
 
 	m_currentLevel = 1;
-	m_inMenu = false;
 
 	sf::Texture& bgTexture = m_holder["mapSprite"];
 
@@ -45,6 +44,8 @@ void Game::init()
 	bgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
+
+	m_currentGamemode = Gamemode::Menu;
 
 #ifdef TEST_FPS
 	x_updateFPS.setFont(m_arialFont);
@@ -119,7 +120,20 @@ void Game::processGameEvents(sf::Event& event)
 		switch (event.key.code)
 		{
 		case sf::Keyboard::Escape:
-			m_window.close();
+			if (m_currentGamemode == Gamemode::Gameplay)
+			{
+				m_currentGamemode = Gamemode::Pause;
+			}
+			else
+			{
+				m_window.close();
+			}
+			break;
+		case sf::Keyboard::Enter:
+			if (m_currentGamemode == Gamemode::Menu || m_currentGamemode == Gamemode::Pause)
+			{
+				m_currentGamemode = Gamemode::Gameplay;
+			}
 			break;
 		default:
 			break;
@@ -202,7 +216,7 @@ void Game::addEnemies()
 		for (int i = 0; i < 3; i++)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
-			m_inMenu = true;
+			m_currentGamemode = Gamemode::Upgrade;
 		}
 		m_currentLevel++;
 	}
@@ -211,7 +225,7 @@ void Game::addEnemies()
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
-	if (!m_inMenu)
+	if (m_currentGamemode == Gamemode::Gameplay)
 	{
 		m_player.update(dt, m_enemies);
 
@@ -227,9 +241,9 @@ void Game::update(double dt)
 		checkCollisions();
 	}
 	
-	if (m_inMenu)
+	if (m_currentGamemode == Gamemode::Upgrade)
 	{
-		m_player.levelUp(m_inMenu);
+		m_player.levelUp(m_currentGamemode);
 	}
 }
 

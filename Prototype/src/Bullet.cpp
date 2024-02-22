@@ -20,10 +20,10 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 	switch (t_weaponType)
 	{
 	case WeaponType::Pistol:
-		m_damage = 12.0f;
+		m_damage = 32.0f;	// default 12
 		break;
 	case WeaponType::AssaultRifle:
-		m_damage = 24.0f;
+		m_damage = 24.0f;	// default 24
 		break;
 	default:
 		break;

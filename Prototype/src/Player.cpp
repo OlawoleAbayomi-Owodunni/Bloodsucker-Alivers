@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Game.h"
 #include <iostream>
 
 Player::Player()
@@ -200,24 +201,24 @@ std::vector<Weapon*> Player::getWeapon()
 	return m_weapons;
 }
 
-void Player::levelUp(bool& t_menu)
+void Player::levelUp(Gamemode& t_gamemode)
 {
 	int playerChoice;
 	std::string text1;
 	std::string text2;
 	std::string text3;
 
-	PlayerUpgrades choice1 = static_cast<PlayerUpgrades>(rand() % 4);
-	PlayerUpgrades choice2 = static_cast<PlayerUpgrades>(rand() % 4);
-	PlayerUpgrades choice3 = static_cast<PlayerUpgrades>(rand() % 4);
+	PlayerUpgrades choice1 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count)); // static_cast<int>(PlayerUpgrades::Count) will give the amount of items in the class
+	PlayerUpgrades choice2 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
+	PlayerUpgrades choice3 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
 
 	while (choice2 == choice1)
 	{
-		choice2 = static_cast<PlayerUpgrades>(rand() % 4);
+		choice2 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
 	}
 	while (choice3 == choice1 || choice3 == choice2)
 	{
-		choice3 = static_cast<PlayerUpgrades>(rand() % 4);
+		choice3 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
 	}
 
 	std::cout << "Choose an upgrade:\n";
@@ -297,7 +298,10 @@ void Player::levelUp(bool& t_menu)
 		break;
 	}
 
-	t_menu = false;
+	if (playerChoice != -1)
+	{
+		t_gamemode = Gamemode::Gameplay;
+	}
 }
 
 void Player::upgradePlayer(PlayerUpgrades t_type)

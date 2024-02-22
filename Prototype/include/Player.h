@@ -5,12 +5,16 @@
 #include "ScreenSize.h"
 #include "Weapon.h"
 
+enum class Gamemode;
+
 enum class PlayerUpgrades
 {
 	Health,
 	Speed,
 	XP,
-	Armor
+	Armor,
+
+	Count
 };
 
 class Player
@@ -33,7 +37,7 @@ public:
 	void increaseXP();
 	void checkXP();
 	int getLevel();
-	void levelUp(bool& t_menu);
+	void levelUp(Gamemode& t_gamemode);
 	void upgradePlayer(PlayerUpgrades t_type);
 
 	sf::RectangleShape getRectangle();

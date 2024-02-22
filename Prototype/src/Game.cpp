@@ -35,7 +35,6 @@ void Game::init()
 
 	m_currentLevel = 1;
 
-	//sf::Texture bgTexture;
 	if (!bgTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
 	{
 		cout << "Failed to load file\n";

@@ -45,7 +45,7 @@ void Game::init()
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 
-	m_currentGamemode = Gamemode::Menu;
+	m_currentGamemode = Gamemode::Gameplay;
 
 #ifdef TEST_FPS
 	x_updateFPS.setFont(m_arialFont);

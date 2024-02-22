@@ -23,6 +23,8 @@ Player::Player()
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
+	m_time = seconds(1.0f);
+
 	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
@@ -84,6 +86,9 @@ void Player::update(double dt, std::vector<Enemy*> t_enemies)
 
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	checkXP();
+
+	setFrames();
+	animate();
 }
 
 void Player::render(sf::RenderWindow& t_window)
@@ -208,33 +213,33 @@ void Player::levelUp(Gamemode& t_gamemode)
 	std::string text2;
 	std::string text3;
 
-	PlayerUpgrades choice1 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count)); // static_cast<int>(PlayerUpgrades::Count) will give the amount of items in the class
-	PlayerUpgrades choice2 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
-	PlayerUpgrades choice3 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
+	PlayerUpgrade choice1 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count)); // static_cast<int>(PlayerUpgrades::Count) will give the amount of items in the class
+	PlayerUpgrade choice2 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
+	PlayerUpgrade choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 
 	while (choice2 == choice1)
 	{
-		choice2 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
+		choice2 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 	}
 	while (choice3 == choice1 || choice3 == choice2)
 	{
-		choice3 = static_cast<PlayerUpgrades>(rand() % static_cast<int>(PlayerUpgrades::Count));
+		choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 	}
 
 	std::cout << "Choose an upgrade:\n";
 	
 	switch (choice1)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		text1 = "1. Health";
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		text1 = "1. Speed";
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		text1 = "1. XP";
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		text1 = "1. Armor";
 		break;
 	default:
@@ -243,16 +248,16 @@ void Player::levelUp(Gamemode& t_gamemode)
 
 	switch (choice2)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		text2 = "2. Health";
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		text2 = "2. Speed";
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		text2 = "2. XP";
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		text2 = "2. Armor";
 		break;
 	default:
@@ -261,16 +266,16 @@ void Player::levelUp(Gamemode& t_gamemode)
 
 	switch (choice3)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		text3 = "3. Health";
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		text3 = "3. Speed";
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		text3 = "3. XP";
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		text3 = "3. Armor";
 		break;
 	default:
@@ -304,22 +309,65 @@ void Player::levelUp(Gamemode& t_gamemode)
 	}
 }
 
-void Player::upgradePlayer(PlayerUpgrades t_type)
+void Player::upgradePlayer(PlayerUpgrade t_type)
 {
 	switch (t_type)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		m_maxHealth += 50;
 		//m_health += 50;
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		m_speedModifier += 0.5f;
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		m_xpModifier += 0.5f;
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		m_armorModifier -= 0.1;
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::animate()
+{
+	if (m_clock.getElapsedTime() > m_time)
+	{
+		if (m_currentFrame + 1 < m_frames.size())
+		{
+			m_currentFrame++;
+		}
+		else
+		{
+			m_currentFrame = 0;
+		}
+		m_clock.restart();
+	}
+
+	m_playerSprite.setTextureRect(m_frames[m_currentFrame]);
+}
+
+void Player::addFrame(sf::IntRect& t_frame)
+{
+	m_frames.push_back(t_frame);
+}
+
+void Player::setFrames()
+{
+	m_frames.clear();
+
+	switch (m_playerState)
+	{
+	case CharacterState::IdleState:
+		addFrame(IntRect{ 0,416,160,200 });
+		break;
+	case CharacterState::WalkRight:
+		addFrame(IntRect{ 0,416,160,200 });
+		break;
+	case CharacterState::WalkLeft:
+		addFrame(IntRect{ 0,416,160,200 });
 		break;
 	default:
 		break;

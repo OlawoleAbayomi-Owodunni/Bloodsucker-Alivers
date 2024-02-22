@@ -7,7 +7,14 @@
 
 enum class Gamemode;
 
-enum class PlayerUpgrades
+enum class CharacterState
+{
+	IdleState,
+	WalkRight,
+	WalkLeft
+};
+
+enum class PlayerUpgrade
 {
 	Health,
 	Speed,
@@ -38,7 +45,11 @@ public:
 	void checkXP();
 	int getLevel();
 	void levelUp(Gamemode& t_gamemode);
-	void upgradePlayer(PlayerUpgrades t_type);
+	void upgradePlayer(PlayerUpgrade t_type);
+
+	void animate();
+	void addFrame(sf::IntRect& t_frame);
+	void setFrames();
 
 	sf::RectangleShape getRectangle();
 	std::vector<Weapon*> getWeapon();
@@ -68,6 +79,12 @@ private:
 	std::vector<Weapon*> m_weapons;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
+
+	CharacterState m_playerState;
+	std::vector<sf::IntRect> m_frames;
+	int m_currentFrame;
+	Time m_time;
+	Clock m_clock;
 	
 	Sprite m_playerSprite;
 	Sprite m_levelBarSprite;

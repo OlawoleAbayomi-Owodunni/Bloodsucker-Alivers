@@ -16,11 +16,16 @@ public:
 	void update(double dt);
 	void render(sf::RenderWindow& t_window);
 
-	sf::CircleShape getCircle();
+	CircleShape getCircle();
 
 private:
-	sf::CircleShape m_circle;
-	sf::Vector2f m_position;
+	CircleShape m_circle;
+	Vector2f m_position;
 
-	sf::Sprite m_orbSprite;
+	vector<sf::IntRect> m_frames;
+	int m_currentFrame;
+	Time m_time;
+	Clock m_clock;
+
+	Sprite m_orbSprite;
 };

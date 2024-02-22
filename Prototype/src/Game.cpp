@@ -233,6 +233,11 @@ void Game::update(double dt)
 		{
 			enemy->update(dt, m_player);
 		}
+		
+		for (auto orb : m_xpOrbs)
+		{
+			orb->update(dt);
+		}
 
 		//std::cout << m_enemies.size() << std::endl;
 

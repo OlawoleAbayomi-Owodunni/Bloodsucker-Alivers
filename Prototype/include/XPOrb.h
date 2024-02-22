@@ -27,5 +27,5 @@ private:
 	Time m_time;
 	Clock m_clock;
 
-	Sprite m_orbSprite;
+	Sprite m_sprite;
 };

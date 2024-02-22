@@ -8,6 +8,13 @@ Pickup::Pickup(sf::Texture& t_texture, sf::Vector2f t_position, PickupType t_typ
 	m_rectangle.setOrigin(20.0f, 20.0f);
 	m_rectangle.setPosition(m_position);
 
+	for (int i = 0; i < 10; i++)
+	{
+		m_frames.push_back(IntRect{ 64 * i,352,64,64 });
+	}
+	m_currentFrame = 0;
+	m_time = seconds(0.2f);
+
 	switch (m_type)
 	{
 	case PickupType::Health:
@@ -30,12 +37,25 @@ Pickup::~Pickup()
 
 void Pickup::update(double dt)
 {
+	if (m_clock.getElapsedTime() > m_time)
+	{
+		if (m_currentFrame + 1 < m_frames.size())
+		{
+			m_currentFrame++;
+		}
+		else
+		{
+			m_currentFrame = 0;
+		}
+		m_clock.restart();
+	}
 
+	m_sprite.setTextureRect(m_frames[m_currentFrame]);
 }
 
 void Pickup::render(sf::RenderWindow& t_window)
 {
-	t_window.draw(m_rectangle);
+	//t_window.draw(m_rectangle);
 	t_window.draw(m_sprite);
 }
 

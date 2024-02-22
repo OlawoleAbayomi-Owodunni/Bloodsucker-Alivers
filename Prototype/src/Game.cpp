@@ -239,6 +239,11 @@ void Game::update(double dt)
 			orb->update(dt);
 		}
 
+		for (auto pickup : m_pickups)
+		{
+			pickup->update(dt);
+		}
+
 		//std::cout << m_enemies.size() << std::endl;
 
 		addEnemies();

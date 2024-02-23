@@ -1,9 +1,9 @@
 #include "Player.h"
 #include "Game.h"
 #include <iostream>
-#include <10.0.22621.0/um/Windows.h>
+#include "Windows.h"
 #include <SFML/Window/Joystick.hpp>
-#include <10.0.22621.0/um/Xinput.h>
+#include "Xinput.h"
 
 //#pragma comment(lib, "XInput.lib") // Link XInput library
 

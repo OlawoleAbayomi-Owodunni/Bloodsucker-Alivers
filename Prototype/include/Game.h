@@ -84,6 +84,7 @@ protected:
 	sf::Font m_arialFont;
 	// main window
 	sf::RenderWindow m_window;
+	sf::View m_view;
 
 	Player m_player;
 	std::vector<Enemy*> m_enemies;

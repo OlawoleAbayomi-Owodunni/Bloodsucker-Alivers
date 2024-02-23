@@ -6,9 +6,13 @@ static double const FPS{ 60.0f };
 
 ////////////////////////////////////////////////////////////
 Game::Game()
-	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Prototype", sf::Style::Default)
+	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Prototype", sf::Style::Default), 
+	m_view(sf::FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y))
 {
 	srand(time(nullptr));
+
+	m_window.setView(m_view);
+
 	init();
 }
 
@@ -213,6 +217,9 @@ void Game::update(double dt)
 	if (!m_inMenu)
 	{
 		m_player.update(dt, m_enemies);
+		
+		m_view.setCenter(m_player.getPosition());
+		m_window.setView(m_view);
 
 		for (auto enemy : m_enemies)
 		{

@@ -44,7 +44,7 @@ void Game::init()
 
 	sf::Texture& bgTexture = m_holder["mapSprite"];
 	bgSprite.setTexture(bgTexture);
-	bgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
+	bgSprite.setTextureRect(IntRect{ 0,0,3200,18100 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 
@@ -202,6 +202,7 @@ void Game::checkCollisions()
 		{
 			m_player.increaseHealth();
 
+
 			delete* it; // Delete the pickup object
 			it = m_pickups.erase(it); // Remove the pickup pointer from the vector
 		}
@@ -234,6 +235,9 @@ void Game::update(double dt)
 		
 		m_view.setCenter(m_player.getPosition());
 		m_window.setView(m_view);
+
+		cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
+
 
 		for (auto enemy : m_enemies)
 		{

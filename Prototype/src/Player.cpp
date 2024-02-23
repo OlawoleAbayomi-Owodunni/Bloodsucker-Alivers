@@ -221,6 +221,9 @@ void Player::setPosition(float t_x, float t_y)
 	m_sprite.setPosition(m_position);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
+	m_xpBar.setPosition(m_position.x, m_position.y - 410.0F);
+	m_emptyxphBar.setPosition(m_position.x, m_position.y - 410.0F);
+	m_levelBarSprite.setPosition(m_position.x, m_position.y - 410.0f);
 }
 
 sf::Vector2f Player::getPosition()

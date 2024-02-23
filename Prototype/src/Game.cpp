@@ -236,7 +236,7 @@ void Game::update(double dt)
 		m_view.setCenter(m_player.getPosition());
 		m_window.setView(m_view);
 
-		cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
+		//cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
 
 
 		for (auto enemy : m_enemies)

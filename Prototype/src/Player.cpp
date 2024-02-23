@@ -445,7 +445,32 @@ void Player::setFrames()
 	switch (m_playerState)
 	{
 	case CharacterState::IdleState:
-		addFrame(IntRect{ 0,416,160,200 });
+		addFrame(IntRect{ 0,744,160,200 });
+		addFrame(IntRect{ 160,744,160,200 });
+		addFrame(IntRect{ 320,744,160,200 });
+		addFrame(IntRect{ 480,744,160,200 });
+		addFrame(IntRect{ 640,744,160,200 });
+		addFrame(IntRect{ 800,744,160,200 });
+		addFrame(IntRect{ 960,744,160,200 });
+		addFrame(IntRect{ 1120,744,160,200 });
+		addFrame(IntRect{ 1280,744,160,200 });
+
+		addFrame(IntRect{ 0,944,160,200 });
+		addFrame(IntRect{ 160,944,160,200 });
+		addFrame(IntRect{ 320,944,160,200 });
+		addFrame(IntRect{ 480,944,160,200 });
+		addFrame(IntRect{ 640,944,160,200 });
+		addFrame(IntRect{ 800,944,160,200 });
+		addFrame(IntRect{ 960,944,160,200 });
+		addFrame(IntRect{ 1120,944,160,200 });
+		addFrame(IntRect{ 1280,944,160,200 });
+
+		addFrame(IntRect{ 0,1144,160,200 });
+		addFrame(IntRect{ 160,1144,160,200 });
+		addFrame(IntRect{ 320,1144,160,200 });
+		addFrame(IntRect{ 480,1144,160,200 });
+		addFrame(IntRect{ 640,1144,160,200 });
+
 		break;
 	case CharacterState::WalkState:
 		addFrame(IntRect{ 160,416,160,200 });

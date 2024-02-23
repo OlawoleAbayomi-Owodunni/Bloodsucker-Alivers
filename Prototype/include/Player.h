@@ -85,11 +85,17 @@ private:
 	CharacterState m_playerState;
 	CharacterState m_previousState;
 
-	std::vector<sf::IntRect> m_frames;
-	int m_currentFrame;
-	Time m_time;
-	Clock m_clock;
+	std::vector<sf::IntRect> m_playerFrames;
+	int m_currentPlayerFrame;
+	Time m_playerTime;
+	Clock m_playerClock;
+
+	std::vector<sf::IntRect> m_haloFrames;
+	int m_currentHaloFrame;
+	Time m_haloTime;
+	Clock m_haloClock;
 	
-	Sprite m_sprite;
+	Sprite m_playerSprite;
+	Sprite m_haloSprite;
 	Sprite m_xpBarSprite;
 };

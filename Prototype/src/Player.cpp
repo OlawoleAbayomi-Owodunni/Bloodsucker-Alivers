@@ -34,39 +34,51 @@ Player::Player()
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
-	m_time = seconds(0.1f);
+	for (int i = 0; i < 6; i++)
+	{
+		m_haloFrames.push_back(IntRect{ 160 * i,1344,160,64 });
+	}
+	m_currentHaloFrame = 0;
+
+	m_playerTime = seconds(0.1f);
+	m_haloTime = seconds(0.2f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position);
 
-	sf::Texture& playerTexture = m_holder["starterAtlas"];
-	sf::Texture& levelBarTexture = m_holder["starterAtlas"];
+	sf::Texture& playerTextures = m_holder["starterAtlas"];
 
-	m_sprite.setTexture(playerTexture);
-	m_sprite.setTextureRect(IntRect{ 0,416,160,200 });
-	m_sprite.setOrigin(80, 100);
-	m_sprite.setScale(0.5f, 0.5f);
-	m_sprite.setPosition(m_position);
+	m_playerSprite.setTexture(playerTextures);
+	m_playerSprite.setTextureRect(IntRect{ 0,416,160,200 });
+	m_playerSprite.setOrigin(80, 100);
+	m_playerSprite.setScale(0.5f, 0.5f);
+	m_playerSprite.setPosition(m_position);
 
-	m_xpBarSprite.setTexture(levelBarTexture);
+	m_xpBarSprite.setTexture(playerTextures);
 	m_xpBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
 	m_xpBarSprite.setOrigin(250, 16);
 	m_xpBarSprite.setScale(2.25f, 2.0f);
 	m_xpBarSprite.setPosition(800.0f, 40.0f);
+
+	m_haloSprite.setTexture(playerTextures);
+	m_haloSprite.setTextureRect(IntRect{ 0,1344,160,64 });
+	m_haloSprite.setOrigin(80, 32);
+	m_haloSprite.setScale(0.6f, 0.6f);
+	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
 	m_emptyHealthBar.setFillColor(sf::Color::Red);
 	m_emptyHealthBar.setOutlineColor(sf::Color::Black);
 	m_emptyHealthBar.setOutlineThickness(2.0f);
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
 
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
 
 	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
 	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
@@ -112,11 +124,13 @@ void Player::render(sf::RenderWindow& t_window)
 		weapon->render(t_window);
 	}
 
+	t_window.draw(m_haloSprite);
+
 	//t_window.draw(m_rectangle);
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
 
-	t_window.draw(m_sprite);
+	t_window.draw(m_playerSprite);
 
 	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
@@ -133,14 +147,14 @@ void Player::handleKeyInput()
 	{
 		m_direction = Direction::West;
 		m_playerState = CharacterState::WalkState;
-		m_sprite.setScale(-0.5f, 0.5f);
+		m_playerSprite.setScale(-0.5f, 0.5f);
 		m_position.x -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		m_direction = Direction::East;
 		m_playerState = CharacterState::WalkState;
-		m_sprite.setScale(0.5f, 0.5f);
+		m_playerSprite.setScale(0.5f, 0.5f);
 		m_position.x += m_speed * m_speedModifier;
 	}
 
@@ -218,12 +232,16 @@ void Player::rumbleStop()
 void Player::setPosition(float t_x, float t_y)
 {
 	m_rectangle.setPosition(m_position);
-	m_sprite.setPosition(m_position);
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
+	m_playerSprite.setPosition(m_position);
+	
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
+	
 	m_xpBar.setPosition(m_position.x, m_position.y - 410.0F);
 	m_emptyXPBar.setPosition(m_position.x, m_position.y - 410.0F);
 	m_xpBarSprite.setPosition(m_position.x, m_position.y - 410.0f);
+
+	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 }
 
 sf::Vector2f Player::getPosition()
@@ -415,32 +433,47 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 
 void Player::animate()
 {
-	if (m_clock.getElapsedTime() > m_time)
+	if (m_playerClock.getElapsedTime() > m_playerTime)
 	{
-		if (m_currentFrame + 1 < m_frames.size())
+		if (m_currentPlayerFrame + 1 < m_playerFrames.size())
 		{
-			m_currentFrame++;
+			m_currentPlayerFrame++;
 		}
 		else
 		{
-			m_currentFrame = 0;
+			m_currentPlayerFrame = 0;
 		}
-		m_clock.restart();
+		m_playerClock.restart();
 	}
 
-	m_sprite.setTextureRect(m_frames[m_currentFrame]);
+	m_playerSprite.setTextureRect(m_playerFrames[m_currentPlayerFrame]);
 	m_previousState = m_playerState;
+
+	if (m_haloClock.getElapsedTime() > m_haloTime)
+	{
+		if (m_currentHaloFrame + 1 < m_haloFrames.size())
+		{
+			m_currentHaloFrame++;
+		}
+		else
+		{
+			m_currentHaloFrame = 0;
+		}
+		m_haloClock.restart();
+	}
+
+	m_haloSprite.setTextureRect(m_haloFrames[m_currentHaloFrame]);
 }
 
 void Player::addFrame(sf::IntRect& t_frame)
 {
-	m_frames.push_back(t_frame);
+	m_playerFrames.push_back(t_frame);
 }
 
 void Player::setFrames()
 {
-	m_frames.clear();
-	m_currentFrame = 0;
+	m_playerFrames.clear();
+	m_currentPlayerFrame = 0;
 
 	switch (m_playerState)
 	{
@@ -470,7 +503,6 @@ void Player::setFrames()
 		addFrame(IntRect{ 320,1144,160,200 });
 		addFrame(IntRect{ 480,1144,160,200 });
 		addFrame(IntRect{ 640,1144,160,200 });
-
 		break;
 	case CharacterState::WalkState:
 		addFrame(IntRect{ 160,416,160,200 });

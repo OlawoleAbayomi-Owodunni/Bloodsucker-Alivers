@@ -46,3 +46,14 @@ bool CollisionDetection::playerOrbCollision(Player& t_player, XPOrb* t_orb)
 
 	return false;
 }
+
+bool CollisionDetection::playerPickupCollision(Player& t_player, Pickup* t_pickup)
+{
+	sf::FloatRect player = t_player.getRectangle().getGlobalBounds();
+	sf::FloatRect pickup = t_pickup->getRectangle().getGlobalBounds();
+
+	if (player.intersects(pickup))
+	{
+		return true;
+	}
+}

@@ -7,11 +7,13 @@
 #endif // _DEBUG
 
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
 #include <string>
 #include "ScreenSize.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "XPOrb.h"
+#include "Pickup.h"
 #include "CollisionDetection.h"
 
 /// <summary>
@@ -86,10 +88,14 @@ protected:
 	Player m_player;
 	std::vector<Enemy*> m_enemies;
 	std::vector<XPOrb*> m_xpOrbs;
+	std::vector<Pickup*> m_pickups;
 
 	int m_currentLevel;
 
-	sf::Texture bgTexture;
+	bool m_inMenu;
+
+	thor::ResourceHolder<sf::Texture, std::string> m_holder;
+
 	Sprite bgSprite;
 
 #ifdef TEST_FPS

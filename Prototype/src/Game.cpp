@@ -18,9 +18,12 @@ void Game::init()
 	// Really only necessary is our target FPS is greater than 60.
 	m_window.setVerticalSyncEnabled(true);
 
-	for (int i = 0; i < 6; i++)
+	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
+	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
+
+	for (int i = 0; i < 10; i++)
 	{
-		m_enemies.push_back(new Enemy);
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 	}
 
 	for (auto enemy : m_enemies)
@@ -34,13 +37,11 @@ void Game::init()
 	}
 
 	m_currentLevel = 1;
+	m_inMenu = false;
 
-	if (!bgTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
-	{
-		cout << "Failed to load file\n";
-	}
+	sf::Texture& bgTexture = m_holder["mapSprite"];
 	bgSprite.setTexture(bgTexture);
-	bgSprite.setTextureRect(IntRect{ 0,192,1600,900 });
+	bgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 
@@ -141,12 +142,22 @@ void Game::checkCollisions()
 			{
 				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 				{
-					if (rand() % 4 != 0)
-					{
-						m_xpOrbs.push_back(new XPOrb(enemy->getPosition()));
-					}
+					enemy->decreaseHealth(bullet->getDamage());
 
-					enemy->initialisePosition();
+					if (enemy->getHealth() < 0)
+					{
+						if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+						{
+							m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+						}
+
+						if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+						{
+							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
+						}
+
+						enemy->initialisePosition();
+					}
 				}
 			}
 		}
@@ -166,6 +177,21 @@ void Game::checkCollisions()
 			++it;
 		}
 	}
+
+	for (auto it = m_pickups.begin(); it != m_pickups.end();)
+	{
+		if (CollisionDetection::playerPickupCollision(m_player, *it))
+		{
+			m_player.increaseHealth();
+
+			delete* it; // Delete the pickup object
+			it = m_pickups.erase(it); // Remove the pickup pointer from the vector
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void Game::addEnemies()
@@ -174,7 +200,8 @@ void Game::addEnemies()
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			m_enemies.push_back(new Enemy);
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+			m_inMenu = true;
 		}
 		m_currentLevel++;
 	}
@@ -183,18 +210,26 @@ void Game::addEnemies()
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
-	m_player.update(dt, m_enemies);
-
-	for (auto enemy : m_enemies)
+	if (!m_inMenu)
 	{
-		enemy->update(dt, m_player);
+		m_player.update(dt, m_enemies);
+
+		for (auto enemy : m_enemies)
+		{
+			enemy->update(dt, m_player);
+		}
+
+		//std::cout << m_enemies.size() << std::endl;
+
+		addEnemies();
+
+		checkCollisions();
 	}
-
-	std::cout << m_enemies.size() << std::endl;
-
-	addEnemies();
-
-	checkCollisions();
+	
+	if (m_inMenu)
+	{
+		m_player.levelUp(m_inMenu);
+	}
 }
 
 ////////////////////////////////////////////////////////////
@@ -202,6 +237,12 @@ void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
 	m_window.draw(bgSprite);
+
+	for (auto pickup : m_pickups)
+	{
+		pickup->render(m_window);
+	}
+
 	for (auto orb : m_xpOrbs)
 	{
 		orb->render(m_window);

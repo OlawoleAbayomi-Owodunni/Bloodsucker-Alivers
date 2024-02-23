@@ -1,7 +1,7 @@
 #include "Bullet.h"
 #include <iostream>
 
-Bullet::Bullet()
+Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 {
 	m_velocity = sf::Vector2f(0.0f, 0.0f);
 	m_position = sf::Vector2f(0.0f, 0.0f);
@@ -11,16 +11,23 @@ Bullet::Bullet()
 	m_circle.setFillColor(sf::Color::Blue);
 	m_circle.setPosition(m_position);
 
-	if (!m_bulletTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
-	{
-		cout << "Failed to load file\n";
-	}
-
-	m_bulletSprite.setTexture(m_bulletTexture);
+	m_bulletSprite.setTexture(t_texture);
 	m_bulletSprite.setTextureRect(IntRect{ 0,64,64,64 });
 	m_bulletSprite.setOrigin(32, 32);
 	m_bulletSprite.setScale(0.5f, 0.5f);
 	m_bulletSprite.setPosition(m_position);
+
+	switch (t_weaponType)
+	{
+	case WeaponType::Pistol:
+		m_damage = 12.0f;
+		break;
+	case WeaponType::AssaultRifle:
+		m_damage = 24.0f;
+		break;
+	default:
+		break;
+	}
 }
 
 Bullet::~Bullet()
@@ -117,4 +124,9 @@ void Bullet::render(sf::RenderWindow& t_window)
 sf::CircleShape Bullet::getCircle()
 {
 	return m_circle;
+}
+
+float Bullet::getDamage()
+{
+	return m_damage;
 }

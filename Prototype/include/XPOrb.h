@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 
 using namespace sf;
@@ -9,7 +10,7 @@ using namespace std;
 class XPOrb
 {
 public:
-	XPOrb(sf::Vector2f t_position);
+	XPOrb(sf::Texture& t_texture, sf::Vector2f t_position);
 	~XPOrb();
 
 	void update(double dt);
@@ -21,6 +22,5 @@ private:
 	sf::CircleShape m_circle;
 	sf::Vector2f m_position;
 
-	sf::Texture m_orbTexture;
 	sf::Sprite m_orbSprite;
 };

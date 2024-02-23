@@ -1,6 +1,6 @@
 #include "XPOrb.h"
 
-XPOrb::XPOrb(sf::Vector2f t_position)
+XPOrb::XPOrb(sf::Texture& t_texture, sf::Vector2f t_position)
 {
 	m_position = t_position;
 
@@ -9,12 +9,7 @@ XPOrb::XPOrb(sf::Vector2f t_position)
 	m_circle.setFillColor(sf::Color::Green);
 	m_circle.setPosition(m_position);
 
-	if (!m_orbTexture.loadFromFile("./resources/sprites/StarterAtlas.png"))
-	{
-		cout << "Failed to load file\n";
-	}
-
-	m_orbSprite.setTexture(m_orbTexture);
+	m_orbSprite.setTexture(t_texture);
 	m_orbSprite.setTextureRect(IntRect{ 0,128,64,64 });
 	m_orbSprite.setOrigin(32, 32);
 	m_orbSprite.setScale(1.0f, 1.0f);

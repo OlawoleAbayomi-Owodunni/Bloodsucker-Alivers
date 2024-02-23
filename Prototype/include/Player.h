@@ -76,7 +76,7 @@ private:
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
 	sf::RectangleShape m_xpBar;
-	sf::RectangleShape m_emptyxphBar;
+	sf::RectangleShape m_emptyXPBar;
 
 	std::vector<Weapon*> m_weapons;
 
@@ -91,5 +91,5 @@ private:
 	Clock m_clock;
 	
 	Sprite m_sprite;
-	Sprite m_levelBarSprite;
+	Sprite m_xpBarSprite;
 };

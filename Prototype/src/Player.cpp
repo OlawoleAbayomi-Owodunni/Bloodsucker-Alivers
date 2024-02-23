@@ -50,11 +50,11 @@ Player::Player()
 	m_sprite.setScale(0.5f, 0.5f);
 	m_sprite.setPosition(m_position);
 
-	m_levelBarSprite.setTexture(levelBarTexture);
-	m_levelBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
-	m_levelBarSprite.setOrigin(250, 16);
-	m_levelBarSprite.setScale(2.25f, 2.0f);
-	m_levelBarSprite.setPosition(800.0f, 40.0f);
+	m_xpBarSprite.setTexture(levelBarTexture);
+	m_xpBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
+	m_xpBarSprite.setOrigin(250, 16);
+	m_xpBarSprite.setScale(2.25f, 2.0f);
+	m_xpBarSprite.setPosition(800.0f, 40.0f);
 
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
@@ -68,10 +68,10 @@ Player::Player()
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 
-	m_emptyxphBar.setSize(sf::Vector2f(1000.0f, 20.0f));
-	m_emptyxphBar.setOrigin(m_emptyxphBar.getSize().x / 2.0f, m_emptyxphBar.getSize().y / 2.0f);
-	m_emptyxphBar.setFillColor(Color::Black);
-	m_emptyxphBar.setPosition(800.0f, 40.0f);
+	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
+	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
+	m_emptyXPBar.setFillColor(Color::Black);
+	m_emptyXPBar.setPosition(800.0f, 40.0f);
 
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
@@ -118,9 +118,9 @@ void Player::render(sf::RenderWindow& t_window)
 
 	t_window.draw(m_sprite);
 
-	t_window.draw(m_emptyxphBar);
+	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
-	t_window.draw(m_levelBarSprite);
+	t_window.draw(m_xpBarSprite);
 }
 
 #pragma region INPUT MANAGER
@@ -222,8 +222,8 @@ void Player::setPosition(float t_x, float t_y)
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 	m_xpBar.setPosition(m_position.x, m_position.y - 410.0F);
-	m_emptyxphBar.setPosition(m_position.x, m_position.y - 410.0F);
-	m_levelBarSprite.setPosition(m_position.x, m_position.y - 410.0f);
+	m_emptyXPBar.setPosition(m_position.x, m_position.y - 410.0F);
+	m_xpBarSprite.setPosition(m_position.x, m_position.y - 410.0f);
 }
 
 sf::Vector2f Player::getPosition()

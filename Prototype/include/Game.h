@@ -25,6 +25,14 @@
 ///		game.run();
 /// </summary>
 
+enum class Gamemode
+{
+	Menu,
+	Gameplay,
+	Pause,
+	Upgrade
+};
+
 class Game
 {
 public:
@@ -86,14 +94,14 @@ protected:
 	sf::RenderWindow m_window;
 	sf::View m_view;
 
+	Gamemode m_currentGamemode;
+
 	Player m_player;
 	std::vector<Enemy*> m_enemies;
 	std::vector<XPOrb*> m_xpOrbs;
 	std::vector<Pickup*> m_pickups;
 
 	int m_currentLevel;
-
-	bool m_inMenu;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 

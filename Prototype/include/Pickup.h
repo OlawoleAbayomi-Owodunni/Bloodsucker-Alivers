@@ -4,6 +4,9 @@
 #include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 
+using namespace sf;
+using namespace std;
+
 enum class PickupType
 {
 	Health
@@ -25,6 +28,12 @@ private:
 	PickupType m_type;
 	sf::Vector2f m_position;
 
-	sf::Sprite m_sprite;
 	sf::RectangleShape m_rectangle;
+
+	vector<sf::IntRect> m_frames;
+	int m_currentFrame;
+	Time m_time;
+	Clock m_clock;
+
+	sf::Sprite m_sprite;
 };

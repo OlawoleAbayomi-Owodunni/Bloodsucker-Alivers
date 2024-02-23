@@ -11,23 +11,30 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 	m_circle.setFillColor(sf::Color::Blue);
 	m_circle.setPosition(m_position);
 
-	m_bulletSprite.setTexture(t_texture);
-	m_bulletSprite.setTextureRect(IntRect{ 0,64,64,64 });
-	m_bulletSprite.setOrigin(32, 32);
-	m_bulletSprite.setScale(0.5f, 0.5f);
-	m_bulletSprite.setPosition(m_position);
+	m_sprite.setTexture(t_texture);
+	m_sprite.setTextureRect(IntRect{ 0,648,32,32 });
+	m_sprite.setOrigin(16, 16);
+	m_sprite.setScale(1.0f, 1.0f);
+	m_sprite.setPosition(m_position);
 
 	switch (t_weaponType)
 	{
 	case WeaponType::Pistol:
-		m_damage = 12.0f;
+		m_damage = 32.0f;	// default 12
 		break;
 	case WeaponType::AssaultRifle:
-		m_damage = 24.0f;
+		m_damage = 24.0f;	// default 24
 		break;
 	default:
 		break;
 	}
+
+	for (int i = 0; i < 16; i++)
+	{
+		m_frames.push_back(IntRect{ 32 * i,648,32,32 });
+	}
+	m_currentFrame = 0;
+	m_time = seconds(0.1f);
 }
 
 Bullet::~Bullet()
@@ -111,14 +118,16 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vec
 		break;
 	}
 
+	animate();
+
 	m_circle.setPosition(m_position);
-	m_bulletSprite.setPosition(m_position);
+	m_sprite.setPosition(m_position);
 }
 
 void Bullet::render(sf::RenderWindow& t_window)
 {
-	t_window.draw(m_circle);
-	t_window.draw(m_bulletSprite);
+	//t_window.draw(m_circle);
+	t_window.draw(m_sprite);
 }
 
 sf::CircleShape Bullet::getCircle()
@@ -129,4 +138,22 @@ sf::CircleShape Bullet::getCircle()
 float Bullet::getDamage()
 {
 	return m_damage;
+}
+
+void Bullet::animate()
+{
+	if (m_clock.getElapsedTime() > m_time)
+	{
+		if (m_currentFrame + 1 < m_frames.size())
+		{
+			m_currentFrame++;
+		}
+		else
+		{
+			m_currentFrame = 0;
+		}
+		m_clock.restart();
+	}
+
+	m_sprite.setTextureRect(m_frames[m_currentFrame]);
 }

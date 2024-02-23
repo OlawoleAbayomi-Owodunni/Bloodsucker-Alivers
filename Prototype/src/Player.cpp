@@ -1,8 +1,9 @@
 #include "Player.h"
+#include "Game.h"
 #include <iostream>
-#include <10.0.22621.0/um/Windows.h>
+#include "Windows.h"
 #include <SFML/Window/Joystick.hpp>
-#include <10.0.22621.0/um/Xinput.h>
+#include "Xinput.h"
 
 //#pragma comment(lib, "XInput.lib") // Link XInput library
 
@@ -28,8 +29,12 @@ Player::Player()
 	
 	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
+	m_playerState = CharacterState::IdleState;
+	m_previousState = CharacterState::None;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
+
+	m_time = seconds(0.1f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -39,11 +44,11 @@ Player::Player()
 	sf::Texture& playerTexture = m_holder["starterAtlas"];
 	sf::Texture& levelBarTexture = m_holder["starterAtlas"];
 
-	m_playerSprite.setTexture(playerTexture);
-	m_playerSprite.setTextureRect(IntRect{ 0,416,160,200 });
-	m_playerSprite.setOrigin(80, 100);
-	m_playerSprite.setScale(0.5f, 0.5f);
-	m_playerSprite.setPosition(m_position);
+	m_sprite.setTexture(playerTexture);
+	m_sprite.setTextureRect(IntRect{ 0,416,160,200 });
+	m_sprite.setOrigin(80, 100);
+	m_sprite.setScale(0.5f, 0.5f);
+	m_sprite.setPosition(m_position);
 
 	m_levelBarSprite.setTexture(levelBarTexture);
 	m_levelBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
@@ -92,6 +97,12 @@ void Player::update(double dt, std::vector<Enemy*> t_enemies)
 
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	checkXP();
+
+	if (m_playerState != m_previousState)
+	{
+		setFrames();
+	}
+	animate();
 }
 
 void Player::render(sf::RenderWindow& t_window)
@@ -105,7 +116,7 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
 
-	t_window.draw(m_playerSprite);
+	t_window.draw(m_sprite);
 
 	t_window.draw(m_emptyxphBar);
 	t_window.draw(m_xpBar);
@@ -121,27 +132,38 @@ void Player::handleKeyInput()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		m_direction = Direction::West;
-		m_playerSprite.setScale(-0.5f, 0.5f);
+		m_playerState = CharacterState::WalkState;
+		m_sprite.setScale(-0.5f, 0.5f);
 		m_position.x -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		m_direction = Direction::East;
-		m_playerSprite.setScale(0.5f, 0.5f);
+		m_playerState = CharacterState::WalkState;
+		m_sprite.setScale(0.5f, 0.5f);
 		m_position.x += m_speed * m_speedModifier;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		m_direction = Direction::North;
+		m_playerState = CharacterState::WalkState;
 		m_position.y -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		m_direction = Direction::South;
+		m_playerState = CharacterState::WalkState;
 		m_position.y += m_speed * m_speedModifier;
 	}
 
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		m_playerState = CharacterState::IdleState;
+	}
 
 	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
 		//float xAxis = state.Gamepad.sThumbLX;
@@ -157,15 +179,11 @@ void Player::handleKeyInput()
 		else if (yAxis == 100) { m_direction = Direction::South; }
 		else { m_direction = Direction::North; }
 
-		cout << xAxis << "\n" << yAxis << "\n\n";
+		//cout << xAxis << "\n" << yAxis << "\n\n";
 		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
 			m_position.x += (xAxis / 100) * m_speed;
 
-			XINPUT_VIBRATION vibration;
-			memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
-			vibration.wLeftMotorSpeed = RUMBLE_THRESHOLD;
-			vibration.wRightMotorSpeed = RUMBLE_THRESHOLD;
-			XInputSetState(0, &vibration);
+			rumbleStart();
 		}
 		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
 			m_position.y += (yAxis / 100) * m_speed;
@@ -200,7 +218,7 @@ void Player::rumbleStop()
 void Player::setPosition(float t_x, float t_y)
 {
 	m_rectangle.setPosition(m_position);
-	m_playerSprite.setPosition(m_position);
+	m_sprite.setPosition(m_position);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 }
@@ -267,40 +285,40 @@ std::vector<Weapon*> Player::getWeapon()
 	return m_weapons;
 }
 
-void Player::levelUp(bool& t_menu)
+void Player::levelUp(Gamemode& t_gamemode)
 {
 	int playerChoice;
 	std::string text1;
 	std::string text2;
 	std::string text3;
 
-	PlayerUpgrades choice1 = static_cast<PlayerUpgrades>(rand() % 4);
-	PlayerUpgrades choice2 = static_cast<PlayerUpgrades>(rand() % 4);
-	PlayerUpgrades choice3 = static_cast<PlayerUpgrades>(rand() % 4);
+	PlayerUpgrade choice1 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count)); // static_cast<int>(PlayerUpgrades::Count) will give the amount of items in the class
+	PlayerUpgrade choice2 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
+	PlayerUpgrade choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 
 	while (choice2 == choice1)
 	{
-		choice2 = static_cast<PlayerUpgrades>(rand() % 4);
+		choice2 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 	}
 	while (choice3 == choice1 || choice3 == choice2)
 	{
-		choice3 = static_cast<PlayerUpgrades>(rand() % 4);
+		choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 	}
 
 	std::cout << "Choose an upgrade:\n";
 	
 	switch (choice1)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		text1 = "1. Health";
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		text1 = "1. Speed";
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		text1 = "1. XP";
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		text1 = "1. Armor";
 		break;
 	default:
@@ -309,16 +327,16 @@ void Player::levelUp(bool& t_menu)
 
 	switch (choice2)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		text2 = "2. Health";
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		text2 = "2. Speed";
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		text2 = "2. XP";
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		text2 = "2. Armor";
 		break;
 	default:
@@ -327,16 +345,16 @@ void Player::levelUp(bool& t_menu)
 
 	switch (choice3)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		text3 = "3. Health";
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		text3 = "3. Speed";
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		text3 = "3. XP";
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		text3 = "3. Armor";
 		break;
 	default:
@@ -364,25 +382,77 @@ void Player::levelUp(bool& t_menu)
 		break;
 	}
 
-	t_menu = false;
+	if (playerChoice != -1)
+	{
+		t_gamemode = Gamemode::Gameplay;
+	}
 }
 
-void Player::upgradePlayer(PlayerUpgrades t_type)
+void Player::upgradePlayer(PlayerUpgrade t_type)
 {
 	switch (t_type)
 	{
-	case PlayerUpgrades::Health:
+	case PlayerUpgrade::Health:
 		m_maxHealth += 50;
 		//m_health += 50;
 		break;
-	case PlayerUpgrades::Speed:
+	case PlayerUpgrade::Speed:
 		m_speedModifier += 0.5f;
 		break;
-	case PlayerUpgrades::XP:
+	case PlayerUpgrade::XP:
 		m_xpModifier += 0.5f;
 		break;
-	case PlayerUpgrades::Armor:
+	case PlayerUpgrade::Armor:
 		m_armorModifier -= 0.1;
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::animate()
+{
+	if (m_clock.getElapsedTime() > m_time)
+	{
+		if (m_currentFrame + 1 < m_frames.size())
+		{
+			m_currentFrame++;
+		}
+		else
+		{
+			m_currentFrame = 0;
+		}
+		m_clock.restart();
+	}
+
+	m_sprite.setTextureRect(m_frames[m_currentFrame]);
+	m_previousState = m_playerState;
+}
+
+void Player::addFrame(sf::IntRect& t_frame)
+{
+	m_frames.push_back(t_frame);
+}
+
+void Player::setFrames()
+{
+	m_frames.clear();
+	m_currentFrame = 0;
+
+	switch (m_playerState)
+	{
+	case CharacterState::IdleState:
+		addFrame(IntRect{ 0,416,160,200 });
+		break;
+	case CharacterState::WalkState:
+		addFrame(IntRect{ 160,416,160,200 });
+		addFrame(IntRect{ 320,416,160,200 });
+		addFrame(IntRect{ 480,416,160,200 });
+		addFrame(IntRect{ 640,416,160,200 });
+		addFrame(IntRect{ 800,416,160,200 });
+		addFrame(IntRect{ 960,416,160,200 });
+		addFrame(IntRect{ 1120,416,160,200 });
+		addFrame(IntRect{ 1280,416,160,200 });
 		break;
 	default:
 		break;

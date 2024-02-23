@@ -28,11 +28,18 @@ public:
 	sf::CircleShape getCircle();
 	float getDamage();
 
+	void animate();
+
 private:
 	sf::CircleShape m_circle;
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
 	float m_damage;
 
-	Sprite m_bulletSprite;
+	vector<sf::IntRect> m_frames;
+	int m_currentFrame;
+	Time m_time;
+	Clock m_clock;
+
+	Sprite m_sprite;
 };

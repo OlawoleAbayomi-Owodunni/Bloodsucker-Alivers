@@ -9,9 +9,9 @@ enum class Gamemode;
 
 enum class CharacterState
 {
+	None,
 	IdleState,
-	WalkRight,
-	WalkLeft
+	WalkState
 };
 
 enum class PlayerUpgrade
@@ -83,11 +83,13 @@ private:
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 
 	CharacterState m_playerState;
+	CharacterState m_previousState;
+
 	std::vector<sf::IntRect> m_frames;
 	int m_currentFrame;
 	Time m_time;
 	Clock m_clock;
 	
-	Sprite m_playerSprite;
+	Sprite m_sprite;
 	Sprite m_levelBarSprite;
 };

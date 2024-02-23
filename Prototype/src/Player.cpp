@@ -29,10 +29,12 @@ Player::Player()
 	
 	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
+	m_playerState = CharacterState::IdleState;
+	m_previousState = CharacterState::None;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
-	m_time = seconds(1.0f);
+	m_time = seconds(0.1f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -42,11 +44,11 @@ Player::Player()
 	sf::Texture& playerTexture = m_holder["starterAtlas"];
 	sf::Texture& levelBarTexture = m_holder["starterAtlas"];
 
-	m_playerSprite.setTexture(playerTexture);
-	m_playerSprite.setTextureRect(IntRect{ 0,416,160,200 });
-	m_playerSprite.setOrigin(80, 100);
-	m_playerSprite.setScale(0.5f, 0.5f);
-	m_playerSprite.setPosition(m_position);
+	m_sprite.setTexture(playerTexture);
+	m_sprite.setTextureRect(IntRect{ 0,416,160,200 });
+	m_sprite.setOrigin(80, 100);
+	m_sprite.setScale(0.5f, 0.5f);
+	m_sprite.setPosition(m_position);
 
 	m_levelBarSprite.setTexture(levelBarTexture);
 	m_levelBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
@@ -96,7 +98,10 @@ void Player::update(double dt, std::vector<Enemy*> t_enemies)
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	checkXP();
 
-	setFrames();
+	if (m_playerState != m_previousState)
+	{
+		setFrames();
+	}
 	animate();
 }
 
@@ -111,7 +116,7 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_emptyHealthBar);
 	t_window.draw(m_currentHealthBar);
 
-	t_window.draw(m_playerSprite);
+	t_window.draw(m_sprite);
 
 	t_window.draw(m_emptyxphBar);
 	t_window.draw(m_xpBar);
@@ -127,27 +132,38 @@ void Player::handleKeyInput()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		m_direction = Direction::West;
-		m_playerSprite.setScale(-0.5f, 0.5f);
+		m_playerState = CharacterState::WalkState;
+		m_sprite.setScale(-0.5f, 0.5f);
 		m_position.x -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		m_direction = Direction::East;
-		m_playerSprite.setScale(0.5f, 0.5f);
+		m_playerState = CharacterState::WalkState;
+		m_sprite.setScale(0.5f, 0.5f);
 		m_position.x += m_speed * m_speedModifier;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		m_direction = Direction::North;
+		m_playerState = CharacterState::WalkState;
 		m_position.y -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		m_direction = Direction::South;
+		m_playerState = CharacterState::WalkState;
 		m_position.y += m_speed * m_speedModifier;
 	}
 
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		m_playerState = CharacterState::IdleState;
+	}
 
 	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
 		//float xAxis = state.Gamepad.sThumbLX;
@@ -163,15 +179,11 @@ void Player::handleKeyInput()
 		else if (yAxis == 100) { m_direction = Direction::South; }
 		else { m_direction = Direction::North; }
 
-		cout << xAxis << "\n" << yAxis << "\n\n";
+		//cout << xAxis << "\n" << yAxis << "\n\n";
 		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
 			m_position.x += (xAxis / 100) * m_speed;
 
-			XINPUT_VIBRATION vibration;
-			memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
-			vibration.wLeftMotorSpeed = RUMBLE_THRESHOLD;
-			vibration.wRightMotorSpeed = RUMBLE_THRESHOLD;
-			XInputSetState(0, &vibration);
+			rumbleStart();
 		}
 		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
 			m_position.y += (yAxis / 100) * m_speed;
@@ -206,7 +218,7 @@ void Player::rumbleStop()
 void Player::setPosition(float t_x, float t_y)
 {
 	m_rectangle.setPosition(m_position);
-	m_playerSprite.setPosition(m_position);
+	m_sprite.setPosition(m_position);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 60.0f);
 }
@@ -413,7 +425,8 @@ void Player::animate()
 		m_clock.restart();
 	}
 
-	m_playerSprite.setTextureRect(m_frames[m_currentFrame]);
+	m_sprite.setTextureRect(m_frames[m_currentFrame]);
+	m_previousState = m_playerState;
 }
 
 void Player::addFrame(sf::IntRect& t_frame)
@@ -424,17 +437,22 @@ void Player::addFrame(sf::IntRect& t_frame)
 void Player::setFrames()
 {
 	m_frames.clear();
+	m_currentFrame = 0;
 
 	switch (m_playerState)
 	{
 	case CharacterState::IdleState:
 		addFrame(IntRect{ 0,416,160,200 });
 		break;
-	case CharacterState::WalkRight:
-		addFrame(IntRect{ 0,416,160,200 });
-		break;
-	case CharacterState::WalkLeft:
-		addFrame(IntRect{ 0,416,160,200 });
+	case CharacterState::WalkState:
+		addFrame(IntRect{ 160,416,160,200 });
+		addFrame(IntRect{ 320,416,160,200 });
+		addFrame(IntRect{ 480,416,160,200 });
+		addFrame(IntRect{ 640,416,160,200 });
+		addFrame(IntRect{ 800,416,160,200 });
+		addFrame(IntRect{ 960,416,160,200 });
+		addFrame(IntRect{ 1120,416,160,200 });
+		addFrame(IntRect{ 1280,416,160,200 });
 		break;
 	default:
 		break;

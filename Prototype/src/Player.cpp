@@ -1,6 +1,15 @@
 #include "Player.h"
 #include "Game.h"
 #include <iostream>
+#include <10.0.22621.0/um/Windows.h>
+#include <SFML/Window/Joystick.hpp>
+#include <10.0.22621.0/um/Xinput.h>
+
+//#pragma comment(lib, "XInput.lib") // Link XInput library
+
+const float JOYSTICK_THRESHOLD = 50.0f; // Adjust as needed
+// Define the rumble intensity (in the range [0, 65535])
+const float RUMBLE_THRESHOLD = 16000;
 
 Player::Player()
 {
@@ -109,8 +118,12 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_levelBarSprite);
 }
 
+#pragma region INPUT MANAGER
 void Player::handleKeyInput()
 {
+	XINPUT_STATE state;
+	memset(&state, 0, sizeof(XINPUT_STATE));
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		m_direction = Direction::West;
@@ -134,7 +147,61 @@ void Player::handleKeyInput()
 		m_direction = Direction::South;
 		m_position.y += m_speed * m_speedModifier;
 	}
+
+
+	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
+		//float xAxis = state.Gamepad.sThumbLX;
+		//float yAxis = state.Gamepad.sThumbLY;
+
+		// Read input from the Xbox controller
+		float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
+		float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
+
+		// Map input to movement controls
+		if (xAxis == 100) { m_direction = Direction::East; }
+		else if (xAxis == -100) { m_direction = Direction::West; }
+		else if (yAxis == 100) { m_direction = Direction::South; }
+		else { m_direction = Direction::North; }
+
+		cout << xAxis << "\n" << yAxis << "\n\n";
+		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
+			m_position.x += (xAxis / 100) * m_speed;
+
+			XINPUT_VIBRATION vibration;
+			memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
+			vibration.wLeftMotorSpeed = RUMBLE_THRESHOLD;
+			vibration.wRightMotorSpeed = RUMBLE_THRESHOLD;
+			XInputSetState(0, &vibration);
+		}
+		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
+			m_position.y += (yAxis / 100) * m_speed;
+
+			rumbleStart();
+		}
+		else {
+			// Stop rumble if no movement
+			rumbleStop();
+		}
+	}
 }
+
+void Player::rumbleStart()
+{
+	XINPUT_VIBRATION vibration;
+	memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
+	vibration.wLeftMotorSpeed = RUMBLE_THRESHOLD;
+	vibration.wRightMotorSpeed = RUMBLE_THRESHOLD;
+	XInputSetState(0, &vibration);
+}
+
+void Player::rumbleStop()
+{
+	XINPUT_VIBRATION vibration;
+	memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
+	XInputSetState(0, &vibration);
+}
+#pragma endregion
+
 
 void Player::setPosition(float t_x, float t_y)
 {

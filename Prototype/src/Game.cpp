@@ -39,7 +39,6 @@ void Game::init()
 	m_currentLevel = 1;
 
 	sf::Texture& bgTexture = m_holder["mapSprite"];
-
 	bgSprite.setTexture(bgTexture);
 	bgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	bgSprite.setOrigin(800, 500);

@@ -33,6 +33,8 @@ public:
 	void update(double dt, std::vector<Enemy*> t_enemies);
 	void render(sf::RenderWindow& t_window);
 	void handleKeyInput();
+	void rumbleStart();
+	void rumbleStop();
 	
 	void setPosition(float t_x, float t_y);
 	sf::Vector2f getPosition();

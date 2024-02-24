@@ -129,28 +129,34 @@ void Player::handleKeyInput()
 	XINPUT_STATE state;
 	memset(&state, 0, sizeof(XINPUT_STATE));
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	// Read input from the Xbox controller
+	float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
+	float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || xAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::West;
 		m_playerState = CharacterState::WalkState;
 		m_sprite.setScale(-0.5f, 0.5f);
 		m_position.x -= m_speed * m_speedModifier;
+		rumbleStart();
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::East;
 		m_playerState = CharacterState::WalkState;
 		m_sprite.setScale(0.5f, 0.5f);
 		m_position.x += m_speed * m_speedModifier;
+		rumbleStart();
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::North;
 		m_playerState = CharacterState::WalkState;
 		m_position.y -= m_speed * m_speedModifier;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::South;
 		m_playerState = CharacterState::WalkState;
@@ -160,41 +166,46 @@ void Player::handleKeyInput()
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
 		!sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
 		!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) &&
-		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && 
+		abs(xAxis) < JOYSTICK_THRESHOLD && abs(yAxis) < JOYSTICK_THRESHOLD)
 	{
 		m_playerState = CharacterState::IdleState;
+		rumbleStop();
 	}
 
-	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
-		//float xAxis = state.Gamepad.sThumbLX;
-		//float yAxis = state.Gamepad.sThumbLY;
+	//if (XInputGetState(0, &state) == ERROR_SUCCESS) {
+ //
 
-		// Read input from the Xbox controller
-		float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
-		float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
+	//	// Map input to movement controls
+	//	if (xAxis == 100) { 
+	//		m_direction = Direction::East; 
+	//	}
+	//	else if (xAxis == -100) { 
+	//		m_direction = Direction::West;
+	//	}
+	//	else if (yAxis == 100) { 
+	//		m_direction = Direction::South;
+	//	}
+	//	else { 
+	//		m_direction = Direction::North;
+	//	}
 
-		// Map input to movement controls
-		if (xAxis == 100) { m_direction = Direction::East; }
-		else if (xAxis == -100) { m_direction = Direction::West; }
-		else if (yAxis == 100) { m_direction = Direction::South; }
-		else { m_direction = Direction::North; }
+	//	//cout << xAxis << "\n" << yAxis << "\n\n";
+	//	if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
+	//		m_position.x += (xAxis / 100) * m_speed;
 
-		//cout << xAxis << "\n" << yAxis << "\n\n";
-		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
-			m_position.x += (xAxis / 100) * m_speed;
+	//		rumbleStart();
+	//	}
+	//	if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
+	//		m_position.y += (yAxis / 100) * m_speed;
 
-			rumbleStart();
-		}
-		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
-			m_position.y += (yAxis / 100) * m_speed;
-
-			rumbleStart();
-		}
-		else {
-			// Stop rumble if no movement
-			rumbleStop();
-		}
-	}
+	//		rumbleStart();
+	//	}
+	//	else {
+	//		// Stop rumble if no movement
+	//		rumbleStop();
+	//	}
+	//}
 }
 
 void Player::rumbleStart()

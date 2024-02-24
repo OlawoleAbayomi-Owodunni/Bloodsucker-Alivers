@@ -44,7 +44,7 @@ void Game::init()
 
 	sf::Texture& bgTexture = m_holder["mapSprite"];
 	bgSprite.setTexture(bgTexture);
-	bgSprite.setTextureRect(IntRect{ 0,0,3200,18100 });
+	bgSprite.setTextureRect(IntRect{ 0,0,3200,1800 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 

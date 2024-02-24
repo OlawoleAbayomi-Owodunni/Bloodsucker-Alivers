@@ -95,7 +95,7 @@ Player::~Player()
 {
 }
 
-void Player::update(double dt, std::vector<Enemy*> t_enemies)
+void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 {
 	handleKeyInput();
 
@@ -105,7 +105,7 @@ void Player::update(double dt, std::vector<Enemy*> t_enemies)
 	}
 	
 	setHealth();
-	setPosition(m_position.x, m_position.y);
+	setPosition(t_view);
 
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	checkXP();
@@ -229,17 +229,19 @@ void Player::rumbleStop()
 #pragma endregion
 
 
-void Player::setPosition(float t_x, float t_y)
+void Player::setPosition(sf::View& t_view)
 {
+	sf::Vector2f cameraPos(t_view.getCenter());
+
 	m_rectangle.setPosition(m_position);
 	m_playerSprite.setPosition(m_position);
 	
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
 	
-	m_xpBar.setPosition(m_position.x, m_position.y - 410.0F);
-	m_emptyXPBar.setPosition(m_position.x, m_position.y - 410.0F);
-	m_xpBarSprite.setPosition(m_position.x, m_position.y - 410.0f);
+	m_xpBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
+	m_emptyXPBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
+	m_xpBarSprite.setPosition(cameraPos.x, cameraPos.y - 410.0f);
 
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 }

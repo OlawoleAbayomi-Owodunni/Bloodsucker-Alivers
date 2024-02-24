@@ -231,8 +231,6 @@ void Game::update(double dt)
 {
 	if (m_currentGamemode == Gamemode::Gameplay)
 	{
-		m_player.update(dt, m_enemies);
-
 		sf::Vector2f targetPosition = m_player.getPosition();
 		sf::Vector2f interpolatedPosition = m_view.getCenter();
 
@@ -246,6 +244,7 @@ void Game::update(double dt)
 
 		//cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
 
+		m_player.update(dt, m_view, m_enemies);
 
 		for (auto enemy : m_enemies)
 		{

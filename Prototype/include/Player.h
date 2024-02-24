@@ -30,13 +30,13 @@ public:
 	Player();
 	~Player();
 
-	void update(double dt, std::vector<Enemy*> t_enemies);
+	void update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies);
 	void render(sf::RenderWindow& t_window);
 	void handleKeyInput();
 	void rumbleStart();
 	void rumbleStop();
 	
-	void setPosition(float t_x, float t_y);
+	void setPosition(sf::View& t_view);
 	sf::Vector2f getPosition();
 
 	void setHealth();

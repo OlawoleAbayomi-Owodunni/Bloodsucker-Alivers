@@ -32,6 +32,7 @@ private:
 	float m_health;
 	float m_speed;
 	sf::Vector2f m_position;
+	sf::Vector2f m_velocity;
 
 	sf::RectangleShape m_rectangle;
 	sf::RectangleShape m_emptyHealthBar;

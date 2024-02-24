@@ -30,13 +30,13 @@ public:
 	Player();
 	~Player();
 
-	void update(double dt, std::vector<Enemy*> t_enemies);
+	void update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies);
 	void render(sf::RenderWindow& t_window);
 	void handleKeyInput();
 	void rumbleStart();
 	void rumbleStop();
 	
-	void setPosition(float t_x, float t_y);
+	void setPosition(sf::View& t_view);
 	sf::Vector2f getPosition();
 
 	void setHealth();
@@ -76,7 +76,7 @@ private:
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
 	sf::RectangleShape m_xpBar;
-	sf::RectangleShape m_emptyxphBar;
+	sf::RectangleShape m_emptyXPBar;
 
 	std::vector<Weapon*> m_weapons;
 
@@ -85,11 +85,17 @@ private:
 	CharacterState m_playerState;
 	CharacterState m_previousState;
 
-	std::vector<sf::IntRect> m_frames;
-	int m_currentFrame;
-	Time m_time;
-	Clock m_clock;
+	std::vector<sf::IntRect> m_playerFrames;
+	int m_currentPlayerFrame;
+	Time m_playerTime;
+	Clock m_playerClock;
+
+	std::vector<sf::IntRect> m_haloFrames;
+	int m_currentHaloFrame;
+	Time m_haloTime;
+	Clock m_haloClock;
 	
-	Sprite m_sprite;
-	Sprite m_levelBarSprite;
+	Sprite m_playerSprite;
+	Sprite m_haloSprite;
+	Sprite m_xpBarSprite;
 };

@@ -2,10 +2,14 @@
 #include "Player.h"
 #include <iostream>
 
+std::vector<Enemy*> Enemy::m_allEnemies{};
+
 Enemy::Enemy(sf::Texture& t_texture)
 {
+	m_allEnemies.push_back(this);
+
 	m_health = 100.0f;
-	m_speed = 1 + ((rand() % 10) / 10 + 0.1);
+	m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
 
 	m_rectangle.setSize(sf::Vector2f(40.0f, 80.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -71,30 +75,54 @@ void Enemy::initialisePosition()
 
 void Enemy::move(Player& t_player)
 {
-	if (m_position.x < t_player.getPosition().x)
+	sf::Vector2f playerPos = t_player.getPosition();
+	sf::Vector2f displacement;
+	float distance;
+
+	displacement.x = playerPos.x - m_position.x;
+	displacement.y = playerPos.y - m_position.y;
+
+	distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+	calculatePushFactor();
+
+	m_velocity = (displacement / distance) * m_speed;
+	m_position += m_velocity;
+	m_position += m_pushFactor;
+
+	if (m_position.x < playerPos.x)
 	{
 		m_enemySprite.setScale(0.5f, 0.5f);
-		m_position.x += m_speed;
 	}
 	else
 	{
 		m_enemySprite.setScale(-0.5f, 0.5f);
-		m_position.x -= m_speed;
-	}
-
-	if (m_position.y < t_player.getPosition().y)
-	{
-		m_position.y += m_speed;
-	}
-	else
-	{
-		m_position.y -= m_speed;
 	}
 
 	m_rectangle.setPosition(m_position);
 	m_enemySprite.setPosition(m_position);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
+}
+
+void Enemy::calculatePushFactor()
+{
+	m_pushFactor.x = 0;
+	m_pushFactor.y = 0;
+
+	for (Enemy const* other : m_allEnemies)
+	{
+		sf::Vector2f difference = m_position - other->m_position;
+		float magnitudeSqrd = difference.x * difference.x + difference.y * difference.y;
+
+		if (magnitudeSqrd > 2000)
+		{
+			continue;
+		}
+		m_pushFactor += difference;
+	}
+
+	m_pushFactor *= 0.06f;
 }
 
 void Enemy::setPosition(float t_x, float t_y)

@@ -73,12 +73,12 @@ Player::Player()
 	m_emptyHealthBar.setFillColor(sf::Color::Red);
 	m_emptyHealthBar.setOutlineColor(sf::Color::Black);
 	m_emptyHealthBar.setOutlineThickness(2.0f);
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 
 	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
 	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
@@ -236,8 +236,8 @@ void Player::setPosition(sf::View& t_view)
 	m_rectangle.setPosition(m_position);
 	m_playerSprite.setPosition(m_position);
 	
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 64.0f);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 	
 	m_xpBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
 	m_emptyXPBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);

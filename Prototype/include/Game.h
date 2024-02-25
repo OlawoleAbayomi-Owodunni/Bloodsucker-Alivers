@@ -87,6 +87,7 @@ protected:
 
 	void checkCollisions();
 	void addEnemies();
+	void playSound();
 
 	// Font used for all text
 	sf::Font m_arialFont;
@@ -100,6 +101,9 @@ protected:
 	std::vector<Enemy*> m_enemies;
 	std::vector<XPOrb*> m_xpOrbs;
 	std::vector<Pickup*> m_pickups;
+
+	sf::SoundBuffer m_pickupSoundBuffer;
+	sf::Sound m_pickupSound;
 
 	int m_currentLevel;
 

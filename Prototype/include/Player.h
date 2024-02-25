@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include<SFML/Audio.hpp>
 #include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 #include "Weapon.h"
@@ -53,6 +54,8 @@ public:
 	void addFrame(sf::IntRect& t_frame);
 	void setFrames();
 
+	void playSound(sf::Sound& t_sound);
+
 	sf::RectangleShape getRectangle();
 	std::vector<Weapon*> getWeapon();
 
@@ -94,7 +97,7 @@ private:
 	int m_currentHaloFrame;
 	Time m_haloTime;
 	Clock m_haloClock;
-	
+
 	Sprite m_playerSprite;
 	Sprite m_haloSprite;
 	Sprite m_xpBarSprite;

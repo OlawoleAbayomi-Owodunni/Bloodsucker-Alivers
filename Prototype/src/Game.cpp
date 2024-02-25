@@ -25,6 +25,13 @@ void Game::init()
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 
+	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
+	{
+		std::cout << "error loading orb pick up sound";
+	}
+	m_pickupSound.setBuffer(m_pickupSoundBuffer);
+	m_pickupSound.setVolume(15.0f);
+
 	for (int i = 0; i < 10; i++)
 	{
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
@@ -185,6 +192,7 @@ void Game::checkCollisions()
 	{
 		if (CollisionDetection::playerOrbCollision(m_player, *it))
 		{
+			m_player.playSound(m_pickupSound);
 			m_player.increaseXP();
 
 			delete* it; // Delete the orb object

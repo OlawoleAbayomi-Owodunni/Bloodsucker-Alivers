@@ -11,6 +11,11 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_health = 100.0f;
 	m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
 
+	m_enemyState = CharacterState::WalkState;
+	m_previousState = CharacterState::None;
+
+	m_enemyTime = seconds(0.2f);
+
 	m_rectangle.setSize(sf::Vector2f(40.0f, 80.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::Red);
@@ -44,6 +49,12 @@ void Enemy::update(double dt, Player& t_player)
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 
 	move(t_player);
+
+	if (m_enemyState != m_previousState)
+	{
+		setFrames();
+	}
+	animate();
 }
 
 void Enemy::render(sf::RenderWindow& t_window)
@@ -148,4 +159,49 @@ void Enemy::decreaseHealth(float t_damage)
 float Enemy::getHealth()
 {
 	return m_health;
+}
+
+void Enemy::animate()
+{
+	if (m_enemyClock.getElapsedTime() > m_enemyTime)
+	{
+		if (m_currentEnemyFrame + 1 < m_enemyFrames.size())
+		{
+			m_currentEnemyFrame++;
+		}
+		else
+		{
+			m_currentEnemyFrame = 0;
+		}
+		m_enemyClock.restart();
+	}
+
+	m_enemySprite.setTextureRect(m_enemyFrames[m_currentEnemyFrame]);
+	m_previousState = m_enemyState;
+}
+
+void Enemy::addFrame(sf::IntRect& t_frame)
+{
+	m_enemyFrames.push_back(t_frame);
+}
+
+void Enemy::setFrames()
+{
+	m_enemyFrames.clear();
+	m_currentEnemyFrame = 0;
+
+	switch (m_enemyState)
+	{
+	case CharacterState::IdleState:
+		break;
+	case CharacterState::WalkState:
+		addFrame(IntRect{ 0,192,160,160 });
+		addFrame(IntRect{ 160,192,160,160 });
+		addFrame(IntRect{ 320,192,160,160 });
+		addFrame(IntRect{ 480,192,160,160 });
+		addFrame(IntRect{ 640,192,160,160 });
+		break;
+	default:
+		break;
+	}
 }

@@ -531,3 +531,8 @@ void Player::setFrames()
 		break;
 	}
 }
+
+void Player::playSound(sf::Sound& t_sound)
+{
+	t_sound.play();
+}

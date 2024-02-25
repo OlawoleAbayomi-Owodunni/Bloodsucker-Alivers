@@ -9,6 +9,7 @@ using namespace std;
 using namespace sf;
 
 class Player;
+enum class CharacterState;
 
 class Enemy
 {
@@ -31,6 +32,10 @@ public:
 
 	sf::RectangleShape getRectangle();
 
+	void animate();
+	void addFrame(sf::IntRect& t_frame);
+	void setFrames();
+
 private:
 	static std::vector<Enemy*> m_allEnemies;
 
@@ -43,6 +48,14 @@ private:
 	sf::RectangleShape m_rectangle;
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
+
+	CharacterState m_enemyState;
+	CharacterState m_previousState;
+
+	std::vector<sf::IntRect> m_enemyFrames;
+	int m_currentEnemyFrame;
+	Time m_enemyTime;
+	Clock m_enemyClock;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 	

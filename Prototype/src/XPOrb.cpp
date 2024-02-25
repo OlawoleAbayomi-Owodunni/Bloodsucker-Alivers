@@ -40,16 +40,28 @@ void XPOrb::update(double dt, Player& t_player)
 
 	distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
 
-	if (distance < 100.0f)
+	if (distance < 150.0f)
 	{
 		float scale = distance / 100.0f;
+		scale = 1 + (0.5f - (scale - 1));
+
+		if (distance < 100.0f)
+		{
+			scale = distance / 100.0f;
+
+			m_movementVector = displacement / distance;
+			m_position += m_movementVector * 4.0f;
+		}
+
 		m_sprite.setScale(scale, scale);
 		
-		m_movementVector = displacement / distance;
-		m_position += m_movementVector * 4.0f;
-
 		m_circle.setPosition(m_position);
 		m_sprite.setPosition(m_position);
+	}
+	else
+	{
+		float scale = 1.0f;
+		m_sprite.setScale(scale, scale);
 	}
 
 	if (m_clock.getElapsedTime() > m_time)

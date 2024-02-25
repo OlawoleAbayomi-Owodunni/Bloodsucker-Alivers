@@ -253,7 +253,7 @@ void Game::update(double dt)
 		
 		for (auto orb : m_xpOrbs)
 		{
-			orb->update(dt);
+			orb->update(dt, m_player);
 		}
 
 		for (auto pickup : m_pickups)

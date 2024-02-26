@@ -12,7 +12,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 	m_circle.setPosition(m_position);
 
 	m_sprite.setTexture(t_texture);
-	m_sprite.setTextureRect(IntRect{ 0,648,32,32 });
+	m_sprite.setTextureRect(IntRect{ 0,658,32,32 });
 	m_sprite.setOrigin(16, 16);
 	m_sprite.setScale(1.0f, 1.0f);
 	m_sprite.setPosition(m_position);
@@ -31,7 +31,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 
 	for (int i = 0; i < 16; i++)
 	{
-		m_frames.push_back(IntRect{ 32 * i,648,32,32 });
+		m_frames.push_back(IntRect{ 32 * i,658,32,32 });
 	}
 	m_currentFrame = 0;
 	m_time = seconds(0.1f);

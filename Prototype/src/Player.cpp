@@ -54,13 +54,13 @@ Player::Player()
 	sf::Texture& playerTextures = m_holder["starterAtlas"];
 
 	m_playerSprite.setTexture(playerTextures);
-	m_playerSprite.setTextureRect(IntRect{ 0,416,160,200 });
-	m_playerSprite.setOrigin(80, 100);
+	m_playerSprite.setTextureRect(IntRect{ 0,416,160,203 });
+	m_playerSprite.setOrigin(80.0f, 101.5f);
 	m_playerSprite.setScale(0.5f, 0.5f);
 	m_playerSprite.setPosition(m_position);
 
 	m_xpBarSprite.setTexture(playerTextures);
-	m_xpBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
+	m_xpBarSprite.setTextureRect(IntRect{ 0,626,500,32 });
 	m_xpBarSprite.setOrigin(250, 16);
 	m_xpBarSprite.setScale(2.25f, 2.0f);
 	m_xpBarSprite.setPosition(800.0f, 40.0f);
@@ -516,41 +516,41 @@ void Player::setFrames()
 	switch (m_playerState)
 	{
 	case CharacterState::IdleState:
-		addFrame(IntRect{ 0,744,160,200 });
-		addFrame(IntRect{ 160,744,160,200 });
-		addFrame(IntRect{ 320,744,160,200 });
-		addFrame(IntRect{ 480,744,160,200 });
-		addFrame(IntRect{ 640,744,160,200 });
-		addFrame(IntRect{ 800,744,160,200 });
-		addFrame(IntRect{ 960,744,160,200 });
-		addFrame(IntRect{ 1120,744,160,200 });
-		addFrame(IntRect{ 1280,744,160,200 });
+		addFrame(IntRect{ 0,744,160,203 });
+		addFrame(IntRect{ 160,744,160,203 });
+		addFrame(IntRect{ 320,744,160,203 });
+		addFrame(IntRect{ 480,744,160,203 });
+		addFrame(IntRect{ 640,744,160,203 });
+		addFrame(IntRect{ 800,744,160,203 });
+		addFrame(IntRect{ 960,744,160,203 });
+		addFrame(IntRect{ 1120,744,160,203 });
+		addFrame(IntRect{ 1280,744,160,203 });
 
-		addFrame(IntRect{ 0,944,160,200 });
-		addFrame(IntRect{ 160,944,160,200 });
-		addFrame(IntRect{ 320,944,160,200 });
-		addFrame(IntRect{ 480,944,160,200 });
-		addFrame(IntRect{ 640,944,160,200 });
-		addFrame(IntRect{ 800,944,160,200 });
-		addFrame(IntRect{ 960,944,160,200 });
-		addFrame(IntRect{ 1120,944,160,200 });
-		addFrame(IntRect{ 1280,944,160,200 });
+		addFrame(IntRect{ 0,944,160,203 });
+		addFrame(IntRect{ 160,944,160,203 });
+		addFrame(IntRect{ 320,944,160,203 });
+		addFrame(IntRect{ 480,944,160,203 });
+		addFrame(IntRect{ 640,944,160,203 });
+		addFrame(IntRect{ 800,944,160,203 });
+		addFrame(IntRect{ 960,944,160,203 });
+		addFrame(IntRect{ 1120,944,160,203 });
+		addFrame(IntRect{ 1280,944,160,203 });
 
-		addFrame(IntRect{ 0,1144,160,200 });
-		addFrame(IntRect{ 160,1144,160,200 });
-		addFrame(IntRect{ 320,1144,160,200 });
-		addFrame(IntRect{ 480,1144,160,200 });
-		addFrame(IntRect{ 640,1144,160,200 });
+		addFrame(IntRect{ 0,1144,160,203 });
+		addFrame(IntRect{ 160,1144,160,203 });
+		addFrame(IntRect{ 320,1144,160,203 });
+		addFrame(IntRect{ 480,1144,160,203 });
+		addFrame(IntRect{ 640,1144,160,203 });
 		break;
 	case CharacterState::WalkState:
-		addFrame(IntRect{ 160,416,160,200 });
-		addFrame(IntRect{ 320,416,160,200 });
-		addFrame(IntRect{ 480,416,160,200 });
-		addFrame(IntRect{ 640,416,160,200 });
-		addFrame(IntRect{ 800,416,160,200 });
-		addFrame(IntRect{ 960,416,160,200 });
-		addFrame(IntRect{ 1120,416,160,200 });
-		addFrame(IntRect{ 1280,416,160,200 });
+		addFrame(IntRect{ 160,416,160,203 });
+		addFrame(IntRect{ 320,416,160,203 });
+		addFrame(IntRect{ 480,416,160,203 });
+		addFrame(IntRect{ 640,416,160,203 });
+		addFrame(IntRect{ 800,416,160,203 });
+		addFrame(IntRect{ 960,416,160,203 });
+		addFrame(IntRect{ 1120,416,160,203 });
+		addFrame(IntRect{ 1280,416,160,203 });
 		break;
 	default:
 		break;

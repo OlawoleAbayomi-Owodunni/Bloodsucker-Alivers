@@ -25,6 +25,19 @@ enum class PlayerUpgrade
 	Count
 };
 
+class AfterImageData
+{
+public:
+	AfterImageData(sf::Vector2f t_position, float t_lifetime, sf::Sprite t_sprite) :
+		m_position(t_position), m_lifetime(t_lifetime), m_sprite(t_sprite)
+	{};
+
+	sf::Vector2f m_position;
+	float m_lifetime;
+	sf::Sprite m_sprite;
+
+};
+
 class Player
 {
 public:
@@ -57,11 +70,15 @@ public:
 	void playSound(sf::Sound& t_sound);
 
 	sf::RectangleShape getRectangle();
+	sf::RectangleShape getDashCollider();
 	std::vector<Weapon*> getWeapon();
 
 private:
-	const float DASH_DISTANCE{ 100.0f };
+	const float DASH_DISTANCE{ 150.0f };
+	const float AFTERIMAGE_COUNT{ 16.0f };
 
+	std::vector<AfterImageData> m_afterImages{};
+	
 	float m_maxHealth;
 	float m_health;
 	float m_speed;
@@ -81,10 +98,15 @@ private:
 	bool m_canDash;
 
 	sf::RectangleShape m_rectangle;
+
 	sf::RectangleShape m_emptyHealthBar;
 	sf::RectangleShape m_currentHealthBar;
+	
 	sf::RectangleShape m_xpBar;
 	sf::RectangleShape m_emptyXPBar;
+
+	sf::RectangleShape m_dashRect;
+	sf::RectangleShape m_dashRectBounds;
 
 	std::vector<Weapon*> m_weapons;
 

@@ -19,7 +19,7 @@ Player::Player()
 	m_maxHealth = 100.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
-	m_level = 1;
+	m_level = 2;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
 
@@ -39,7 +39,7 @@ Player::Player()
 
 	for (int i = 0; i < 6; i++)
 	{
-		m_haloFrames.push_back(IntRect{ 160 * i,1344,160,64 });
+		m_haloFrames.push_back(IntRect{ 160 * i,1350,160,64 });
 	}
 	m_currentHaloFrame = 0;
 
@@ -66,7 +66,7 @@ Player::Player()
 	m_xpBarSprite.setPosition(800.0f, 40.0f);
 
 	m_haloSprite.setTexture(playerTextures);
-	m_haloSprite.setTextureRect(IntRect{ 0,1344,160,64 });
+	m_haloSprite.setTextureRect(IntRect{ 0,1350,160,64 });
 	m_haloSprite.setOrigin(80, 32);
 	m_haloSprite.setScale(0.6f, 0.6f);
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
@@ -92,6 +92,11 @@ Player::Player()
 	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
 	m_xpBar.setFillColor(sf::Color::Green);
 	m_xpBar.setPosition(800.0f, 40.0f);
+
+	m_dashRect.setSize(sf::Vector2f(100.0f, 10.0f));
+	m_dashRect.setOrigin(m_dashRect.getSize().x / 2.0f, m_dashRect.getSize().y / 2.0f);
+	m_dashRect.setFillColor(sf::Color::White);
+	m_dashRect.setPosition(-1000.0f,-1000.0f);
 }
 
 Player::~Player()
@@ -107,6 +112,13 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 		weapon->update(dt, m_position, t_enemies, m_direction);
 	}
 	
+	m_dashRectBounds.setFillColor(sf::Color::Transparent);
+	m_dashRectBounds.setOutlineColor(sf::Color::Green);
+	m_dashRectBounds.setOutlineThickness(2.0f);
+	m_dashRectBounds.setOrigin(m_dashRect.getGlobalBounds().width / 2.0f, m_dashRect.getGlobalBounds().height / 2.0f);
+	m_dashRectBounds.setPosition(m_dashRect.getPosition());
+	m_dashRectBounds.setSize(sf::Vector2f(m_dashRect.getGlobalBounds().width, m_dashRect.getGlobalBounds().height));
+
 	setHealth();
 	setPosition(t_view);
 
@@ -125,6 +137,21 @@ void Player::render(sf::RenderWindow& t_window)
 	{
 		weapon->render(t_window);
 	}
+
+	const sf::Color baseColor = m_playerSprite.getColor();
+	for (AfterImageData data : m_afterImages)
+	{
+		const float colorScale = data.m_lifetime * 255;
+		const auto offsetColor = baseColor * sf::Color(255, 255, 255, colorScale);
+
+		data.m_sprite.setPosition(data.m_position);
+		data.m_sprite.setColor(offsetColor);
+		t_window.draw(data.m_sprite);
+	}
+
+	// Dash collider and bounds checker
+	/*t_window.draw(m_dashRect);
+	t_window.draw(m_dashRectBounds);*/
 
 	t_window.draw(m_haloSprite);
 
@@ -154,27 +181,27 @@ void Player::handleKeyInput()
 		m_direction = Direction::West;
 		m_playerState = CharacterState::WalkState;
 		m_playerSprite.setScale(-0.5f, 0.5f);
-		m_movementVector.x -= m_speed * m_speedModifier;
+		m_movementVector.x -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		m_direction = Direction::East;
 		m_playerState = CharacterState::WalkState;
 		m_playerSprite.setScale(0.5f, 0.5f);
-		m_movementVector.x += m_speed * m_speedModifier;
+		m_movementVector.x += m_speed;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		m_direction = Direction::North;
 		m_playerState = CharacterState::WalkState;
-		m_movementVector.y -= m_speed * m_speedModifier;
+		m_movementVector.y -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		m_direction = Direction::South;
 		m_playerState = CharacterState::WalkState;
-		m_movementVector.y += m_speed * m_speedModifier;
+		m_movementVector.y += m_speed;
 	}
 
 	// Controller
@@ -194,12 +221,12 @@ void Player::handleKeyInput()
 
 		//cout << xAxis << "\n" << yAxis << "\n\n";
 		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
-			m_movementVector.x += (xAxis / 100) * m_speed * m_speedModifier;
+			m_movementVector.x += (xAxis / 100) * m_speed;
 
 			rumbleStart();
 		}
 		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
-			m_movementVector.y += (yAxis / 100) * m_speed * m_speedModifier;
+			m_movementVector.y += (yAxis / 100) * m_speed;
 
 			rumbleStart();
 		}
@@ -209,7 +236,7 @@ void Player::handleKeyInput()
 		}
 	}
 
-	m_position += m_movementVector;
+	m_position += m_movementVector * m_speedModifier;
 
 	// Checking Idle state
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
@@ -226,14 +253,45 @@ void Player::handleKeyInput()
 		if (m_canDash && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			m_canDash = false;
-
 			sf::Vector2f heading = m_movementVector * DASH_DISTANCE;
+
+			for (unsigned int i = 0; i < AFTERIMAGE_COUNT; i++)
+			{
+				AfterImageData data{
+					m_position + (m_movementVector * (DASH_DISTANCE * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
+					static_cast<float>(i) / AFTERIMAGE_COUNT, m_playerSprite
+				};
+
+				m_afterImages.push_back(data);
+			}
+
+			float distance = std::sqrtf(heading.x * heading.x + heading.y * heading.y);
+			float dashAngle = atan2(heading.y, heading.x) * (180.0f / 3.14159);
+			
+			m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
+			m_dashRect.setOrigin(distance / 2.0f, 5.0f);
+			m_dashRect.setRotation(dashAngle);
+			m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
 
 			m_position += heading;
 		}
 		else if (!m_canDash && !sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			m_canDash = true;
+			m_dashRect.setPosition(-1000.0f,-1000.0f);
+		}
+
+		for (int i = 0; i < m_afterImages.size(); i++)
+		{
+			AfterImageData& data = m_afterImages[i];
+
+			data.m_lifetime -= 0.016f;
+
+			if (data.m_lifetime < 0.0f)
+			{
+				m_afterImages.erase(m_afterImages.begin() + i);
+				i--;
+			}
 		}
 	}
 }
@@ -342,6 +400,11 @@ sf::RectangleShape Player::getRectangle()
 std::vector<Weapon*> Player::getWeapon()
 {
 	return m_weapons;
+}
+
+sf::RectangleShape Player::getDashCollider()
+{
+	return m_dashRect;
 }
 
 void Player::levelUp(Gamemode& t_gamemode)
@@ -526,21 +589,21 @@ void Player::setFrames()
 		addFrame(IntRect{ 1120,744,160,203 });
 		addFrame(IntRect{ 1280,744,160,203 });
 
-		addFrame(IntRect{ 0,944,160,203 });
-		addFrame(IntRect{ 160,944,160,203 });
-		addFrame(IntRect{ 320,944,160,203 });
-		addFrame(IntRect{ 480,944,160,203 });
-		addFrame(IntRect{ 640,944,160,203 });
-		addFrame(IntRect{ 800,944,160,203 });
-		addFrame(IntRect{ 960,944,160,203 });
-		addFrame(IntRect{ 1120,944,160,203 });
-		addFrame(IntRect{ 1280,944,160,203 });
+		addFrame(IntRect{ 0,947,160,203 });
+		addFrame(IntRect{ 160,947,160,203 });
+		addFrame(IntRect{ 320,947,160,203 });
+		addFrame(IntRect{ 480,947,160,203 });
+		addFrame(IntRect{ 640,947,160,203 });
+		addFrame(IntRect{ 800,947,160,203 });
+		addFrame(IntRect{ 960,947,160,203 });
+		addFrame(IntRect{ 1120,947,160,203 });
+		addFrame(IntRect{ 1280,947,160,203 });
 
-		addFrame(IntRect{ 0,1144,160,203 });
-		addFrame(IntRect{ 160,1144,160,203 });
-		addFrame(IntRect{ 320,1144,160,203 });
-		addFrame(IntRect{ 480,1144,160,203 });
-		addFrame(IntRect{ 640,1144,160,203 });
+		addFrame(IntRect{ 0,1150,160,203 });
+		addFrame(IntRect{ 160,1150,160,203 });
+		addFrame(IntRect{ 320,1150,160,203 });
+		addFrame(IntRect{ 480,1150,160,203 });
+		addFrame(IntRect{ 640,1150,160,203 });
 		break;
 	case CharacterState::WalkState:
 		addFrame(IntRect{ 160,416,160,203 });

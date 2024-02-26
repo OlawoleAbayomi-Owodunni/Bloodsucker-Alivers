@@ -56,4 +56,19 @@ bool CollisionDetection::playerPickupCollision(Player& t_player, Pickup* t_picku
 	{
 		return true;
 	}
+
+	return false;
+}
+
+bool CollisionDetection::playerDashEnemyCollision(Player& t_player, Enemy* t_enemy)
+{
+	sf::FloatRect playerDash = t_player.getDashCollider().getGlobalBounds();
+	sf::FloatRect enemy = t_enemy->getRectangle().getGlobalBounds();
+
+	if (playerDash.intersects(enemy))
+	{
+		return true;
+	}
+
+	return false;
 }

@@ -453,7 +453,7 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 		m_armorModifier -= 0.1;
 		break;
 	case PlayerUpgrade::Weapon:
-		m_weapons[0]->upgradeWeapon();
+		m_weapons[0]->upgradeWeapon(); //taking the weapon enum of the pistol or AR should let us get the exact weapon
 		break;
 	default:
 		break;

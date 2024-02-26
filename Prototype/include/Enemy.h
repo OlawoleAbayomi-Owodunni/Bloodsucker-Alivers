@@ -46,8 +46,8 @@ private:
 	sf::Vector2f m_pushFactor;
 
 	sf::RectangleShape m_rectangle;
-	sf::RectangleShape m_emptyHealthBar;
-	sf::RectangleShape m_currentHealthBar;
+	//sf::RectangleShape m_emptyHealthBar;
+	//sf::RectangleShape m_currentHealthBar;
 
 	CharacterState m_enemyState;
 	CharacterState m_previousState;

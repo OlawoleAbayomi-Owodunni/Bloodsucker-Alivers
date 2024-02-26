@@ -26,9 +26,12 @@ Player::Player()
 	m_speedModifier = 1;
 	m_xpModifier = 1;
 	m_armorModifier = 1;
-	
-	m_weapons.push_back(new Weapon(WeaponType::Pistol));
+
 	m_direction = Direction::East;
+	m_canDash = false;
+
+	m_weapons.push_back(new Weapon(WeaponType::Pistol));
+	
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
 
@@ -107,7 +110,6 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 	setHealth();
 	setPosition(t_view);
 
-	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 	checkXP();
 
 	if (m_playerState != m_previousState)
@@ -143,42 +145,39 @@ void Player::handleKeyInput()
 	XINPUT_STATE state;
 	memset(&state, 0, sizeof(XINPUT_STATE));
 
+	///// Movement
+	// Keyboard
+	m_movementVector = sf::Vector2f(0.0f, 0.0f);
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		m_direction = Direction::West;
 		m_playerState = CharacterState::WalkState;
 		m_playerSprite.setScale(-0.5f, 0.5f);
-		m_position.x -= m_speed * m_speedModifier;
+		m_movementVector.x -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		m_direction = Direction::East;
 		m_playerState = CharacterState::WalkState;
 		m_playerSprite.setScale(0.5f, 0.5f);
-		m_position.x += m_speed * m_speedModifier;
+		m_movementVector.x += m_speed * m_speedModifier;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		m_direction = Direction::North;
 		m_playerState = CharacterState::WalkState;
-		m_position.y -= m_speed * m_speedModifier;
+		m_movementVector.y -= m_speed * m_speedModifier;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		m_direction = Direction::South;
 		m_playerState = CharacterState::WalkState;
-		m_position.y += m_speed * m_speedModifier;
+		m_movementVector.y += m_speed * m_speedModifier;
 	}
 
-	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
-		!sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
-		!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) &&
-		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-	{
-		m_playerState = CharacterState::IdleState;
-	}
-
+	// Controller
 	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
 		//float xAxis = state.Gamepad.sThumbLX;
 		//float yAxis = state.Gamepad.sThumbLY;
@@ -195,18 +194,46 @@ void Player::handleKeyInput()
 
 		//cout << xAxis << "\n" << yAxis << "\n\n";
 		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
-			m_position.x += (xAxis / 100) * m_speed;
+			m_movementVector.x += (xAxis / 100) * m_speed * m_speedModifier;
 
 			rumbleStart();
 		}
 		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
-			m_position.y += (yAxis / 100) * m_speed;
+			m_movementVector.y += (yAxis / 100) * m_speed * m_speedModifier;
 
 			rumbleStart();
 		}
 		else {
 			// Stop rumble if no movement
 			rumbleStop();
+		}
+	}
+
+	m_position += m_movementVector;
+
+	// Checking Idle state
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) &&
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		m_playerState = CharacterState::IdleState;
+	}
+
+	// Dash
+	if (m_level > 1)
+	{
+		if (m_canDash && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			m_canDash = false;
+
+			sf::Vector2f heading = m_movementVector * DASH_DISTANCE;
+
+			m_position += heading;
+		}
+		else if (!m_canDash && !sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			m_canDash = true;
 		}
 	}
 }
@@ -285,11 +312,20 @@ void Player::increaseXP()
 
 void Player::checkXP()
 {
+	float fillAmount = m_xp / m_xpRequired;
+
+	m_xpBar.setSize(sf::Vector2f(fillAmount * 1000.0f, 20.0f));
+
 	if (m_xp >= m_xpRequired)
 	{
 		m_level++;
 		m_xpRequired *= 2;
 		m_xp = 0;
+
+		if (m_level == 2)
+		{
+			m_canDash = true;
+		}
 	}
 }
 

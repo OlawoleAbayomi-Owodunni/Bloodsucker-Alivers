@@ -21,7 +21,7 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_rectangle.setFillColor(sf::Color::Red);
 	m_rectangle.setPosition(m_position);
 
-	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
+	/*m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
 	m_emptyHealthBar.setFillColor(sf::Color::Red);
 	m_emptyHealthBar.setOutlineColor(sf::Color::Black);
@@ -31,7 +31,7 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);*/
 
 	m_enemySprite.setTexture(t_texture);
 	m_enemySprite.setTextureRect(IntRect{ 0,192,160,160 });
@@ -46,7 +46,7 @@ Enemy::~Enemy()
 
 void Enemy::update(double dt, Player& t_player)
 {
-	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+	//m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 
 	move(t_player);
 
@@ -61,8 +61,8 @@ void Enemy::render(sf::RenderWindow& t_window)
 {
 	//t_window.draw(m_rectangle);
 	t_window.draw(m_enemySprite);
-	t_window.draw(m_emptyHealthBar);
-	t_window.draw(m_currentHealthBar);
+	//t_window.draw(m_emptyHealthBar);
+	//t_window.draw(m_currentHealthBar);
 }
 
 void Enemy::initialisePosition()
@@ -112,8 +112,8 @@ void Enemy::move(Player& t_player)
 
 	m_rectangle.setPosition(m_position);
 	m_enemySprite.setPosition(m_position);
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
+	//m_emptyHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
+	//m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
 }
 
 void Enemy::calculatePushFactor()

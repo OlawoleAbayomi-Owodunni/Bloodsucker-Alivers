@@ -60,10 +60,13 @@ public:
 	std::vector<Weapon*> getWeapon();
 
 private:
+	const float DASH_DISTANCE{ 100.0f };
+
 	float m_maxHealth;
 	float m_health;
 	float m_speed;
 	sf::Vector2f m_position;
+	sf::Vector2f m_movementVector;
 	
 	int m_level;
 	float m_xp;
@@ -74,6 +77,8 @@ private:
 	float m_armorModifier;
 
 	Direction m_direction;
+
+	bool m_canDash;
 
 	sf::RectangleShape m_rectangle;
 	sf::RectangleShape m_emptyHealthBar;

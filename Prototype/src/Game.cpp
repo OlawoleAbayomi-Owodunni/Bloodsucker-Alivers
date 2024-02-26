@@ -22,9 +22,11 @@ void Game::init()
 	// Really only necessary is our target FPS is greater than 60.
 	m_window.setVerticalSyncEnabled(true);
 
+	//THOR
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
-
+	
+	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
 	{
 		std::cout << "error loading orb pick up sound";
@@ -32,23 +34,24 @@ void Game::init()
 	m_pickupSound.setBuffer(m_pickupSoundBuffer);
 	m_pickupSound.setVolume(15.0f);
 
+	//ENEMIES
 	for (int i = 0; i < 10; i++)
 	{
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 	}
-
 	for (auto enemy : m_enemies)
 	{
 		enemy->initialisePosition(m_player.getPosition());
 	}
+	m_currentLevel = 1;
 
+	//FONT
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
 	{
 		std::cout << "Error loading font file";
 	}
 
-	m_currentLevel = 1;
-
+	//BACKGROUND
 	sf::Texture& bgTexture = m_holder["mapSprite"];
 	bgSprite.setTexture(bgTexture);
 	bgSprite.setTextureRect(IntRect{ 0,0,3200,1800 });
@@ -69,12 +72,13 @@ void Game::init()
 #endif
 }
 
+#pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
 ////////////////////////////////////////////////////////////
 void Game::run()
 {
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
-	
+
 	sf::Time timePerFrame = sf::seconds(1.0f / FPS); // 60 fps
 	while (m_window.isOpen())
 	{
@@ -121,7 +125,9 @@ void Game::processEvents()
 	}
 }
 
-////////////////////////////////////////////////////////////
+#pragma endregion
+
+
 void Game::processGameEvents(sf::Event& event)
 {
 	// check if the event is a a mouse button release
@@ -151,108 +157,6 @@ void Game::processGameEvents(sf::Event& event)
 	}
 }
 
-void Game::checkCollisions()
-{
-
-	for (auto enemy : m_enemies)
-	{
-		if (CollisionDetection::playerEnemyCollision(m_player, enemy))
-		{
-			m_player.decreaseHealth();
-		}
-
-		if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
-		{
-			enemy->decreaseHealth(100.0f);
-
-			if (enemy->getHealth() < 0)
-			{
-				if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
-				{
-					m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
-				}
-
-				if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
-				{
-					m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-				}
-
-				enemy->initialisePosition(m_player.getPosition());
-			}
-		}
-
-		for (auto weapon : m_player.getWeapon())
-		{
-			for (auto bullet : weapon->getBullet())
-			{
-				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
-				{
-					enemy->decreaseHealth(bullet->getDamage());
-
-					if (enemy->getHealth() < 0)
-					{
-						if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
-						{
-							m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
-						}
-
-						if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
-						{
-							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-						}
-
-						enemy->initialisePosition(m_player.getPosition());
-					}
-				}
-			}
-		}
-	}
-
-	for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
-	{
-		if (CollisionDetection::playerOrbCollision(m_player, *it))
-		{
-			m_player.playSound(m_pickupSound);
-			m_player.increaseXP();
-
-			delete* it; // Delete the orb object
-			it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
-		}
-		else 
-		{
-			++it;
-		}
-	}
-
-	for (auto it = m_pickups.begin(); it != m_pickups.end();)
-	{
-		if (CollisionDetection::playerPickupCollision(m_player, *it))
-		{
-			m_player.increaseHealth();
-
-
-			delete* it; // Delete the pickup object
-			it = m_pickups.erase(it); // Remove the pickup pointer from the vector
-		}
-		else
-		{
-			++it;
-		}
-	}
-}
-
-void Game::addEnemies()
-{
-	if (m_player.getLevel() > m_currentLevel)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
-			m_currentGamemode = Gamemode::Upgrade;
-		}
-		m_currentLevel++;
-	}
-}
 
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
@@ -330,4 +234,130 @@ void Game::render()
 	m_window.draw(x_drawFPS);
 #endif
 	m_window.display();
+}
+
+
+
+#pragma region COLLISION HANDLER
+void Game::checkCollisions()
+{
+#pragma region Enemies
+	for (auto enemy : m_enemies)
+	{
+		//Player to Enemy
+		if (CollisionDetection::playerEnemyCollision(m_player, enemy))
+		{
+			m_player.decreaseHealth();
+		}
+
+		//Enemy to Dash
+		if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
+		{
+			enemy->decreaseHealth(100.0f);
+
+			if (enemy->getHealth() < 0)
+			{
+				if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+				{
+					m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+				}
+
+				if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+				{
+					m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
+				}
+
+				enemy->initialisePosition(m_player.getPosition());
+			}
+		}
+
+		//Bullet to Enemy
+		for (auto weapon : m_player.getWeapon())
+		{
+			for (auto bullet : weapon->getBullet())
+			{
+				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
+				{
+					enemy->decreaseHealth(bullet->getDamage());
+
+					if (enemy->getHealth() < 0)
+					{
+						if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+						{
+							m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+						}
+
+						if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+						{
+							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
+						}
+
+						enemy->initialisePosition(m_player.getPosition());
+					}
+				}
+			}
+		}
+	}
+
+#pragma endregion
+
+#pragma region Orbs
+	for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
+	{
+		if (CollisionDetection::playerOrbCollision(m_player, *it))
+		{
+			m_player.rumbleStart();
+			rumbleTimer.restart();
+
+			m_player.playSound(m_pickupSound);
+			m_player.increaseXP();
+
+			delete* it; // Delete the orb object
+			it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
+		}
+		else
+		{
+			++it;
+		}
+	}
+	cout << rumbleTimer.getElapsedTime().asSeconds() << "\n";
+
+	if (rumbleTimer.getElapsedTime().asSeconds() > 0.1f) {
+		m_player.rumbleStop();
+	}
+
+#pragma endregion
+
+#pragma region Pickups
+	for (auto it = m_pickups.begin(); it != m_pickups.end();)
+	{
+		if (CollisionDetection::playerPickupCollision(m_player, *it))
+		{
+			m_player.increaseHealth();
+
+			delete* it; // Delete the pickup object
+			it = m_pickups.erase(it); // Remove the pickup pointer from the vector
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+#pragma endregion
+
+}
+#pragma endregion
+
+void Game::addEnemies()
+{
+	if (m_player.getLevel() > m_currentLevel)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+			m_currentGamemode = Gamemode::Upgrade;
+		}
+		m_currentLevel++;
+	}
 }

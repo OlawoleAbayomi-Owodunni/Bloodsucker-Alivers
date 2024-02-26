@@ -9,6 +9,7 @@ Weapon::Weapon(WeaponType t_type)
 	m_type = t_type;
 	m_firing = false;
 	counter = 0;
+	m_fireRateModifier = 1;
 
 	if (!m_weaponTexture.loadFromFile("./resources/sprites/plyrPh.png"))
 	{
@@ -23,12 +24,12 @@ Weapon::Weapon(WeaponType t_type)
 	switch (m_type)
 	{
 	case WeaponType::Pistol:
-		m_fireRate = 3.0f;
+		m_fireRate = 3.0f * m_fireRateModifier;
 		m_bullets.push_back(new Bullet(WeaponType::Pistol, m_holder["starterAtlas"]));
 		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
 		break;
 	case WeaponType::AssaultRifle:
-		m_fireRate = 1.0f;
+		m_fireRate = 1.0f / m_fireRateModifier;
 		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
 		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
 		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
@@ -37,6 +38,8 @@ Weapon::Weapon(WeaponType t_type)
 	default:
 		break;
 	}
+
+	m_weaponLvl = 0;
 }
 
 Weapon::~Weapon()
@@ -47,7 +50,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 {	
 	if (!m_firing)
 	{
-		if (m_timer.getElapsedTime().asSeconds() > m_fireRate)
+		if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
 		{
 			m_firing = true;
 			m_timer.restart();
@@ -55,7 +58,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 	}
 	else if (m_firing)
 	{
-		if (m_timer.getElapsedTime().asSeconds() > 2)
+		if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
 		{
 			m_firing = false;
 			m_timer.restart();
@@ -113,4 +116,28 @@ void Weapon::render(sf::RenderWindow& t_window)
 std::vector<Bullet*> Weapon::getBullet()
 {
 	return m_bullets;
+}
+
+int Weapon::getWeaponLevel()
+{
+	return m_weaponLvl;
+}
+
+void Weapon::upgradeWeapon() //probably pass in which weapon ID is coming from the player and based off that modify that guns properties in here
+{
+	m_weaponLvl++;
+	switch (m_weaponLvl)
+	{
+	case 1:
+		m_fireRateModifier = 2.0f;
+		break;
+	case 2:
+		m_fireRateModifier = 3.0f;
+		break;
+	case 3:
+		m_fireRateModifier = 4.0f;
+		break;
+	default:
+		break;
+	}
 }

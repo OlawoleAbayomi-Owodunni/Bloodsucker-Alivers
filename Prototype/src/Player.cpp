@@ -11,11 +11,14 @@ const float JOYSTICK_THRESHOLD = 50.0f; // Adjust as needed
 // Define the rumble intensity (in the range [0, 65535])
 const float RUMBLE_THRESHOLD = 16000;
 
+#pragma region CONSTRUCTOR
 Player::Player()
 {
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
+	m_holder.acquire("playerAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/differentCharacterangle.png"));
 
+	//Base variable initialiser
 	m_maxHealth = 100.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
@@ -23,10 +26,13 @@ Player::Player()
 	m_xp = 0;
 	m_xpRequired = 10.0f;
 
+	//Upgrade modifiers
 	m_speedModifier = 1;
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
+	//FSM setup
+	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
 	m_canDash = false;
 
@@ -46,11 +52,8 @@ Player::Player()
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
 
-	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
-	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
-	m_rectangle.setFillColor(sf::Color::White);
-	m_rectangle.setPosition(m_position);
 
+#pragma region SPRITES
 	sf::Texture& playerTextures = m_holder["starterAtlas"];
 
 	m_playerSprite.setTexture(playerTextures);
@@ -59,18 +62,36 @@ Player::Player()
 	m_playerSprite.setScale(0.5f, 0.5f);
 	m_playerSprite.setPosition(m_position);
 
+	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
+	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
+	m_rectangle.setFillColor(sf::Color::White);
+	m_rectangle.setPosition(m_position);
+
+	//XP Bar sprite setup
 	m_xpBarSprite.setTexture(playerTextures);
 	m_xpBarSprite.setTextureRect(IntRect{ 0,626,500,32 });
 	m_xpBarSprite.setOrigin(250, 16);
 	m_xpBarSprite.setScale(2.25f, 2.0f);
 	m_xpBarSprite.setPosition(800.0f, 40.0f);
 
+	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
+	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
+	m_emptyXPBar.setFillColor(Color::Black);
+	m_emptyXPBar.setPosition(800.0f, 40.0f);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
+	m_xpBar.setFillColor(sf::Color::Green);
+	m_xpBar.setPosition(800.0f, 40.0f);
+
+	//Halo Sprite setup
 	m_haloSprite.setTexture(playerTextures);
 	m_haloSprite.setTextureRect(IntRect{ 0,1350,160,64 });
 	m_haloSprite.setOrigin(80, 32);
 	m_haloSprite.setScale(0.6f, 0.6f);
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 
+	//Health bar setup
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
 	m_emptyHealthBar.setFillColor(sf::Color::Red);
@@ -83,21 +104,17 @@ Player::Player()
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 
-	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
-	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
-	m_emptyXPBar.setFillColor(Color::Black);
-	m_emptyXPBar.setPosition(800.0f, 40.0f);
-
-	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
-	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
-	m_xpBar.setFillColor(sf::Color::Green);
-	m_xpBar.setPosition(800.0f, 40.0f);
-
+	//Dash setup
 	m_dashRect.setSize(sf::Vector2f(100.0f, 10.0f));
 	m_dashRect.setOrigin(m_dashRect.getSize().x / 2.0f, m_dashRect.getSize().y / 2.0f);
 	m_dashRect.setFillColor(sf::Color::White);
-	m_dashRect.setPosition(-1000.0f,-1000.0f);
+	m_dashRect.setPosition(-1000.0f, -1000.0f);
+#pragma endregion
+
 }
+
+#pragma endregion
+
 
 Player::~Player()
 {
@@ -175,15 +192,18 @@ void Player::handleKeyInput()
 	///// Movement
 	// Keyboard
 	m_movementVector = sf::Vector2f(0.0f, 0.0f);
+	// Read input from the Xbox controller
+	float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
+	float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || xAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::West;
 		m_playerState = CharacterState::WalkState;
 		m_playerSprite.setScale(-0.5f, 0.5f);
 		m_movementVector.x -= m_speed;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::East;
 		m_playerState = CharacterState::WalkState;
@@ -191,50 +211,37 @@ void Player::handleKeyInput()
 		m_movementVector.x += m_speed;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::North;
 		m_playerState = CharacterState::WalkState;
 		m_movementVector.y -= m_speed;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::South;
 		m_playerState = CharacterState::WalkState;
 		m_movementVector.y += m_speed;
 	}
 
-	// Controller
-	if (XInputGetState(0, &state) == ERROR_SUCCESS) {
-		//float xAxis = state.Gamepad.sThumbLX;
-		//float yAxis = state.Gamepad.sThumbLY;
+	//	// Map input to movement controls
+	//	if (xAxis == 100) { 
+	//		m_direction = Direction::East; 
+	//	}
+	//	else if (xAxis == -100) { 
+	//		m_direction = Direction::West;
+	//	}
+	//	else if (yAxis == 100) { 
+	//		m_direction = Direction::South;
+	//	}
+	//	else { 
+	//		m_direction = Direction::North;
+	//	}
 
-		// Read input from the Xbox controller
-		float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
-		float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
-
-		// Map input to movement controls
-		if (xAxis == 100) { m_direction = Direction::East; }
-		else if (xAxis == -100) { m_direction = Direction::West; }
-		else if (yAxis == 100) { m_direction = Direction::South; }
-		else { m_direction = Direction::North; }
-
-		//cout << xAxis << "\n" << yAxis << "\n\n";
-		if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
-			m_movementVector.x += (xAxis / 100) * m_speed;
-
-			rumbleStart();
-		}
-		if (std::abs(yAxis) > JOYSTICK_THRESHOLD) {
-			m_movementVector.y += (yAxis / 100) * m_speed;
-
-			rumbleStart();
-		}
-		else {
-			// Stop rumble if no movement
-			rumbleStop();
-		}
-	}
+	//	//cout << xAxis << "\n" << yAxis << "\n\n";
+	//	if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
+	//		m_position.x += (xAxis / 100) * m_speed;
+	//}
 
 	m_position += m_movementVector * m_speedModifier;
 
@@ -242,7 +249,8 @@ void Player::handleKeyInput()
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left) &&
 		!sf::Keyboard::isKeyPressed(sf::Keyboard::Right) &&
 		!sf::Keyboard::isKeyPressed(sf::Keyboard::Up) &&
-		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		!sf::Keyboard::isKeyPressed(sf::Keyboard::Down) &&
+		abs(xAxis) < JOYSTICK_THRESHOLD && abs(yAxis) < JOYSTICK_THRESHOLD)
 	{
 		m_playerState = CharacterState::IdleState;
 	}
@@ -321,78 +329,11 @@ void Player::rumbleStop()
 }
 #pragma endregion
 
-
-void Player::setPosition(sf::View& t_view)
-{
-	sf::Vector2f cameraPos(t_view.getCenter());
-
-	m_rectangle.setPosition(m_position);
-	m_playerSprite.setPosition(m_position);
-	
-	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
-	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
-	
-	m_xpBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
-	m_emptyXPBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
-	m_xpBarSprite.setPosition(cameraPos.x, cameraPos.y - 410.0f);
-
-	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
-}
-
+#pragma region GETTERS & SETTERS
+#pragma region Getters
 sf::Vector2f Player::getPosition()
 {
 	return m_position;
-}
-
-void Player::setHealth()
-{
-	if (m_health < 0)
-	{
-		m_health = 0;
-	}
-	else if (m_health > m_maxHealth)
-	{
-		m_health = m_maxHealth;
-	}
-
-	m_currentHealthBar.setSize(sf::Vector2f((m_health / m_maxHealth) * 50.0f, 6.0f));
-}
-
-void Player::decreaseHealth()
-{
-	m_health -= 1.0f * m_armorModifier;
-}
-
-void Player::increaseHealth()
-{
-	if (m_health < m_maxHealth)
-	{
-		m_health += 25.0f;
-	}
-}
-
-void Player::increaseXP()
-{
-	m_xp += 2 * m_xpModifier;
-}
-
-void Player::checkXP()
-{
-	float fillAmount = m_xp / m_xpRequired;
-
-	m_xpBar.setSize(sf::Vector2f(fillAmount * 1000.0f, 20.0f));
-
-	if (m_xp >= m_xpRequired)
-	{
-		m_level++;
-		m_xpRequired *= 2;
-		m_xp = 0;
-
-		if (m_level == 2)
-		{
-			m_canDash = true;
-		}
-	}
 }
 
 int Player::getLevel()
@@ -415,8 +356,50 @@ sf::RectangleShape Player::getDashCollider()
 	return m_dashRect;
 }
 
+#pragma endregion
+
+#pragma region Setters
+void Player::setPosition(sf::View& t_view)
+{
+	sf::Vector2f cameraPos(t_view.getCenter());
+
+	m_rectangle.setPosition(m_position);
+	m_playerSprite.setPosition(m_position);
+
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+
+	m_xpBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
+	m_emptyXPBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
+	m_xpBarSprite.setPosition(cameraPos.x, cameraPos.y - 410.0f);
+
+	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
+}
+
+void Player::setHealth()
+{
+	if (m_health < 0)
+	{
+		m_health = 0;
+	}
+	else if (m_health > m_maxHealth)
+	{
+		m_health = m_maxHealth;
+	}
+
+	m_currentHealthBar.setSize(sf::Vector2f((m_health / m_maxHealth) * 50.0f, 6.0f));
+}
+
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region UPGRADES
+#pragma region Player Upgrades
 void Player::levelUp(Gamemode& t_gamemode)
 {
+#pragma region Text/Console stuff
 	int playerChoice;
 	std::string text1;
 	std::string text2;
@@ -436,7 +419,7 @@ void Player::levelUp(Gamemode& t_gamemode)
 	}
 
 	std::cout << "Choose an upgrade:\n";
-	
+
 	switch (choice1)
 	{
 	case PlayerUpgrade::Health:
@@ -450,6 +433,9 @@ void Player::levelUp(Gamemode& t_gamemode)
 		break;
 	case PlayerUpgrade::Armor:
 		text1 = "1. Armor";
+		break;
+	case PlayerUpgrade::Weapon:
+		text1 = "1. Pistol LEVEL++";
 		break;
 	default:
 		break;
@@ -469,6 +455,10 @@ void Player::levelUp(Gamemode& t_gamemode)
 	case PlayerUpgrade::Armor:
 		text2 = "2. Armor";
 		break;
+	case PlayerUpgrade::Weapon:
+		text2 = "2. Pistol LEVEL++";
+		break;
+
 	default:
 		break;
 	}
@@ -487,6 +477,9 @@ void Player::levelUp(Gamemode& t_gamemode)
 	case PlayerUpgrade::Armor:
 		text3 = "3. Armor";
 		break;
+	case PlayerUpgrade::Weapon:
+		text3 = "3. Pistol LEVEL++";
+		break;
 	default:
 		break;
 	}
@@ -496,6 +489,9 @@ void Player::levelUp(Gamemode& t_gamemode)
 	std::cout << text3 << "\n";
 
 	std::cin >> playerChoice;
+
+#pragma endregion
+
 
 	switch (playerChoice)
 	{
@@ -535,11 +531,49 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 	case PlayerUpgrade::Armor:
 		m_armorModifier -= 0.1;
 		break;
+	case PlayerUpgrade::Weapon:
+		m_weapons[0]->upgradeWeapon(); //taking the weapon enum of the pistol or AR should let us get the exact weapon
+		break;
 	default:
 		break;
 	}
 }
 
+#pragma endregion
+
+#pragma endregion
+
+
+void Player::decreaseHealth()
+{
+	m_health -= 1.0f * m_armorModifier;
+}
+
+void Player::increaseHealth()
+{
+	if (m_health < m_maxHealth)
+	{
+		m_health += 25.0f;
+	}
+}
+
+void Player::increaseXP()
+{
+	m_xp += 2 * m_xpModifier;
+}
+
+void Player::checkXP()
+{
+	if (m_xp >= m_xpRequired)
+	{
+		m_level++;
+		m_xpRequired *= 2;
+		m_xp = 0;
+	}
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+}
+
+#pragma region FSM
 void Player::animate()
 {
 	if (m_playerClock.getElapsedTime() > m_playerTime)
@@ -627,6 +661,9 @@ void Player::setFrames()
 		break;
 	}
 }
+
+#pragma endregion
+
 
 void Player::playSound(sf::Sound& t_sound)
 {

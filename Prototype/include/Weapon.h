@@ -13,12 +13,17 @@ public:
 
 	std::vector<Bullet*> getBullet();
 
+	int getWeaponLevel();
+
+	void upgradeWeapon();
+
 private:
 	sf::Clock m_timer;
 	WeaponType m_type;
 	std::vector<Bullet*> m_bullets;
 	bool m_firing;
 	float m_fireRate;
+	float m_fireRateModifier;
 
 	int counter;
 
@@ -26,4 +31,6 @@ private:
 
 	Texture m_weaponTexture;
 	Sprite m_weaponSprite;
+
+	int m_weaponLvl;
 };

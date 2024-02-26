@@ -21,6 +21,7 @@ enum class PlayerUpgrade
 	Speed,
 	XP,
 	Armor,
+	Weapon,
 
 	Count
 };

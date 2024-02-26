@@ -72,12 +72,10 @@ void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 	float xPos = rand() % 3200 + 1;
 	float yPos = rand() % 1800 + 1;
 	
-	while (xPos > t_playerPos.x - 800 && xPos < t_playerPos.x + 800)
+	while (xPos > t_playerPos.x - 800 && xPos < t_playerPos.x + 800 &&
+		   yPos > t_playerPos.y - 450 && yPos < t_playerPos.y + 450)
 	{
 		xPos = rand() % 3200 + 1;
-	}
-	while (yPos > t_playerPos.y - 450 && yPos < t_playerPos.y + 450)
-	{
 		yPos = rand() % 1800 + 1;
 	}
 	

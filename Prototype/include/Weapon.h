@@ -13,6 +13,8 @@ public:
 
 	std::vector<Bullet*> getBullet();
 
+	int getWeaponLevel();
+
 	void upgradeWeapon();
 
 private:
@@ -21,6 +23,7 @@ private:
 	std::vector<Bullet*> m_bullets;
 	bool m_firing;
 	float m_fireRate;
+	float m_fireRateModifier;
 
 	int counter;
 

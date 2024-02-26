@@ -42,4 +42,7 @@ private:
 	Clock m_clock;
 
 	Sprite m_sprite;
+
+	float pistolSpeed;
+	float arSpeed;
 };

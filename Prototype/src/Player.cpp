@@ -18,6 +18,7 @@ Player::Player()
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("playerAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/differentCharacterangle.png"));
 
+	//Base variable initialiser
 	m_maxHealth = 100.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
@@ -25,10 +26,12 @@ Player::Player()
 	m_xp = 0;
 	m_xpRequired = 10.0f;
 
+	//Upgrade modifiers
 	m_speedModifier = 1;
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
+	//FSM setup
 	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
 	m_playerState = CharacterState::IdleState;
@@ -45,31 +48,47 @@ Player::Player()
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
 
-	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
-	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
-	m_rectangle.setFillColor(sf::Color::White);
-	m_rectangle.setPosition(m_position);
 
+#pragma region SPRITES
 	sf::Texture& playerTextures = m_holder["starterAtlas"];
 
+	//Player sprite setup
 	m_playerSprite.setTexture(playerTextures);
 	m_playerSprite.setTextureRect(IntRect{ 0,0,160,200 });
 	m_playerSprite.setOrigin(80, 100);
 	m_playerSprite.setScale(0.5f, 0.5f);
 	m_playerSprite.setPosition(m_position);
 
+	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
+	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
+	m_rectangle.setFillColor(sf::Color::White);
+	m_rectangle.setPosition(m_position);
+
+	//XP Bar sprite setup
 	m_xpBarSprite.setTexture(playerTextures);
 	m_xpBarSprite.setTextureRect(IntRect{ 0,616,500,32 });
 	m_xpBarSprite.setOrigin(250, 16);
 	m_xpBarSprite.setScale(2.25f, 2.0f);
 	m_xpBarSprite.setPosition(800.0f, 40.0f);
 
+	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
+	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
+	m_emptyXPBar.setFillColor(Color::Black);
+	m_emptyXPBar.setPosition(800.0f, 40.0f);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
+	m_xpBar.setFillColor(sf::Color::Green);
+	m_xpBar.setPosition(800.0f, 40.0f);
+
+	//Halo Sprite setup
 	m_haloSprite.setTexture(playerTextures);
 	m_haloSprite.setTextureRect(IntRect{ 0,1344,160,64 });
 	m_haloSprite.setOrigin(80, 32);
 	m_haloSprite.setScale(0.6f, 0.6f);
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 
+	//Health bar setup
 	m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
 	m_emptyHealthBar.setFillColor(sf::Color::Red);
@@ -82,15 +101,8 @@ Player::Player()
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 
-	m_emptyXPBar.setSize(sf::Vector2f(1000.0f, 20.0f));
-	m_emptyXPBar.setOrigin(m_emptyXPBar.getSize().x / 2.0f, m_emptyXPBar.getSize().y / 2.0f);
-	m_emptyXPBar.setFillColor(Color::Black);
-	m_emptyXPBar.setPosition(800.0f, 40.0f);
+#pragma endregion
 
-	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
-	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
-	m_xpBar.setFillColor(sf::Color::Green);
-	m_xpBar.setPosition(800.0f, 40.0f);
 }
 
 #pragma endregion
@@ -308,6 +320,7 @@ void Player::setHealth()
 #pragma region Player Upgrades
 void Player::levelUp(Gamemode& t_gamemode)
 {
+#pragma region Text/Console stuff
 	int playerChoice;
 	std::string text1;
 	std::string text2;
@@ -342,6 +355,9 @@ void Player::levelUp(Gamemode& t_gamemode)
 	case PlayerUpgrade::Armor:
 		text1 = "1. Armor";
 		break;
+	case PlayerUpgrade::Weapon:
+		text1 = "1. Pistol LEVEL++";
+		break;
 	default:
 		break;
 	}
@@ -360,6 +376,10 @@ void Player::levelUp(Gamemode& t_gamemode)
 	case PlayerUpgrade::Armor:
 		text2 = "2. Armor";
 		break;
+	case PlayerUpgrade::Weapon:
+		text2 = "2. Pistol LEVEL++";
+		break;
+
 	default:
 		break;
 	}
@@ -378,6 +398,9 @@ void Player::levelUp(Gamemode& t_gamemode)
 	case PlayerUpgrade::Armor:
 		text3 = "3. Armor";
 		break;
+	case PlayerUpgrade::Weapon:
+		text3 = "3. Pistol LEVEL++";
+		break;
 	default:
 		break;
 	}
@@ -387,6 +410,9 @@ void Player::levelUp(Gamemode& t_gamemode)
 	std::cout << text3 << "\n";
 
 	std::cin >> playerChoice;
+
+#pragma endregion
+
 
 	switch (playerChoice)
 	{
@@ -425,6 +451,9 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 		break;
 	case PlayerUpgrade::Armor:
 		m_armorModifier -= 0.1;
+		break;
+	case PlayerUpgrade::Weapon:
+		m_weapons[0]->upgradeWeapon();
 		break;
 	default:
 		break;

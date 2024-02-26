@@ -6,6 +6,8 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 	m_velocity = sf::Vector2f(0.0f, 0.0f);
 	m_position = sf::Vector2f(0.0f, 0.0f);
 
+
+#pragma region SPRITE AND SHAPE SETUP (PLUS FRAME INSTANTIATOR)
 	m_circle.setRadius(5.0f);
 	m_circle.setOrigin(m_circle.getRadius(), m_circle.getRadius());
 	m_circle.setFillColor(sf::Color::Blue);
@@ -17,24 +19,38 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture)
 	m_sprite.setScale(1.0f, 1.0f);
 	m_sprite.setPosition(m_position);
 
-	switch (t_weaponType)
-	{
-	case WeaponType::Pistol:
-		m_damage = 32.0f;	// default 12
-		break;
-	case WeaponType::AssaultRifle:
-		m_damage = 24.0f;	// default 24
-		break;
-	default:
-		break;
-	}
-
 	for (int i = 0; i < 16; i++)
 	{
 		m_frames.push_back(IntRect{ 32 * i,648,32,32 });
 	}
 	m_currentFrame = 0;
 	m_time = seconds(0.1f);
+#pragma endregion
+
+#pragma region GUN TYPE INITIALISER (CALCULATIONS DONE HERE)
+	pistolSpeed = 10.0f;
+	arSpeed = 7.5f;
+	switch (t_weaponType)
+	{
+#pragma region Pistol
+	case WeaponType::Pistol:
+		m_damage = 32.0f;	// default 12
+		break;
+
+#pragma endregion
+
+#pragma region Assault Rifle
+	case WeaponType::AssaultRifle:
+		m_damage = 24.0f;	// default 24
+		break;
+
+#pragma endregion
+
+	default:
+		break;
+	}
+
+#pragma endregion
 }
 
 Bullet::~Bullet()
@@ -43,8 +59,10 @@ Bullet::~Bullet()
 
 void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, WeaponType t_type, Direction t_direction)
 {
+#pragma region BULLET MOVEMENT
 	switch (t_type)
 	{
+#pragma region Pistol
 	case WeaponType::Pistol:
 		if (!t_firing)
 		{
@@ -78,7 +96,7 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vec
 			}
 
 			shortestDisplacement = shortestDisplacement / shortestDistance;
-			m_velocity = shortestDisplacement * 10.0f;
+			m_velocity = shortestDisplacement * pistolSpeed;
 
 		}
 		else if (t_firing)
@@ -86,6 +104,10 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vec
 			m_position += m_velocity;
 		}
 		break;
+
+#pragma endregion
+
+#pragma region Assault Rifle
 	case WeaponType::AssaultRifle:
 		if (!t_firing)
 		{
@@ -94,16 +116,16 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vec
 			switch (t_direction)
 			{
 			case Direction::North:
-				m_velocity = sf::Vector2f(0.0f,-10.0f);
+				m_velocity = sf::Vector2f(0.0f, -arSpeed);
 				break;
 			case Direction::West:
-				m_velocity = sf::Vector2f(-10.0f, 0.0f);
+				m_velocity = sf::Vector2f(-arSpeed, 0.0f);
 				break;
 			case Direction::South:
-				m_velocity = sf::Vector2f(0.0f, 10.0f);
+				m_velocity = sf::Vector2f(0.0f, arSpeed);
 				break;
 			case Direction::East:
-				m_velocity = sf::Vector2f(10.0f, 0.0f);
+				m_velocity = sf::Vector2f(arSpeed, 0.0f);
 				break;
 			default:
 				break;
@@ -114,9 +136,13 @@ void Bullet::update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vec
 			m_position += m_velocity;
 		}
 		break;
+
+#pragma endregion
+
 	default:
 		break;
 	}
+#pragma endregion
 
 	animate();
 
@@ -130,6 +156,8 @@ void Bullet::render(sf::RenderWindow& t_window)
 	t_window.draw(m_sprite);
 }
 
+#pragma region GETTERS AND SETTERS
+#pragma region Getters
 sf::CircleShape Bullet::getCircle()
 {
 	return m_circle;
@@ -140,6 +168,11 @@ float Bullet::getDamage()
 	return m_damage;
 }
 
+#pragma endregion
+
+#pragma endregion
+
+#pragma region ANIMATIONS
 void Bullet::animate()
 {
 	if (m_clock.getElapsedTime() > m_time)
@@ -157,3 +190,5 @@ void Bullet::animate()
 
 	m_sprite.setTextureRect(m_frames[m_currentFrame]);
 }
+#pragma endregion
+

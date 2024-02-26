@@ -19,7 +19,7 @@ Player::Player()
 	m_maxHealth = 100.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
-	m_level = 2;
+	m_level = 1;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
 

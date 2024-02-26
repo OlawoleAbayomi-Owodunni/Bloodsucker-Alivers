@@ -192,6 +192,9 @@ void Game::checkCollisions()
 	{
 		if (CollisionDetection::playerOrbCollision(m_player, *it))
 		{
+			m_player.rumbleStart();
+			rumbleTimer.restart();
+
 			m_player.playSound(m_pickupSound);
 			m_player.increaseXP();
 
@@ -203,6 +206,12 @@ void Game::checkCollisions()
 			++it;
 		}
 	}
+	cout << rumbleTimer.getElapsedTime().asSeconds() << "\n";
+
+	if (rumbleTimer.getElapsedTime().asSeconds() > 0.1f) {
+		m_player.rumbleStop();
+	}
+
 
 	for (auto it = m_pickups.begin(); it != m_pickups.end();)
 	{

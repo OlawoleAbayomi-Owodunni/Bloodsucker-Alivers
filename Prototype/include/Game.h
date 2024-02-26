@@ -111,6 +111,8 @@ protected:
 
 	Sprite bgSprite;
 
+	Clock rumbleTimer;
+
 #ifdef TEST_FPS
 	sf::Text x_updateFPS;					// text used to display updates per second.
 	sf::Text x_drawFPS;						// text used to display draw calls per second.

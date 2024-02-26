@@ -37,6 +37,8 @@ Weapon::Weapon(WeaponType t_type)
 	default:
 		break;
 	}
+
+	m_weaponLvl = 1;
 }
 
 Weapon::~Weapon()
@@ -113,4 +115,13 @@ void Weapon::render(sf::RenderWindow& t_window)
 std::vector<Bullet*> Weapon::getBullet()
 {
 	return m_bullets;
+}
+
+void Weapon::upgradeWeapon()
+{
+	//switch (m_weaponLvl)
+	//{
+	//case 1:
+
+	//}
 }

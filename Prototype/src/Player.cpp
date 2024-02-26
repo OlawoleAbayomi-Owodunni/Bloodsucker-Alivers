@@ -268,8 +268,16 @@ void Player::handleKeyInput()
 			float distance = std::sqrtf(heading.x * heading.x + heading.y * heading.y);
 			float dashAngle = atan2(heading.y, heading.x) * (180.0f / 3.14159);
 			
-			m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
-			m_dashRect.setOrigin(distance / 2.0f, 5.0f);
+			if (abs(static_cast<int>(dashAngle)) % 90 == 0)
+			{
+				m_dashRect.setSize(sf::Vector2f(distance, 60.0f));
+			}
+			else
+			{
+				m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
+			}
+			
+			m_dashRect.setOrigin(distance / 2.0f, m_dashRect.getSize().y / 2.0f);
 			m_dashRect.setRotation(dashAngle);
 			m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
 

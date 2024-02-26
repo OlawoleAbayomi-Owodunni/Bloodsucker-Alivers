@@ -65,20 +65,20 @@ void Enemy::render(sf::RenderWindow& t_window)
 	//t_window.draw(m_currentHealthBar);
 }
 
-void Enemy::initialisePosition()
+void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 {
 	m_health = 100.0f;
 
-	float xPos = rand() % 2400 + 100;
-	float yPos = rand() % 1350 + 100;
+	float xPos = rand() % 3200 + 1;
+	float yPos = rand() % 1800 + 1;
 	
-	if (xPos < ScreenSize::s_width && xPos > 0)
+	while (xPos > t_playerPos.x - 800 && xPos < t_playerPos.x + 800)
 	{
-		xPos = -(rand() % 800 + 100);
+		xPos = rand() % 3200 + 1;
 	}
-	if (yPos < ScreenSize::s_height && yPos > 0)
+	while (yPos > t_playerPos.y - 450 && yPos < t_playerPos.y + 450)
 	{
-		yPos = -(rand() % 450 + 100);
+		yPos = rand() % 1800 + 1;
 	}
 	
 	m_position = sf::Vector2f(xPos, yPos);

@@ -39,7 +39,7 @@ void Game::init()
 
 	for (auto enemy : m_enemies)
 	{
-		enemy->initialisePosition();
+		enemy->initialisePosition(m_player.getPosition());
 	}
 
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
@@ -177,7 +177,7 @@ void Game::checkCollisions()
 					m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
 				}
 
-				enemy->initialisePosition();
+				enemy->initialisePosition(m_player.getPosition());
 			}
 		}
 
@@ -201,7 +201,7 @@ void Game::checkCollisions()
 							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
 						}
 
-						enemy->initialisePosition();
+						enemy->initialisePosition(m_player.getPosition());
 					}
 				}
 			}

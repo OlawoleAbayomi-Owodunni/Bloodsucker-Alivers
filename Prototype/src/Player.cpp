@@ -31,6 +31,9 @@ Player::Player()
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
+	isPistolEquipped = false;
+	isArEqipped = false;
+
 	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
 
 	//FSM setup
@@ -635,25 +638,34 @@ void Player::giveWeapon(WeaponType t_type)
 	switch (t_type)
 	{
 	case WeaponType::Pistol:
+		//current problem, this loops throught the entire array. If there are 3 slots, and slot 1 and 2 are occupied, slot 3 WILL get filled
+		//because it checks if it's the same type, if it is, skips but STILL iterates to check the next cell and if it isn't it adds the weapon anyway
+		//SOLUTION: add a bool that sets on true and only add to the vector if that condition is true AFTER looping through the array
 		for (auto weapon : m_weapons)
 		{
-			if (weapon->getType() != t_type) {
-				m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+			if (weapon->getType() == t_type) {
+				isPistolEquipped = true;
 			}
-			else {
-				cout << "You already have that weapon equipped\n";
-			}
+		}
+		if (!isPistolEquipped) {
+			m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+		}
+		else {
+			cout << "You already have that weapon equipped\n";
 		}
 		break;
 	case WeaponType::AssaultRifle:
 		for (auto weapon : m_weapons)
 		{
 			if (weapon->getType() != t_type) {
-				m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
 			}
-			else {
-				cout << "You already have that weapon equipped\n";
-			}
+
+		}
+		if (!isArEqipped) {
+			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle )); // all we need to do to player to add a new weapon
+		}
+		else {
+			cout << "You already have that weapon equipped\n";
 		}
 		break;
 	default:

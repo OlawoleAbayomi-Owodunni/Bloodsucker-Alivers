@@ -132,4 +132,7 @@ private:
 	Sprite m_playerSprite;
 	Sprite m_haloSprite;
 	Sprite m_xpBarSprite;
+
+	bool isPistolEquipped;
+	bool isArEqipped;
 };

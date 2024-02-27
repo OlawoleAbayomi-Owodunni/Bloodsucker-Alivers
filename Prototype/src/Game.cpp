@@ -272,6 +272,25 @@ void Game::checkCollisions()
 		}
 
 		//Bullet to Enemy
+		for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
+		{
+			if (CollisionDetection::playerOrbCollision(m_player, *it))
+			{
+				m_player.rumbleStart();
+				rumbleTimer.restart();
+
+				m_player.playSound(m_pickupSound);
+				m_player.increaseXP();
+
+				delete* it; // Delete the orb object
+				it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
+			}
+			else
+			{
+				++it;
+			}
+		}
+
 		for (auto weapon : m_player.getWeapon())
 		{
 			for (auto bullet : weapon->getBullets())
@@ -293,6 +312,7 @@ void Game::checkCollisions()
 						}
 
 						enemy->initialisePosition(m_player.getPosition());
+
 					}
 				}
 			}

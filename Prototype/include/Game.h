@@ -110,15 +110,6 @@ protected:
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 
 	Sprite bgSprite;
-
+	
 	Clock rumbleTimer;
-
-#ifdef TEST_FPS
-	sf::Text x_updateFPS;					// text used to display updates per second.
-	sf::Text x_drawFPS;						// text used to display draw calls per second.
-	sf::Time x_secondTime {sf::Time::Zero};	// counter used to establish when a second has passed.
-	int x_updateFrameCount{ 0 };			// updates per second counter.
-	int x_drawFrameCount{ 0 };				// draws per second counter.
-#endif // TEST_FPS
-
 };

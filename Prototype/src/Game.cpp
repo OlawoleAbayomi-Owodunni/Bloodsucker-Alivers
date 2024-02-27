@@ -59,17 +59,6 @@ void Game::init()
 	bgSprite.setPosition(800, 500);
 
 	m_currentGamemode = Gamemode::Gameplay;
-
-#ifdef TEST_FPS
-	x_updateFPS.setFont(m_arialFont);
-	x_updateFPS.setPosition(20, 300);
-	x_updateFPS.setCharacterSize(24);
-	x_updateFPS.setFillColor(sf::Color::White);
-	x_drawFPS.setFont(m_arialFont);
-	x_drawFPS.setPosition(20, 350);
-	x_drawFPS.setCharacterSize(24);
-	x_drawFPS.setFillColor(sf::Color::White);
-#endif
 }
 
 #pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
@@ -89,25 +78,8 @@ void Game::run()
 			timeSinceLastUpdate -= timePerFrame;
 			processEvents(); // at least 60 fps
 			update(timePerFrame.asMilliseconds()); //60 fps
-#ifdef TEST_FPS
-			x_secondTime += timePerFrame;
-			x_updateFrameCount++;
-			if (x_secondTime.asSeconds() > 1)
-			{
-				std::string updatesPS = "UPS " + std::to_string(x_updateFrameCount - 1);
-				x_updateFPS.setString(updatesPS);
-				std::string drawsPS = "DPS " + std::to_string(x_drawFrameCount);
-				x_drawFPS.setString(drawsPS);
-				x_updateFrameCount = 0;
-				x_drawFrameCount = 0;
-				x_secondTime = sf::Time::Zero;
-			}
-#endif
 		}
 		render(); // as many as possible
-#ifdef TEST_FPS
-		x_drawFrameCount++;
-#endif
 	}
 }
 
@@ -247,10 +219,6 @@ void Game::render()
 	
 	m_player.render(m_window);
 
-#ifdef TEST_FPS
-	m_window.draw(x_updateFPS);
-	m_window.draw(x_drawFPS);
-#endif
 	m_window.display();
 }
 

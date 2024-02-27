@@ -171,6 +171,24 @@ void Game::update(double dt)
 		interpolatedPosition.x = interpolatedPosition.x + (targetPosition.x - interpolatedPosition.x) * speed;
 		interpolatedPosition.y = interpolatedPosition.y + (targetPosition.y - interpolatedPosition.y) * speed;
 
+		if (interpolatedPosition.x < ScreenSize::s_width / 2.0f)
+		{
+			interpolatedPosition.x = ScreenSize::s_width / 2.0f;
+		}
+		else if (interpolatedPosition.x > ScreenSize::s_mapWidth - ScreenSize::s_width / 2.0f)
+		{
+			interpolatedPosition.x = ScreenSize::s_mapWidth - ScreenSize::s_width / 2.0f;
+		}
+
+		if (interpolatedPosition.y < ScreenSize::s_height / 2.0f)
+		{
+			interpolatedPosition.y = ScreenSize::s_height / 2.0f;
+		}
+		else if (interpolatedPosition.y > ScreenSize::s_mapHeight - ScreenSize::s_height / 2.0f)
+		{
+			interpolatedPosition.y = ScreenSize::s_mapHeight - ScreenSize::s_height / 2.0f;
+		}
+
 		m_view.setCenter(interpolatedPosition);
 		m_window.setView(m_view);
 

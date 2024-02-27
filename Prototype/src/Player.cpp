@@ -561,7 +561,7 @@ void Player::carePackage(Gamemode& t_gamemode)
 	//	choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 	//}
 
-	std::cout << "Choose an upgrade:\n";
+	std::cout << "Choose a new weapon:\n";
 
 	switch (choice1)
 	{
@@ -607,7 +607,7 @@ void Player::carePackage(Gamemode& t_gamemode)
 
 #pragma endregion
 
-	//most likeley going to get rid of the switch since it will always do the same thing
+	//most likely going to get rid of the switch since it will always do the same thing
 	switch (playerChoice)
 	{
 	case 1:

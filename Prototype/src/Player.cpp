@@ -31,7 +31,7 @@ Player::Player()
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
-	m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
 
 	//FSM setup
 	m_direction = Direction::East;

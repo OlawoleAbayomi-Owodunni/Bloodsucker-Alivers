@@ -198,13 +198,15 @@ void Player::handleKeyInput()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::North;
-		m_playerState = CharacterState::WalkSideState;
+		m_playerState = CharacterState::WalkUpState;
+		m_playerSprite.setScale(0.5f, 0.5f);
 		m_movementVector.y -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::South;
 		m_playerState = CharacterState::WalkDownState;
+		m_playerSprite.setScale(0.5f, 0.5f);
 		m_movementVector.y += m_speed;
 	}
 
@@ -632,28 +634,46 @@ void Player::carePackage(Gamemode& t_gamemode)
 
 void Player::giveWeapon(WeaponType t_type)
 {
+	bool weaponEquipped = false;
+
 	switch (t_type)
 	{
 	case WeaponType::Pistol:
+
 		for (auto weapon : m_weapons)
 		{
-			if (weapon->getType() != t_type) {
-				m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+			if (weapon->getType() == t_type) {
+				weaponEquipped = true;
 			}
-			else {
-				cout << "You already have that weapon equipped\n";
-			}
+		}
+		
+		if (weaponEquipped)
+		{
+			cout << "You already have that weapon equipped.\n";
+		}
+		else
+		{
+			m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+			cout << "Pistol added to arsenal.\n";
 		}
 		break;
 	case WeaponType::AssaultRifle:
+
 		for (auto weapon : m_weapons)
 		{
-			if (weapon->getType() != t_type) {
-				m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+			if (weapon->getType() == t_type) {
+				weaponEquipped = true;
 			}
-			else {
-				cout << "You already have that weapon equipped\n";
-			}
+		}
+
+		if (weaponEquipped)
+		{
+			cout << "You already have that weapon equipped.\n";
+		}
+		else
+		{
+			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+			cout << "Assault Rifle added to arsenal.\n";
 		}
 		break;
 	default:
@@ -793,6 +813,15 @@ void Player::setFrames()
 		addFrame(IntRect{ 1600, 1408, 160, 200 });
 		addFrame(IntRect{ 1760, 1408, 160, 200 });
 		addFrame(IntRect{ 1920, 1408, 160, 200 });
+		break;
+	case CharacterState::WalkUpState:
+		addFrame(IntRect{ 0, 1938, 160, 200 });
+		addFrame(IntRect{ 160, 1938, 160, 200 });
+		addFrame(IntRect{ 320, 1938, 160, 200 });
+		addFrame(IntRect{ 480, 1938, 160, 200 });
+		addFrame(IntRect{ 640, 1938, 160, 200 });
+		addFrame(IntRect{ 800, 1938, 160, 200 });
+		addFrame(IntRect{ 960, 1938, 160, 200 });
 		break;
 	default:
 		break;

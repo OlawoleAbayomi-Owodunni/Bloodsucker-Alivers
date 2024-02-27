@@ -19,21 +19,17 @@ Weapon::Weapon(WeaponType t_type)
 	{
 	case WeaponType::Pistol:
 		m_fireRate = 3.0f * m_fireRateModifier;
-		m_bullets.push_back(new Bullet(WeaponType::Pistol, m_holder["starterAtlas"]));
 		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
 		break;
 	case WeaponType::AssaultRifle:
 		m_fireRate = 1.0f / m_fireRateModifier;
-		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
-		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
-		m_bullets.push_back(new Bullet(WeaponType::AssaultRifle, m_holder["starterAtlas"]));
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
 		break;
 	default:
 		break;
 	}
 
-	m_weaponLvl = 0;
+	m_weaponLvl = 1;
 }
 
 Weapon::~Weapon()
@@ -42,61 +38,59 @@ Weapon::~Weapon()
 
 void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction)
 {	
-	if (!m_firing)
-	{
-		if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
-		{
-			m_firing = true;
-			m_timer.restart();
-		}
-	}
-	else if (m_firing)
-	{
-		if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
-		{
-			m_firing = false;
-			m_timer.restart();
-		}
-	}
-
-	//std::cout << m_timer.getElapsedTime().asSeconds() << std::endl;
-
 	switch (m_type)
 	{
 	case WeaponType::Pistol:
-		for (auto bullet : m_bullets)
+		if (!m_firing)
 		{
-			bullet->update(dt, m_firing, t_playerPos, t_enemies, m_type, t_direction);
+			if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
+			{
+				m_firing = true;
+			}
+		}
+		else if (m_firing)
+		{
+			m_firing = false;
+			m_timer.restart();
+
+			m_bullets.push_back(new Bullet(m_type, m_holder["starterAtlas"], t_playerPos, t_enemies, t_direction));
 		}
 		break;
 	case WeaponType::AssaultRifle:
-		/*if (counter > 0)
+		if (!m_firing)
 		{
-			m_bullets.at(0)->update(dt, m_firing, t_playerPos, t_enemies, m_type, t_direction);
+			if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
+			{
+				m_firing = true;
+			}
 		}
-		if (counter > 100)
+		else if (m_firing)
 		{
-			m_bullets.at(1)->update(dt, m_firing, t_playerPos, t_enemies, m_type, t_direction);
-		}
-		if (counter > 200)
-		{
-			m_bullets.at(2)->update(dt, m_firing, t_playerPos, t_enemies, m_type, t_direction);
-		}
-		counter++;*/
-
-		//std::cout << std::endl;
-
-		for (auto bullet : m_bullets)
-		{
-			bullet->update(dt, m_firing, t_playerPos, t_enemies, m_type, t_direction);
+				m_firing = false;
+				m_timer.restart();
 		}
 		break;
 	default:
 		break;
 	}
-
 	
+	//std::cout << m_timer.getElapsedTime().asSeconds() << std::endl;
 
+	for (auto it = m_bullets.begin(); it != m_bullets.end();)
+	{
+		(*it)->update(dt, m_type);
+
+		if ((*it)->getPosition().x < 0 || (*it)->getPosition().x > 3200 ||
+			(*it)->getPosition().y < 0 || (*it)->getPosition().y > 1800)
+		{
+			delete* it; // Delete the orb object
+			it = m_bullets.erase(it); // Remove the orb pointer from the vector
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void Weapon::render(sf::RenderWindow& t_window)
@@ -107,9 +101,14 @@ void Weapon::render(sf::RenderWindow& t_window)
 	}
 }
 
-std::vector<Bullet*> Weapon::getBullet()
+std::vector<Bullet*> Weapon::getBullets()
 {
 	return m_bullets;
+}
+
+WeaponType Weapon::getType()
+{
+	return m_type;
 }
 
 int Weapon::getWeaponLevel()
@@ -131,10 +130,10 @@ void Weapon::upgradeWeapon() //probably pass in which weapon ID is coming from t
 		m_fireRateModifier = 2.0f;
 		break;
 	case 2:
-		m_fireRateModifier = 3.0f;
+		m_fireRateModifier = 2.5f;
 		break;
 	case 3:
-		m_fireRateModifier = 4.0f;
+		m_fireRateModifier = 3.0f;
 		break;
 	default:
 		break;

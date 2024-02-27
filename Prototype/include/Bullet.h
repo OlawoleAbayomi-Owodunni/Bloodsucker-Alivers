@@ -21,14 +21,15 @@ enum class Direction
 class Bullet
 {
 public:
-	Bullet(WeaponType t_weaponType, sf::Texture& t_texture);
+	Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction);
 	~Bullet();
 
-	void update(double dt, bool t_firing, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, WeaponType t_type, Direction t_direction);
+	void update(double dt, WeaponType t_type);
 	void render(sf::RenderWindow& t_window);
 
 	sf::CircleShape getCircle();
 	float getDamage();
+	sf::Vector2f getPosition();
 
 	void animate();
 

@@ -11,8 +11,8 @@ public:
 	void update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction);
 	void render(sf::RenderWindow& t_window);
 
-	std::vector<Bullet*> getBullet();
-
+	std::vector<Bullet*> getBullets();
+	WeaponType getType();
 	int getWeaponLevel();
 	WeaponType getType();
 

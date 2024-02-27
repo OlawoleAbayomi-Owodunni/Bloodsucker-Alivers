@@ -31,8 +31,9 @@ Player::Player()
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
+	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+
 	//FSM setup
-	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
 	m_canDash = false;
 	
@@ -508,7 +509,8 @@ void Player::levelUp(Gamemode& t_gamemode)
 
 	if (playerChoice != -1)
 	{
-		t_gamemode = Gamemode::Gameplay;
+		//t_gamemode = Gamemode::Gameplay;
+		carePackage(t_gamemode);
 	}
 }
 
@@ -531,6 +533,128 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 		break;
 	case PlayerUpgrade::Weapon:
 		m_weapons[0]->upgradeWeapon(); //taking the weapon enum of the pistol or AR should let us get the exact weapon
+		//current issue that ID 0 = pistol so if AR is attatched, then code crashes bcuz upgrade happens based on ID
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::carePackage(Gamemode& t_gamemode)
+{
+#pragma region Text/Console stuff
+	int playerChoice;
+	std::string text1;
+	std::string text2;
+	std::string text3;
+
+	WeaponType choice1 = static_cast<WeaponType>(rand() % static_cast<int>(WeaponType::Count)); // static_cast<int>(PlayerUpgrades::Count) will give the amount of items in the class
+	WeaponType choice2 = static_cast<WeaponType>(rand() % static_cast<int>(WeaponType::Count));
+	//WeaponType choice3 = static_cast<WeaponType>(rand() % static_cast<int>(WeaponType::Count));
+
+	while (choice2 == choice1)
+	{
+		choice2 = static_cast<WeaponType>(rand() % static_cast<int>(WeaponType::Count));
+	}
+	//while (choice3 == choice1 || choice3 == choice2)
+	//{
+	//	choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
+	//}
+
+	std::cout << "Choose an upgrade:\n";
+
+	switch (choice1)
+	{
+	case WeaponType::Pistol:
+		text1 = "1. Pistol";
+		break;
+	case WeaponType::AssaultRifle:
+		text1 = "1. Assault Rifle";
+		break;
+	default:
+		break;
+	}
+
+	switch (choice2)
+	{
+	case WeaponType::Pistol:
+		text2 = "2. Pistol";
+		break;
+	case WeaponType::AssaultRifle:
+		text2 = "2. Assault Rifle";
+		break;
+	default:
+		break;
+	}
+
+	//switch (choice3)
+	//{
+	//case WeaponType::Pistol:
+	//	text3 = "3. Pistol";
+	//	break;
+	//case WeaponType::AssaultRifle:
+	//	text3 = "3. Assault Rifle";
+	//	break;
+	//default:
+	//	break;
+	//}
+
+	std::cout << text1 << "\n";
+	std::cout << text2 << "\n";
+	//std::cout << text3 << "\n";
+
+	std::cin >> playerChoice;
+
+#pragma endregion
+
+	//most likeley going to get rid of the switch since it will always do the same thing
+	switch (playerChoice)
+	{
+	case 1:
+		giveWeapon(choice1);
+		break;
+	case 2:
+		giveWeapon(choice2);
+		break;
+	//case 3:
+	//	upgradePlayer(choice3);
+	//	break;
+	default:
+		break;
+	}
+
+	if (playerChoice != -1)
+	{
+		t_gamemode = Gamemode::Gameplay;
+	}
+
+}
+
+void Player::giveWeapon(WeaponType t_type)
+{
+	switch (t_type)
+	{
+	case WeaponType::Pistol:
+		for (auto weapon : m_weapons)
+		{
+			if (weapon->getType() != t_type) {
+				m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+			}
+			else {
+				cout << "You already have that weapon equipped\n";
+			}
+		}
+		break;
+	case WeaponType::AssaultRifle:
+		for (auto weapon : m_weapons)
+		{
+			if (weapon->getType() != t_type) {
+				m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+			}
+			else {
+				cout << "You already have that weapon equipped\n";
+			}
+		}
 		break;
 	default:
 		break;

@@ -5,7 +5,9 @@
 enum class WeaponType
 {
 	Pistol,
-	AssaultRifle
+	AssaultRifle,
+
+	Count
 };
 
 enum class Direction

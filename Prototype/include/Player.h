@@ -64,6 +64,8 @@ public:
 	int getLevel();
 	void levelUp(Gamemode& t_gamemode);
 	void upgradePlayer(PlayerUpgrade t_type);
+	void carePackage(Gamemode& t_gamemode);
+	void giveWeapon(WeaponType t_type);
 
 	void animate();
 	void addFrame(sf::IntRect& t_frame);

@@ -36,6 +36,7 @@ Player::Player()
 	//FSM setup
 	m_direction = Direction::East;
 	m_canDash = false;
+	m_dashBarFillAmount = 0;
 	
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
@@ -50,7 +51,8 @@ Player::Player()
 
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
-
+	m_dashStateTime = seconds(1.0f);
+	m_dashCooldownTime = seconds(4.0f);
 
 #pragma region SPRITES
 	sf::Texture& playerTextures = m_holder["starterAtlas"];
@@ -60,6 +62,12 @@ Player::Player()
 	m_playerSprite.setOrigin(80.0f, 101.5f);
 	m_playerSprite.setScale(0.5f, 0.5f);
 	m_playerSprite.setPosition(m_position);
+
+	m_dashSprite.setTexture(playerTextures);
+	m_dashSprite.setTextureRect(IntRect{ 200, 1778, 200, 160 });
+	m_dashSprite.setOrigin(100.0f, 80.0f);
+	m_dashSprite.setScale(0.5f, 0.5f);
+	m_dashSprite.setPosition(m_position);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -82,6 +90,23 @@ Player::Player()
 	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
 	m_xpBar.setFillColor(sf::Color::Green);
 	m_xpBar.setPosition(800.0f, 40.0f);
+
+	//Dash Bar sprite setup
+	m_dashBarSprite.setTexture(playerTextures);
+	m_dashBarSprite.setTextureRect(IntRect{ 0, 1614, 34, 164 });
+	m_dashBarSprite.setOrigin(17, 82);
+	m_dashBarSprite.setScale(2.0f, 2.0f);
+	m_dashBarSprite.setPosition(1480.0f, 680.0f);
+
+	m_emptyDashBar.setSize(sf::Vector2f(24.0f, 244.0f));
+	m_emptyDashBar.setOrigin(m_emptyDashBar.getSize().x / 2.0f, m_emptyDashBar.getSize().y / 2.0f);
+	m_emptyDashBar.setFillColor(Color::Black);
+	m_emptyDashBar.setPosition(1480.0f, 666.0f);
+
+	m_dashBar.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBar.setOrigin(m_dashBar.getSize().x / 2.0f, -122.0f);
+	m_dashBar.setFillColor(sf::Color::White);
+	m_dashBar.setPosition(1480.0f, 666.0f);
 
 	//Halo Sprite setup
 	m_haloSprite.setTexture(playerTextures);
@@ -138,6 +163,7 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 	setHealth();
 	setPosition(t_view);
 
+	updateDashbar();
 	checkXP();
 
 	if (m_playerState != m_previousState)
@@ -180,6 +206,13 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
 	t_window.draw(m_xpBarSprite);
+
+	if (m_level > 1)
+	{
+		t_window.draw(m_emptyDashBar);
+		t_window.draw(m_dashBar);
+		t_window.draw(m_dashBarSprite);
+	}
 }
 
 #pragma region INPUT MANAGER
@@ -195,34 +228,44 @@ void Player::handleKeyInput()
 	float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
 	float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
+	if (m_dashStateClock.getElapsedTime() > m_dashStateTime)
 	{
-		m_direction = Direction::North;
-		m_playerState = CharacterState::WalkUpState;
-		m_playerSprite.setScale(0.5f, 0.5f);
-		m_movementVector.y -= m_speed;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
-	{
-		m_direction = Direction::South;
-		m_playerState = CharacterState::WalkDownState;
-		m_playerSprite.setScale(0.5f, 0.5f);
-		m_movementVector.y += m_speed;
+		m_playerState = CharacterState::None;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || xAxis < -JOYSTICK_THRESHOLD)
+	if (m_playerState != CharacterState::DashState)
 	{
-		m_direction = Direction::West;
-		m_playerState = CharacterState::WalkSideState;
-		m_playerSprite.setScale(-0.5f, 0.5f);
-		m_movementVector.x -= m_speed;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
-	{
-		m_direction = Direction::East;
-		m_playerState = CharacterState::WalkSideState;
-		m_playerSprite.setScale(0.5f, 0.5f);
-		m_movementVector.x += m_speed;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
+		{
+			m_direction = Direction::North;
+			m_playerState = CharacterState::WalkUpState;
+			m_playerSprite.setScale(0.5f, 0.5f);
+			m_movementVector.y -= m_speed;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
+		{
+			m_direction = Direction::South;
+			m_playerState = CharacterState::WalkDownState;
+			m_playerSprite.setScale(0.5f, 0.5f);
+			m_movementVector.y += m_speed;
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || xAxis < -JOYSTICK_THRESHOLD)
+		{
+			m_direction = Direction::West;
+			m_playerState = CharacterState::WalkSideState;
+			m_playerSprite.setScale(-0.5f, 0.5f);
+			m_dashSprite.setScale(-0.5f, 0.5f);
+			m_movementVector.x -= m_speed;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
+		{
+			m_direction = Direction::East;
+			m_playerState = CharacterState::WalkSideState;
+			m_playerSprite.setScale(0.5f, 0.5f);
+			m_dashSprite.setScale(0.5f, 0.5f);
+			m_movementVector.x += m_speed;
+		}
 	}
 
 	//	// Map input to movement controls
@@ -259,38 +302,18 @@ void Player::handleKeyInput()
 	// Dash
 	if (m_level > 1)
 	{
-		if (m_canDash && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if (m_dashStateClock.getElapsedTime() < m_dashStateTime)
 		{
-			m_canDash = false;
-			sf::Vector2f heading = m_movementVector * DASH_DISTANCE;
+			m_playerState = CharacterState::DashState;
+		}
 
-			for (unsigned int i = 0; i < AFTERIMAGE_COUNT; i++)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			if (m_dashCooldownClock.getElapsedTime() > m_dashCooldownTime)
 			{
-				AfterImageData data{
-					m_position + (m_movementVector * (DASH_DISTANCE * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
-					static_cast<float>(i) / AFTERIMAGE_COUNT, m_playerSprite
-				};
-
-				m_afterImages.push_back(data);
+				dash();
+				m_dashCooldownClock.restart();
 			}
-
-			float distance = std::sqrtf(heading.x * heading.x + heading.y * heading.y);
-			float dashAngle = atan2(heading.y, heading.x) * (180.0f / 3.14159);
-			
-			if (abs(static_cast<int>(dashAngle)) % 90 == 0)
-			{
-				m_dashRect.setSize(sf::Vector2f(distance, 60.0f));
-			}
-			else
-			{
-				m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
-			}
-			
-			m_dashRect.setOrigin(distance / 2.0f, m_dashRect.getSize().y / 2.0f);
-			m_dashRect.setRotation(dashAngle);
-			m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
-
-			m_position += heading;
 		}
 		else if (!m_canDash && !sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
@@ -373,6 +396,10 @@ void Player::setPosition(sf::View& t_view)
 	m_xpBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
 	m_emptyXPBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
 	m_xpBarSprite.setPosition(cameraPos.x, cameraPos.y - 410.0f);
+
+	m_dashBarSprite.setPosition(cameraPos.x + 680.0f, cameraPos.y + 230.0f);
+	m_emptyDashBar.setPosition(cameraPos.x + 680.0f, cameraPos.y + 216.0f);
+	m_dashBar.setPosition(cameraPos.x + 680.0f, cameraPos.y + 216.0f);
 
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 }
@@ -699,6 +726,62 @@ void Player::increaseHealth()
 	}
 }
 
+void Player::dash()
+{
+	if (m_canDash)
+	{
+		m_canDash = false;
+		m_dashStateClock.restart();
+
+		sf::Vector2f heading = m_movementVector * DASH_DISTANCE;
+
+		for (unsigned int i = 0; i < AFTERIMAGE_COUNT; i++)
+		{
+			AfterImageData data{
+				m_position + (m_movementVector * (DASH_DISTANCE * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
+				static_cast<float>(i) / AFTERIMAGE_COUNT, m_dashSprite
+			};
+
+			m_afterImages.push_back(data);
+		}
+
+		float distance = std::sqrtf(heading.x * heading.x + heading.y * heading.y);
+		float dashAngle = atan2(heading.y, heading.x) * (180.0f / 3.14159);
+
+		if (abs(static_cast<int>(dashAngle)) % 90 == 0)
+		{
+			m_dashRect.setSize(sf::Vector2f(distance, 60.0f));
+		}
+		else
+		{
+			m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
+		}
+
+		m_dashRect.setOrigin(distance / 2.0f, m_dashRect.getSize().y / 2.0f);
+		m_dashRect.setRotation(dashAngle);
+		m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
+
+		m_position += heading;
+	}
+}
+
+void Player::updateDashbar()
+{
+	m_dashBarFillAmount = -(m_dashCooldownClock.getElapsedTime().asSeconds() / m_dashCooldownTime.asSeconds() * 244.0f);
+
+	if (m_dashBarFillAmount <= -244.0f)
+	{
+		m_dashBarFillAmount = -244.0f;
+		m_dashBar.setFillColor(sf::Color::White);
+	}
+	else
+	{
+		m_dashBar.setFillColor(sf::Color::Red);
+	}
+
+	m_dashBar.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+}
+
 void Player::increaseXP()
 {
 	m_xp += 2 * m_xpModifier;
@@ -788,6 +871,7 @@ void Player::setFrames()
 		addFrame(IntRect{ 320,1150,160,203 });
 		addFrame(IntRect{ 480,1150,160,203 });
 		addFrame(IntRect{ 640,1150,160,203 });
+		m_playerSprite.setOrigin(80.0f, 101.5f);
 		break;
 	case CharacterState::WalkSideState:
 		addFrame(IntRect{ 160,416,160,203 });
@@ -798,6 +882,7 @@ void Player::setFrames()
 		addFrame(IntRect{ 960,416,160,203 });
 		addFrame(IntRect{ 1120,416,160,203 });
 		addFrame(IntRect{ 1280,416,160,203 });
+		m_playerSprite.setOrigin(80.0f, 101.5f);
 		break;
 	case CharacterState::WalkDownState:
 		addFrame(IntRect{ 0, 1408, 160, 200 });
@@ -813,6 +898,7 @@ void Player::setFrames()
 		addFrame(IntRect{ 1600, 1408, 160, 200 });
 		addFrame(IntRect{ 1760, 1408, 160, 200 });
 		addFrame(IntRect{ 1920, 1408, 160, 200 });
+		m_playerSprite.setOrigin(80.0f, 100.0f);
 		break;
 	case CharacterState::WalkUpState:
 		addFrame(IntRect{ 0, 1938, 160, 200 });
@@ -822,6 +908,11 @@ void Player::setFrames()
 		addFrame(IntRect{ 640, 1938, 160, 200 });
 		addFrame(IntRect{ 800, 1938, 160, 200 });
 		addFrame(IntRect{ 960, 1938, 160, 200 });
+		m_playerSprite.setOrigin(80.0f, 100.0f);
+		break;
+	case CharacterState::DashState:
+		addFrame(IntRect{ 0, 1778, 200, 160 });
+		m_playerSprite.setOrigin(100.0f, 60.0f);
 		break;
 	default:
 		break;

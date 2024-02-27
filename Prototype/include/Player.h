@@ -14,7 +14,8 @@ enum class CharacterState
 	IdleState,
 	WalkSideState,
 	WalkDownState,
-	WalkUpState
+	WalkUpState,
+	DashState
 };
 
 enum class PlayerUpgrade
@@ -60,6 +61,9 @@ public:
 	void decreaseHealth();
 	void increaseHealth();
 
+	void dash();
+	void updateDashbar();
+
 	void increaseXP();
 	void checkXP();
 	int getLevel();
@@ -101,6 +105,9 @@ private:
 	Direction m_direction;
 
 	bool m_canDash;
+	Clock m_dashCooldownClock;
+	Time m_dashCooldownTime;
+	float m_dashBarFillAmount;
 
 	sf::RectangleShape m_rectangle;
 
@@ -112,6 +119,9 @@ private:
 
 	sf::RectangleShape m_dashRect;
 	sf::RectangleShape m_dashRectBounds;
+
+	sf::RectangleShape m_dashBar;
+	sf::RectangleShape m_emptyDashBar;
 
 	std::vector<Weapon*> m_weapons;
 
@@ -130,7 +140,13 @@ private:
 	Time m_haloTime;
 	Clock m_haloClock;
 
+	Time m_dashStateTime;
+	Clock m_dashStateClock;
+
 	Sprite m_playerSprite;
+	Sprite m_dashSprite;
 	Sprite m_haloSprite;
+
 	Sprite m_xpBarSprite;
+	Sprite m_dashBarSprite;
 };

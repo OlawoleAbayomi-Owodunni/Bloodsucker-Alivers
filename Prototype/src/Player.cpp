@@ -25,7 +25,7 @@ Player::Player()
 		std::cout << "error loading dash sound";
 	}
 	m_dashSound.setBuffer(m_dashSoundBuffer);
-	m_dashSound.setVolume(5.0f);
+	m_dashSound.setVolume(3.0f);
 
 	//Base variable initialiser
 	m_maxHealth = 100.0f;
@@ -316,7 +316,7 @@ void Player::handleKeyInput()
 			m_playerState = CharacterState::DashState;
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			if (m_dashCooldownClock.getElapsedTime() > m_dashCooldownTime)
 			{
@@ -328,6 +328,20 @@ void Player::handleKeyInput()
 		{
 			m_canDash = true;
 			m_dashRect.setPosition(-1000.0f,-1000.0f);
+		}*/
+
+		if (m_movementVector.x != 0.0f || m_movementVector.y != 0.0f)
+		{
+			if (m_dashCooldownClock.getElapsedTime() > m_dashCooldownTime)
+			{
+				dash();
+				m_dashCooldownClock.restart();
+			}
+		}
+		else if (!m_canDash && m_movementVector.x == 0.0f && m_movementVector.y == 0.0f)
+		{
+			m_canDash = true;
+			m_dashRect.setPosition(-1000.0f, -1000.0f);
 		}
 
 		for (int i = 0; i < m_afterImages.size(); i++)

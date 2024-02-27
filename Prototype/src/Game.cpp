@@ -274,7 +274,7 @@ void Game::checkCollisions()
 		//Bullet to Enemy
 		for (auto weapon : m_player.getWeapon())
 		{
-			for (auto bullet : weapon->getBullet())
+			for (auto bullet : weapon->getBullets())
 			{
 				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 				{
@@ -296,6 +296,39 @@ void Game::checkCollisions()
 					}
 				}
 			}
+
+			//for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();)
+			//{
+			//	if (CollisionDetection::bulletEnemyCollision((*it), enemy))
+			//	{
+			//		enemy->decreaseHealth((*it)->getDamage());
+
+			//		if (enemy->getHealth() < 0)
+			//		{
+			//			if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+			//			{
+			//				m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+			//			}
+
+			//			if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+			//			{
+			//				m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
+			//			}
+
+			//			enemy->initialisePosition(m_player.getPosition());
+
+			//			if (weapon->getType() == WeaponType::Pistol)
+			//			{
+			//				delete* it; // Delete the orb object
+			//				it = weapon->getBullets().erase(it); // Remove the orb pointer from the vector
+			//			}
+			//		}
+			//	}
+			//	else
+			//	{
+			//		++it;
+			//	}
+			//}
 		}
 	}
 

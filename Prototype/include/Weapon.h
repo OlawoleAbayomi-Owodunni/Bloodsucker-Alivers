@@ -14,6 +14,7 @@ public:
 	std::vector<Bullet*> getBullet();
 
 	int getWeaponLevel();
+	WeaponType getType();
 
 	void upgradeWeapon();
 

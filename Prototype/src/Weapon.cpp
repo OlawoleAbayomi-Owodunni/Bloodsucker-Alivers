@@ -117,6 +117,11 @@ int Weapon::getWeaponLevel()
 	return m_weaponLvl;
 }
 
+WeaponType Weapon::getType()
+{
+	return m_type;
+}
+
 void Weapon::upgradeWeapon() //probably pass in which weapon ID is coming from the player and based off that modify that guns properties in here
 {
 	m_weaponLvl++;

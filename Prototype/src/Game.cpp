@@ -35,7 +35,7 @@ void Game::init()
 	m_pickupSound.setVolume(15.0f);
 
 	//ENEMIES
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 12; i++)
 	{
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 	}
@@ -404,7 +404,7 @@ void Game::addEnemies()
 {
 	if (m_player.getLevel() > m_currentLevel)
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 6; i++)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
 			m_currentGamemode = Gamemode::Upgrade;

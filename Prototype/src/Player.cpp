@@ -14,9 +14,18 @@ const float RUMBLE_THRESHOLD = 16000;
 #pragma region CONSTRUCTOR
 Player::Player()
 {
+	//THOR
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("playerAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/differentCharacterangle.png"));
+
+	//SOUND
+	if (!m_dashSoundBuffer.loadFromFile("resources/sounds/dash.wav"))
+	{
+		std::cout << "error loading dash sound";
+	}
+	m_dashSound.setBuffer(m_dashSoundBuffer);
+	m_dashSound.setVolume(5.0f);
 
 	//Base variable initialiser
 	m_maxHealth = 100.0f;
@@ -732,6 +741,9 @@ void Player::dash()
 	{
 		m_canDash = false;
 		m_dashStateClock.restart();
+
+		m_dashSound.stop();
+		m_dashSound.play();
 
 		sf::Vector2f heading = m_movementVector * DASH_DISTANCE;
 

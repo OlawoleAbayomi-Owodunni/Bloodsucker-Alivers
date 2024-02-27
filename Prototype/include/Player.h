@@ -143,6 +143,9 @@ private:
 	Time m_dashStateTime;
 	Clock m_dashStateClock;
 
+	SoundBuffer m_dashSoundBuffer;
+	Sound m_dashSound;
+
 	Sprite m_playerSprite;
 	Sprite m_dashSprite;
 	Sprite m_haloSprite;

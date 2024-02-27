@@ -320,7 +320,7 @@ void Game::checkCollisions()
 			++it;
 		}
 	}
-	cout << rumbleTimer.getElapsedTime().asSeconds() << "\n";
+	//cout << rumbleTimer.getElapsedTime().asSeconds() << "\n";
 
 	if (rumbleTimer.getElapsedTime().asSeconds() > 0.1f) {
 		m_player.rumbleStop();

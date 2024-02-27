@@ -12,7 +12,8 @@ enum class CharacterState
 {
 	None,
 	IdleState,
-	WalkState
+	WalkSideState,
+	WalkDownState
 };
 
 enum class PlayerUpgrade

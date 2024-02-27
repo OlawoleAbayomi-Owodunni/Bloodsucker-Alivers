@@ -35,8 +35,6 @@ Player::Player()
 	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	m_direction = Direction::East;
 	m_canDash = false;
-
-	m_weapons.push_back(new Weapon(WeaponType::Pistol));
 	
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
@@ -45,7 +43,7 @@ Player::Player()
 
 	for (int i = 0; i < 6; i++)
 	{
-		m_haloFrames.push_back(IntRect{ 160 * i,1350,160,64 });
+		m_haloFrames.push_back(IntRect{ 160 * i,1351,160,64 });
 	}
 	m_currentHaloFrame = 0;
 
@@ -196,32 +194,32 @@ void Player::handleKeyInput()
 	float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
 	float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
 
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
+	{
+		m_direction = Direction::North;
+		m_playerState = CharacterState::WalkSideState;
+		m_movementVector.y -= m_speed;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
+	{
+		m_direction = Direction::South;
+		m_playerState = CharacterState::WalkDownState;
+		m_movementVector.y += m_speed;
+	}
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || xAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::West;
-		m_playerState = CharacterState::WalkState;
+		m_playerState = CharacterState::WalkSideState;
 		m_playerSprite.setScale(-0.5f, 0.5f);
 		m_movementVector.x -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::East;
-		m_playerState = CharacterState::WalkState;
+		m_playerState = CharacterState::WalkSideState;
 		m_playerSprite.setScale(0.5f, 0.5f);
 		m_movementVector.x += m_speed;
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
-	{
-		m_direction = Direction::North;
-		m_playerState = CharacterState::WalkState;
-		m_movementVector.y -= m_speed;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
-	{
-		m_direction = Direction::South;
-		m_playerState = CharacterState::WalkState;
-		m_movementVector.y += m_speed;
 	}
 
 	//	// Map input to movement controls
@@ -647,7 +645,7 @@ void Player::setFrames()
 		addFrame(IntRect{ 480,1150,160,203 });
 		addFrame(IntRect{ 640,1150,160,203 });
 		break;
-	case CharacterState::WalkState:
+	case CharacterState::WalkSideState:
 		addFrame(IntRect{ 160,416,160,203 });
 		addFrame(IntRect{ 320,416,160,203 });
 		addFrame(IntRect{ 480,416,160,203 });
@@ -656,6 +654,21 @@ void Player::setFrames()
 		addFrame(IntRect{ 960,416,160,203 });
 		addFrame(IntRect{ 1120,416,160,203 });
 		addFrame(IntRect{ 1280,416,160,203 });
+		break;
+	case CharacterState::WalkDownState:
+		addFrame(IntRect{ 0, 1408, 160, 200 });
+		addFrame(IntRect{ 160, 1408, 160, 200 });
+		addFrame(IntRect{ 320, 1408, 160, 200 });
+		addFrame(IntRect{ 480, 1408, 160, 200 });
+		addFrame(IntRect{ 640, 1408, 160, 200 });
+		addFrame(IntRect{ 800, 1408, 160, 200 });
+		addFrame(IntRect{ 960, 1408, 160, 200 });
+		addFrame(IntRect{ 1120, 1408, 160, 200 });
+		addFrame(IntRect{ 1280, 1408, 160, 200 });
+		addFrame(IntRect{ 1440, 1408, 160, 200 });
+		addFrame(IntRect{ 1600, 1408, 160, 200 });
+		addFrame(IntRect{ 1760, 1408, 160, 200 });
+		addFrame(IntRect{ 1920, 1408, 160, 200 });
 		break;
 	default:
 		break;

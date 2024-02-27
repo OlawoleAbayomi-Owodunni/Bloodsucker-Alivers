@@ -11,7 +11,7 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_health = 100.0f;
 	m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
 
-	m_enemyState = CharacterState::WalkState;
+	m_enemyState = CharacterState::WalkSideState;
 	m_previousState = CharacterState::None;
 
 	m_enemyTime = seconds(0.2f);
@@ -192,7 +192,7 @@ void Enemy::setFrames()
 	{
 	case CharacterState::IdleState:
 		break;
-	case CharacterState::WalkState:
+	case CharacterState::WalkSideState:
 		addFrame(IntRect{ 0,192,160,160 });
 		addFrame(IntRect{ 160,192,160,160 });
 		addFrame(IntRect{ 320,192,160,160 });

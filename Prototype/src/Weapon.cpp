@@ -11,13 +11,7 @@ Weapon::Weapon(WeaponType t_type)
 	counter = 0;
 	m_fireRateModifier = 1;
 
-	if (!m_weaponTexture.loadFromFile("./resources/sprites/plyrPh.png"))
-	{
-		cout << "Failed to load file\n";
-	}
-
 	m_weaponSprite.setTexture(m_weaponTexture);
-
 	m_weaponSprite.setOrigin(16, 16);
 	m_weaponSprite.setScale(5.0f, 5.0f);
 

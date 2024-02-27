@@ -201,13 +201,15 @@ void Player::handleKeyInput()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || yAxis < -JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::North;
-		m_playerState = CharacterState::WalkSideState;
+		m_playerState = CharacterState::WalkUpState;
+		m_playerSprite.setScale(0.5f, 0.5f);
 		m_movementVector.y -= m_speed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || yAxis > JOYSTICK_THRESHOLD)
 	{
 		m_direction = Direction::South;
 		m_playerState = CharacterState::WalkDownState;
+		m_playerSprite.setScale(0.5f, 0.5f);
 		m_movementVector.y += m_speed;
 	}
 
@@ -564,7 +566,7 @@ void Player::carePackage(Gamemode& t_gamemode)
 	//	choice3 = static_cast<PlayerUpgrade>(rand() % static_cast<int>(PlayerUpgrade::Count));
 	//}
 
-	std::cout << "Choose an upgrade:\n";
+	std::cout << "Choose a new weapon:\n";
 
 	switch (choice1)
 	{
@@ -610,7 +612,7 @@ void Player::carePackage(Gamemode& t_gamemode)
 
 #pragma endregion
 
-	//most likeley going to get rid of the switch since it will always do the same thing
+	//most likely going to get rid of the switch since it will always do the same thing
 	switch (playerChoice)
 	{
 	case 1:
@@ -635,37 +637,42 @@ void Player::carePackage(Gamemode& t_gamemode)
 
 void Player::giveWeapon(WeaponType t_type)
 {
+	bool weaponEquipped = false;
+
 	switch (t_type)
 	{
 	case WeaponType::Pistol:
-		//current problem, this loops throught the entire array. If there are 3 slots, and slot 1 and 2 are occupied, slot 3 WILL get filled
-		//because it checks if it's the same type, if it is, skips but STILL iterates to check the next cell and if it isn't it adds the weapon anyway
-		//SOLUTION: add a bool that sets on true and only add to the vector if that condition is true AFTER looping through the array
 		for (auto weapon : m_weapons)
 		{
 			if (weapon->getType() == t_type) {
-				isPistolEquipped = true;
+				weaponEquipped = true;
 			}
 		}
-		if (!isPistolEquipped) {
-			m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+		
+		if (weaponEquipped) {
+			cout << "You already have that weapon equipped.\n";
 		}
 		else {
-			cout << "You already have that weapon equipped\n";
+			m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+			cout << "Pistol added to arsenal.\n";
 		}
 		break;
 	case WeaponType::AssaultRifle:
+
 		for (auto weapon : m_weapons)
 		{
-			if (weapon->getType() != t_type) {
+			if (weapon->getType() == t_type) {
+				weaponEquipped = true;
 			}
 
 		}
-		if (!isArEqipped) {
-			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle )); // all we need to do to player to add a new weapon
+
+		if (weaponEquipped) {
+			cout << "You already have that weapon equipped.\n";
 		}
 		else {
-			cout << "You already have that weapon equipped\n";
+			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+			cout << "Assault Rifle added to arsenal.\n";
 		}
 		break;
 	default:
@@ -805,6 +812,15 @@ void Player::setFrames()
 		addFrame(IntRect{ 1600, 1408, 160, 200 });
 		addFrame(IntRect{ 1760, 1408, 160, 200 });
 		addFrame(IntRect{ 1920, 1408, 160, 200 });
+		break;
+	case CharacterState::WalkUpState:
+		addFrame(IntRect{ 0, 1938, 160, 200 });
+		addFrame(IntRect{ 160, 1938, 160, 200 });
+		addFrame(IntRect{ 320, 1938, 160, 200 });
+		addFrame(IntRect{ 480, 1938, 160, 200 });
+		addFrame(IntRect{ 640, 1938, 160, 200 });
+		addFrame(IntRect{ 800, 1938, 160, 200 });
+		addFrame(IntRect{ 960, 1938, 160, 200 });
 		break;
 	default:
 		break;

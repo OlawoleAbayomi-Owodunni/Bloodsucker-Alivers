@@ -19,13 +19,15 @@ public:
 
 private:
 	sf::Clock m_timer;
+	sf::Clock m_arTimer;
+	sf::Time m_arCooldown;
+
 	WeaponType m_type;
 	std::vector<Bullet*> m_bullets;
 	bool m_firing;
 	float m_fireRate;
 	float m_fireRateModifier;
-
-	int counter;
+	int m_arBulletCounter;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 

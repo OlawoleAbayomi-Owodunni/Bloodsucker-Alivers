@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 #include <vector>
@@ -36,6 +37,8 @@ public:
 	void addFrame(sf::IntRect& t_frame);
 	void setFrames();
 
+	void playHitSound();
+
 private:
 	static std::vector<Enemy*> m_allEnemies;
 
@@ -44,6 +47,9 @@ private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
 	sf::Vector2f m_pushFactor;
+
+	sf::SoundBuffer m_hitSoundBuffer;
+	sf::Sound m_hitSound;
 
 	sf::RectangleShape m_rectangle;
 	//sf::RectangleShape m_emptyHealthBar;

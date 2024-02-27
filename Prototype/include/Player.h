@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include<SFML/Audio.hpp>
+#include <SFML/Audio.hpp>
 #include <Thor/Resources.hpp>
 #include "ScreenSize.h"
 #include "Weapon.h"

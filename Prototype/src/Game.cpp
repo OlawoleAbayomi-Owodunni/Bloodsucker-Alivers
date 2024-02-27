@@ -278,6 +278,8 @@ void Game::checkCollisions()
 							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
 						}
 
+						enemy->playHitSound();
+
 						enemy->initialisePosition(m_player.getPosition());
 					}
 				}

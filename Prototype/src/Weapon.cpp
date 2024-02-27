@@ -8,8 +8,9 @@ Weapon::Weapon(WeaponType t_type)
 
 	m_type = t_type;
 	m_firing = false;
-	counter = 0;
 	m_fireRateModifier = 1;
+	m_arCooldown = seconds(0.15);
+	m_arBulletCounter = 0;
 
 	m_weaponSprite.setTexture(m_weaponTexture);
 	m_weaponSprite.setOrigin(16, 16);
@@ -18,11 +19,11 @@ Weapon::Weapon(WeaponType t_type)
 	switch (m_type)
 	{
 	case WeaponType::Pistol:
-		m_fireRate = 3.0f * m_fireRateModifier;
+		m_fireRate = 2.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
 		break;
 	case WeaponType::AssaultRifle:
-		m_fireRate = 1.0f / m_fireRateModifier;
+		m_fireRate = 3.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
 		break;
 	default:
@@ -66,8 +67,19 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 		}
 		else if (m_firing)
 		{
+			if (m_arTimer.getElapsedTime() > m_arCooldown)
+			{
+				m_arTimer.restart();
+				m_bullets.push_back(new Bullet(m_type, m_holder["starterAtlas"], t_playerPos, t_enemies, t_direction));
+				m_arBulletCounter++;
+			}
+
+			if (m_arBulletCounter == 3)
+			{
+				m_arBulletCounter = 0;
 				m_firing = false;
 				m_timer.restart();
+			}
 		}
 		break;
 	default:
@@ -122,13 +134,13 @@ void Weapon::upgradeWeapon() //probably pass in which weapon ID is coming from t
 	switch (m_weaponLvl)
 	{
 	case 1:
-		m_fireRateModifier = 2.0f;
+		m_fireRateModifier = 1.0f;
 		break;
 	case 2:
-		m_fireRateModifier = 2.5f;
+		m_fireRateModifier = 1.5f;
 		break;
 	case 3:
-		m_fireRateModifier = 3.0f;
+		m_fireRateModifier = 2.0f;
 		break;
 	default:
 		break;

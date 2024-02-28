@@ -93,7 +93,8 @@ protected:
 	sf::Font m_arialFont;
 	// main window
 	sf::RenderWindow m_window;
-	sf::View m_view;
+	sf::View m_playerCamera;
+	View m_menuCamera;
 
 	Gamemode m_currentGamemode;
 
@@ -121,4 +122,7 @@ protected:
 	int x_drawFrameCount{ 0 };				// draws per second counter.
 #endif // TEST_FPS
 
+
+	//MENU VARIABLES
+	Sprite menuBgSprite;
 };

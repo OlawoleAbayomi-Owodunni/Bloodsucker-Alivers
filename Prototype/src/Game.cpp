@@ -6,14 +6,20 @@ static double const FPS{ 60.0f };
 
 ////////////////////////////////////////////////////////////
 Game::Game()
-	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Prototype", sf::Style::Default), 
-	m_view(sf::FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y))
+	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Prototype", sf::Style::Default),
+	m_playerCamera(sf::FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y)),
+	m_menuCamera(FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y))
 {
 	srand(time(nullptr));
-
-	m_window.setView(m_view);
-
 	init();
+
+	switch (m_currentGamemode) {
+	case Gamemode::Menu:
+		m_window.setView(m_menuCamera);
+		break;
+	case Gamemode::Gameplay:
+		m_window.setView(m_playerCamera);
+	}
 }
 
 ////////////////////////////////////////////////////////////
@@ -22,9 +28,12 @@ void Game::init()
 	// Really only necessary is our target FPS is greater than 60.
 	m_window.setVerticalSyncEnabled(true);
 
+	m_currentGamemode = Gamemode::Menu;
+
 	//THOR
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
+	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/GPmenu.png"));
 	
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
@@ -58,18 +67,13 @@ void Game::init()
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 
-	m_currentGamemode = Gamemode::Gameplay;
-
-#ifdef TEST_FPS
-	x_updateFPS.setFont(m_arialFont);
-	x_updateFPS.setPosition(20, 300);
-	x_updateFPS.setCharacterSize(24);
-	x_updateFPS.setFillColor(sf::Color::White);
-	x_drawFPS.setFont(m_arialFont);
-	x_drawFPS.setPosition(20, 350);
-	x_drawFPS.setCharacterSize(24);
-	x_drawFPS.setFillColor(sf::Color::White);
-#endif
+	//MAIN MENU INITIALISER
+	Texture& mainMenuBgTexture = m_holder["mainMenuBG"];
+	menuBgSprite.setTexture(mainMenuBgTexture);
+	menuBgSprite.setTextureRect(IntRect{ 0,0,150,80 });
+	menuBgSprite.setOrigin(150.0f / 2.0f, 80.0f / 2.0f);
+	menuBgSprite.setPosition(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
+	menuBgSprite.setScale(10.0f, 10.0f);
 }
 
 #pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
@@ -151,6 +155,11 @@ void Game::processGameEvents(sf::Event& event)
 				m_currentGamemode = Gamemode::Gameplay;
 			}
 			break;
+		case Keyboard::M:
+			if (m_currentGamemode == Gamemode::Gameplay)
+			{
+				m_currentGamemode = Gamemode::Menu;
+			}
 		default:
 			break;
 		}
@@ -161,12 +170,22 @@ void Game::processGameEvents(sf::Event& event)
 ////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
-	if (m_currentGamemode == Gamemode::Gameplay)
+	//switching camera modes
+	switch (m_currentGamemode) {
+	case Gamemode::Menu:
+		m_window.setView(m_menuCamera);
+		break;
+	case Gamemode::Gameplay:
+		m_window.setView(m_playerCamera);
+	}
+
+#pragma region Gameplay Gamemode logic
+	if (m_currentGamemode == Gamemode::Gameplay) //switching between screens
 	{
 		sf::Vector2f targetPosition = m_player.getPosition();
-		sf::Vector2f interpolatedPosition = m_view.getCenter();
+		sf::Vector2f interpolatedPosition = m_playerCamera.getCenter();
 
-		float speed = dt/1000 * 10.0f;
+		float speed = dt / 1000 * 10.0f;
 
 		interpolatedPosition.x = interpolatedPosition.x + (targetPosition.x - interpolatedPosition.x) * speed;
 		interpolatedPosition.y = interpolatedPosition.y + (targetPosition.y - interpolatedPosition.y) * speed;
@@ -189,18 +208,18 @@ void Game::update(double dt)
 			interpolatedPosition.y = ScreenSize::s_mapHeight - ScreenSize::s_height / 2.0f;
 		}
 
-		m_view.setCenter(interpolatedPosition);
-		m_window.setView(m_view);
+		m_playerCamera.setCenter(interpolatedPosition);
+		m_window.setView(m_playerCamera);
 
 		//cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
 
-		m_player.update(dt, m_view, m_enemies);
+		m_player.update(dt, m_playerCamera, m_enemies);
 
 		for (auto enemy : m_enemies)
 		{
 			enemy->update(dt, m_player);
 		}
-		
+
 		for (auto orb : m_xpOrbs)
 		{
 			orb->update(dt, m_player);
@@ -217,40 +236,67 @@ void Game::update(double dt)
 
 		checkCollisions();
 	}
-	
-	if (m_currentGamemode == Gamemode::Upgrade)
+
+#pragma endregion
+
+	if (m_currentGamemode == Gamemode::Upgrade) //setup upgrade screen here
 	{
 		m_player.levelUp(m_currentGamemode);
 	}
+
+	if (m_currentGamemode == Gamemode::Menu)
+	{
+		//Do menu based stuff
+	}
+
+	if (m_currentGamemode == Gamemode::Pause)
+	{
+		//Do pause based stuff
+	}
 }
+
+
 
 ////////////////////////////////////////////////////////////
 void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
-	m_window.draw(bgSprite);
-
-	for (auto pickup : m_pickups)
-	{
-		pickup->render(m_window);
-	}
-
-	for (auto orb : m_xpOrbs)
-	{
-		orb->render(m_window);
-	}
-
-	for (auto enemy : m_enemies)
-	{
-		enemy->render(m_window);
-	}
 	
-	m_player.render(m_window);
+#pragma region GAMEPLAY
+	if (m_currentGamemode == Gamemode::Gameplay)
+	{
+		m_window.draw(bgSprite);
 
-#ifdef TEST_FPS
-	m_window.draw(x_updateFPS);
-	m_window.draw(x_drawFPS);
-#endif
+		for (auto pickup : m_pickups)
+		{
+			pickup->render(m_window);
+		}
+
+		for (auto orb : m_xpOrbs)
+		{
+			orb->render(m_window);
+		}
+
+		for (auto enemy : m_enemies)
+		{
+			enemy->render(m_window);
+		}
+
+		m_player.render(m_window);
+	}
+#pragma endregion
+
+	if (m_currentGamemode == Gamemode::Upgrade)
+	{
+		
+	}
+
+	if (m_currentGamemode == Gamemode::Menu)
+	{
+		m_window.draw(menuBgSprite);
+	}
+
+
 	m_window.display();
 }
 
@@ -290,28 +336,9 @@ void Game::checkCollisions()
 		}
 
 		//Bullet to Enemy
-		for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
-		{
-			if (CollisionDetection::playerOrbCollision(m_player, *it))
-			{
-				m_player.rumbleStart();
-				rumbleTimer.restart();
-
-				m_player.playSound(m_pickupSound);
-				m_player.increaseXP();
-
-				delete* it; // Delete the orb object
-				it = m_xpOrbs.erase(it); // Remove the orb pointer from the vector
-			}
-			else
-			{
-				++it;
-			}
-		}
-
 		for (auto weapon : m_player.getWeapon())
 		{
-			for (auto bullet : weapon->getBullets())
+			for (auto bullet  : weapon->getBullets())
 			{
 				if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 				{
@@ -335,7 +362,7 @@ void Game::checkCollisions()
 				}
 			}
 
-			//for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();)
+			//for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();) // this line is the issue. it needs to be permanent. it gets destroyed so no work
 			//{
 			//	if (CollisionDetection::bulletEnemyCollision((*it), enemy))
 			//	{
@@ -357,8 +384,8 @@ void Game::checkCollisions()
 
 			//			if (weapon->getType() == WeaponType::Pistol)
 			//			{
-			//				delete* it; // Delete the orb object
-			//				it = weapon->getBullets().erase(it); // Remove the orb pointer from the vector
+			//				delete* it; // Delete the bullet object
+			//				it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
 			//			}
 			//		}
 			//	}

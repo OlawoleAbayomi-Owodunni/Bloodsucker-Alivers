@@ -25,6 +25,8 @@ public:
 	void update(double dt);
 	void renderBottom(sf::RenderWindow& t_window);
 	void renderTop(sf::RenderWindow& t_window);
+	
+	RectangleShape getRectangle();
 
 private:
 	RectangleShape m_rectangle;

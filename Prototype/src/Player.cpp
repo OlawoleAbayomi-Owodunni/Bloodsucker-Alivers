@@ -40,7 +40,7 @@ Player::Player()
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
-	m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
 
 	//FSM setup
 	m_direction = Direction::East;
@@ -54,6 +54,7 @@ Player::Player()
 	m_previousState = CharacterState::None;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
+	m_previousPosition = m_position;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -265,6 +266,7 @@ void Player::handleKeyInput()
 	///// Movement
 	// Keyboard
 	m_movementVector = sf::Vector2f(0.0f, 0.0f);
+	m_previousPosition = m_position;
 	// Read input from the Xbox controller
 	float xAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
 	float yAxis = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
@@ -500,6 +502,11 @@ void Player::setHealth()
 
 
 #pragma endregion
+
+void Player::pushBack()
+{
+	m_position = m_previousPosition;
+}
 
 #pragma endregion
 

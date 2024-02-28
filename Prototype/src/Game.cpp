@@ -440,6 +440,11 @@ void Game::render()
 		m_player.renderPlayer(m_window);
 		m_player.renderHUD(m_window);
 
+		for (auto obstacle : m_obstacles)
+		{
+			obstacle->renderTop(m_window);
+		}
+
 		//Render pause menu
 		if (m_currentGamemode == Gamemode::Pause)
 		{
@@ -628,6 +633,14 @@ void Game::checkCollisions()
 	}
 
 #pragma endregion
+
+	for (auto obstacle : m_obstacles)
+	{
+		if (CollisionDetection::playerObstacleCollision(m_player, obstacle))
+		{
+			m_player.pushBack();
+		}
+	}
 
 }
 #pragma endregion

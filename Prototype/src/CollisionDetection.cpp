@@ -72,3 +72,16 @@ bool CollisionDetection::playerDashEnemyCollision(Player& t_player, Enemy* t_ene
 
 	return false;
 }
+
+bool CollisionDetection::playerObstacleCollision(Player& t_player, Obstacle* t_obstacle)
+{
+	sf::FloatRect player = t_player.getRectangle().getGlobalBounds();
+	sf::FloatRect obstacle = t_obstacle->getRectangle().getGlobalBounds();
+
+	if (player.intersects(obstacle))
+	{
+		return true;
+	}
+
+	return false;
+}

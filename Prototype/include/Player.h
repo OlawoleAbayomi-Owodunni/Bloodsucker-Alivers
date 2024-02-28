@@ -58,6 +58,7 @@ public:
 	
 	void setPosition(sf::View& t_view);
 	sf::Vector2f getPosition();
+	void pushBack();
 
 	void setHealth();
 	void decreaseHealth();
@@ -95,6 +96,7 @@ private:
 	float m_health;
 	float m_speed;
 	sf::Vector2f m_position;
+	sf::Vector2f m_previousPosition;
 	sf::Vector2f m_movementVector;
 	
 	int m_level;

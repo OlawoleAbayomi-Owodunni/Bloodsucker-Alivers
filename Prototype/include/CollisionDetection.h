@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "XPOrb.h"
 #include "Pickup.h"
+#include "Obstacle.h"
 
 class CollisionDetection
 {
@@ -17,7 +18,5 @@ public:
 	bool static playerOrbCollision(Player& t_player, XPOrb* t_orb);
 	bool static playerPickupCollision(Player& t_player, Pickup* t_pickup);
 	bool static playerDashEnemyCollision(Player& t_player, Enemy* t_enemy);
-
-private:
-
+	bool static playerObstacleCollision(Player& t_player, Obstacle* t_obstacle);
 };

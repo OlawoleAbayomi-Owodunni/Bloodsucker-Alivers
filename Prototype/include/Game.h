@@ -128,6 +128,9 @@ protected:
 	Sprite menuBgSprite;
 	vector<Button*> m_menuButtons;
 
+	Sprite pauseBgSprite;
+	vector<Button*> m_pauseButtons;
+
 	Sprite m_cursorSprite;
 	int m_cursorPos; 
 	ButtonType m_cursorButtonType;

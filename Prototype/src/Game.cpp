@@ -35,7 +35,6 @@ void Game::init()
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
-	m_holder.acquire("tempCursor", thor::Resources::fromFile<sf::Texture>("resources/sprites/Add.png"));
 	
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
@@ -71,22 +70,30 @@ void Game::init()
 
 	//MAIN MENU INITIALISER
 	Texture& mainMenuBgTexture = m_holder["mainMenuBG"];
+	Texture& UITexture = m_holder["UIAtlas"];
 	menuBgSprite.setTexture(mainMenuBgTexture);
 	menuBgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
-	menuBgSprite.setPosition(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
+	menuBgSprite.setPosition(m_menuCamera.getCenter());
 
-	m_menuButtons.push_back(new Button(ButtonType::Play, m_holder["UIAtlas"], m_arialFont, Vector2f(550, 535)));
-	m_menuButtons.push_back(new Button(ButtonType::Tutorial, m_holder["UIAtlas"], m_arialFont, Vector2f(1050, 535)));
-	m_menuButtons.push_back(new Button(ButtonType::Credits, m_holder["UIAtlas"], m_arialFont, Vector2f(550, 680)));
-	m_menuButtons.push_back(new Button(ButtonType::Exit, m_holder["UIAtlas"], m_arialFont, Vector2f(1050, 680)));
+	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 535)));
+	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(1050, 535)));
+	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 680)));
+	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(1050, 680)));
 
+
+	//PAUSE MENU INITIALISER 
+	pauseBgSprite.setTexture(UITexture);
+	pauseBgSprite.setTextureRect(IntRect{ 0, 1840, 400, 600 });
+	pauseBgSprite.setOrigin(200, 300);
+	pauseBgSprite.setPosition(m_playerCamera.getCenter());
+
+	//CURSOR INITIALISER
 	m_cursorPos = 0;
-	Texture& cursorTexture = m_holder["UIAtlas"];
-	m_cursorSprite.setTexture(cursorTexture);
+	m_cursorSprite.setTexture(UITexture);
 	m_cursorSprite.setTextureRect(IntRect{ 0, 1664, 550, 150 });
 	m_cursorSprite.setOrigin(275.0f, 75.0f);
-	m_cursorSprite.setScale(1.0f, 1.0f);
+	m_cursorSprite.setScale(0.9f, 1.0f);
 	m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 	m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 }
@@ -184,19 +191,6 @@ void Game::processGameEvents(sf::Event& event)
 			break;
 #pragma endregion
 
-
-		case Gamemode::Gameplay:
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Escape:
-					m_currentGamemode = Gamemode::Pause;
-				break;
-
-			default:
-				break;
-			}
-			break;
-
 		case Gamemode::Pause:
 			switch (event.key.code)
 			{
@@ -206,6 +200,19 @@ void Game::processGameEvents(sf::Event& event)
 			case Keyboard::Enter:
 				m_currentGamemode = Gamemode::Gameplay;
 				break;
+			default:
+				break;
+			}
+			break;
+
+		case Gamemode::Gameplay:
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Escape:
+					m_currentGamemode = Gamemode::Pause;
+					pauseBgSprite.setPosition(m_playerCamera.getCenter());
+				break;
+
 			default:
 				break;
 			}
@@ -311,7 +318,7 @@ void Game::render()
 	m_window.clear(sf::Color(0, 0, 0, 0));
 	
 #pragma region GAMEPLAY
-	if (m_currentGamemode == Gamemode::Gameplay)
+	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause)
 	{
 		m_window.draw(bgSprite);
 
@@ -331,6 +338,11 @@ void Game::render()
 		}
 
 		m_player.render(m_window);
+
+		if (m_currentGamemode == Gamemode::Pause)
+		{
+			m_window.draw(pauseBgSprite);
+		}
 	}
 #pragma endregion
 

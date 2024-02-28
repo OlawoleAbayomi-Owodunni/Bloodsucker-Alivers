@@ -181,25 +181,28 @@ Player::~Player()
 
 void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 {
-	handleKeyInput();
-
-	for (auto weapon : m_weapons)
+	if (m_playerState != CharacterState::DeadState)
 	{
-		weapon->update(dt, m_position, t_enemies, m_direction);
+		handleKeyInput();
+
+		for (auto weapon : m_weapons)
+		{
+			weapon->update(dt, m_position, t_enemies, m_direction);
+		}
+
+		m_dashRectBounds.setFillColor(sf::Color::Transparent);
+		m_dashRectBounds.setOutlineColor(sf::Color::Green);
+		m_dashRectBounds.setOutlineThickness(2.0f);
+		m_dashRectBounds.setOrigin(m_dashRect.getGlobalBounds().width / 2.0f, m_dashRect.getGlobalBounds().height / 2.0f);
+		m_dashRectBounds.setPosition(m_dashRect.getPosition());
+		m_dashRectBounds.setSize(sf::Vector2f(m_dashRect.getGlobalBounds().width, m_dashRect.getGlobalBounds().height));
+
+		setHealth();
+		setPosition(t_view);
+
+		updateDashbar();
+		checkXP();
 	}
-	
-	m_dashRectBounds.setFillColor(sf::Color::Transparent);
-	m_dashRectBounds.setOutlineColor(sf::Color::Green);
-	m_dashRectBounds.setOutlineThickness(2.0f);
-	m_dashRectBounds.setOrigin(m_dashRect.getGlobalBounds().width / 2.0f, m_dashRect.getGlobalBounds().height / 2.0f);
-	m_dashRectBounds.setPosition(m_dashRect.getPosition());
-	m_dashRectBounds.setSize(sf::Vector2f(m_dashRect.getGlobalBounds().width, m_dashRect.getGlobalBounds().height));
-
-	setHealth();
-	setPosition(t_view);
-
-	updateDashbar();
-	checkXP();
 
 	if (m_playerState != m_previousState)
 	{
@@ -488,9 +491,10 @@ void Player::setPosition(sf::View& t_view)
 
 void Player::setHealth()
 {
-	if (m_health < 0)
+	if (m_health <= 0)
 	{
 		m_health = 0;
+		m_playerState = CharacterState::DeadState;
 	}
 	else if (m_health > m_maxHealth)
 	{
@@ -733,14 +737,25 @@ void Player::animate()
 {
 	if (m_playerClock.getElapsedTime() > m_playerTime)
 	{
-		if (m_currentPlayerFrame + 1 < m_playerFrames.size())
+		if (m_playerState != CharacterState::DeadState)
 		{
-			m_currentPlayerFrame++;
+			if (m_currentPlayerFrame + 1 < m_playerFrames.size())
+			{
+				m_currentPlayerFrame++;
+			}
+			else
+			{
+				m_currentPlayerFrame = 0;
+			}
 		}
 		else
 		{
-			m_currentPlayerFrame = 0;
+			if (m_currentPlayerFrame + 1 < m_playerFrames.size())
+			{
+				m_currentPlayerFrame++;
+			}
 		}
+		
 		m_playerClock.restart();
 	}
 
@@ -843,6 +858,24 @@ void Player::setFrames()
 	case CharacterState::DashState:
 		addFrame(IntRect{ 0, 1778, 200, 160 });
 		m_playerSprite.setOrigin(100.0f, 60.0f);
+		break;
+	case CharacterState::DeadState:
+		addFrame(IntRect{ 0, 2176, 400, 200 });
+		addFrame(IntRect{ 400, 2176, 400, 200 });
+		addFrame(IntRect{ 800, 2176, 400, 200 });
+		addFrame(IntRect{ 1200, 2176, 400, 200 });
+		addFrame(IntRect{ 1600, 2176, 400, 200 });
+		addFrame(IntRect{ 2000, 2176, 400, 200 });
+		addFrame(IntRect{ 2400, 2176, 400, 200 });
+		addFrame(IntRect{ 2800, 2176, 400, 200 });
+		addFrame(IntRect{ 3200, 2176, 400, 200 });
+		addFrame(IntRect{ 3600, 2176, 400, 200 });
+		addFrame(IntRect{ 4000, 2176, 400, 200 });
+		addFrame(IntRect{ 4400, 2176, 400, 200 });
+		addFrame(IntRect{ 4800, 2176, 400, 200 });
+		addFrame(IntRect{ 5200, 2176, 400, 200 });
+		addFrame(IntRect{ 5600, 2176, 400, 200 });
+		m_playerSprite.setOrigin(200.0f, 100.0f);
 		break;
 	default:
 		break;

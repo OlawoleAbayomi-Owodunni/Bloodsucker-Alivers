@@ -583,12 +583,30 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 	case PlayerUpgrade::Armor:
 		m_armorModifier -= 0.1;
 		break;
-	case PlayerUpgrade::Weapon:
-		m_weapons[0]->upgradeWeapon(); //taking the weapon enum of the pistol or AR should let us get the exact weapon
-		//current issue that ID 0 = pistol so if AR is attatched, then code crashes bcuz upgrade happens based on ID
-		break;
 	default:
 		break;
+	}
+}
+
+void Player::upgradeGun(WeaponType t_type)
+{
+	switch (t_type)
+	{
+	case WeaponType::Pistol:
+		for (int i = 0; i < m_weapons.size(); i++) {
+			if (m_weapons[i]->getType() == t_type) {
+				m_weapons[i]->upgradeWeapon(t_type);
+				cout << "Weapon Actually upgraded\n";
+			}
+		}
+		break;
+	case WeaponType::AssaultRifle:
+		for (int i = 0; i < m_weapons.size(); i++) {
+			if (m_weapons[i]->getType() == t_type) {
+				m_weapons[i]->upgradeWeapon(t_type);
+				cout << "Weapon Actually upgraded\n";
+			}
+		}
 	}
 }
 

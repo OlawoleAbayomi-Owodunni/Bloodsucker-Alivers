@@ -270,11 +270,11 @@ void Game::processGameEvents(sf::Event& event)
 					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradePistol:
-					m_player.upgradePlayer(PlayerUpgrade::Weapon); // go back to player and refreactor to allow for pistol and ar
+					m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
 					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradeAR:
-					m_player.upgradePlayer(PlayerUpgrade::Weapon);
+					m_player.upgradeGun(WeaponType::AssaultRifle);
 					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				}

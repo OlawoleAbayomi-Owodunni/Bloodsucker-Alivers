@@ -129,22 +129,49 @@ int Weapon::getWeaponLevel()
 }
 
 
-void Weapon::upgradeWeapon() //probably pass in which weapon ID is coming from the player and based off that modify that guns properties in here
+void Weapon::upgradeWeapon(WeaponType t_type) //probably pass in which weapon ID is coming from the player and based off that modify that guns properties in here
 {
-	//switch statement here based off the weapon (E.G: more bullets in AR)
 	m_weaponLvl++;
-	switch (m_weaponLvl)
+
+	switch (t_type)
 	{
-	case 1:
-		m_fireRateModifier = 1.0f;
+	case WeaponType::Pistol:
+		switch (m_weaponLvl)
+		{
+		case 1:
+			m_fireRateModifier = 1.0f;
+			break;
+		case 2:
+			m_fireRateModifier = 1.5f;
+			break;
+		case 3:
+			m_fireRateModifier = 2.0f;
+			break;
+		default:
+			break;
+		}
 		break;
-	case 2:
-		m_fireRateModifier = 1.5f;
+	case WeaponType::AssaultRifle:
+		switch (m_weaponLvl)
+		{
+		case 1:
+			m_fireRateModifier = 1.0f;
+			m_arBulletCounter++;
+			break;
+		case 2:
+			m_fireRateModifier = 1.5f;
+			m_arBulletCounter += 2;
+			break;
+		case 3:
+			m_fireRateModifier = 2.0f;
+			m_arBulletCounter *= 2;
+			break;
+		default:
+			break;
+		}
 		break;
-	case 3:
-		m_fireRateModifier = 2.0f;
-		break;
-	default:
 		break;
 	}
+	//switch statement here based off the weapon (E.G: more bullets in AR)
+
 }

@@ -82,11 +82,11 @@ void Game::init()
 	m_menuButtons.push_back(new Button(ButtonType::Exit, m_holder["UIAtlas"], m_arialFont, Vector2f(1050, 680)));
 
 	m_cursorPos = 0;
-	Texture& cursorTexture = m_holder["tempCursor"];
+	Texture& cursorTexture = m_holder["UIAtlas"];
 	m_cursorSprite.setTexture(cursorTexture);
-	m_cursorSprite.setTextureRect(IntRect{ 0,0,150,150 });
-	m_cursorSprite.setOrigin(75.0f, 75.0f);
-	m_cursorSprite.setScale(0.25f, 0.25f);
+	m_cursorSprite.setTextureRect(IntRect{ 0, 1664, 550, 150 });
+	m_cursorSprite.setOrigin(275.0f, 75.0f);
+	m_cursorSprite.setScale(1.0f, 1.0f);
 	m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 	m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 }

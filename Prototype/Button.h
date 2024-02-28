@@ -23,7 +23,15 @@ enum ButtonType
 
 	//Game over menu buttons
 	NewGame, //new game will eventually be moved to main menu section
-	BackToMenu //eventually to be removed cuz it exists in pause menu
+	BackToMenu, //eventually to be removed cuz it exists in pause menu
+
+	//UPGRADE BUTTONS
+	UpgradeHealth,
+	UpgradeSpeed,
+	UpgradeXP,
+	UpgradeArmor,
+	UpgradePistol,
+	UpgradeAR
 };
 //I'm thinking we make every button in the constructor based off the button type passed. A lot of enums but automation assured
 //either check if we can do an enum within an enum or have a different class of buttons that handle upgrades
@@ -35,7 +43,7 @@ public:
 
 	void render(sf::RenderWindow& t_window);
 
-	void buttonPressed();
+	void setPosition(Vector2f t_pos);
 
 	Vector2f getPositon();
 	ButtonType getType();

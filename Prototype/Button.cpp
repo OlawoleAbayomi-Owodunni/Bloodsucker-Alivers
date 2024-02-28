@@ -68,6 +68,48 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 
 #pragma endregion
 
+	case ButtonType::UpgradeHealth:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("HEALTH");
+		break;
+	case ButtonType::UpgradeSpeed:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("SPEED");
+		break;
+	case ButtonType::UpgradeXP:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("XP");
+		break;
+	case ButtonType::UpgradeArmor:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("ARMOR");
+		break;
+	case ButtonType::UpgradePistol:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("PISTOL +");
+		break;
+	case ButtonType::UpgradeAR:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("ASSAULT\nRIFLE +");
+		break;
 	}
 
 	m_text.setOrigin(m_text.getGlobalBounds().width / 2.0f, m_text.getGlobalBounds().height / 2.0f);
@@ -78,6 +120,13 @@ void Button::render(sf::RenderWindow& t_window)
 {
 	t_window.draw(m_bgSprite);
 	t_window.draw(m_text);
+}
+
+void Button::setPosition(Vector2f t_pos)
+{
+	m_pos = t_pos;
+	m_bgSprite.setPosition(t_pos);
+	m_text.setPosition(t_pos);
 }
 
 

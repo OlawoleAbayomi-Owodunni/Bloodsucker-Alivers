@@ -131,6 +131,7 @@ int Weapon::getWeaponLevel()
 
 void Weapon::upgradeWeapon() //probably pass in which weapon ID is coming from the player and based off that modify that guns properties in here
 {
+	//switch statement here based off the weapon (E.G: more bullets in AR)
 	m_weaponLvl++;
 	switch (m_weaponLvl)
 	{

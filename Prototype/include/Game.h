@@ -88,7 +88,11 @@ protected:
 	void processGameEvents(sf::Event&);
 
 	void checkCollisions();
-	void addEnemies();
+
+	void levelUpSpawner();
+	void createRandomUpgrades();
+
+
 	void playSound();
 
 	// Font used for all text
@@ -130,6 +134,9 @@ protected:
 
 	Sprite pauseBgSprite;
 	vector<Button*> m_pauseButtons;
+
+	Sprite levelUpBGSprite;
+	vector<Button*> m_upgradeButtons;
 
 	Sprite m_cursorSprite;
 	int m_cursorPos; 

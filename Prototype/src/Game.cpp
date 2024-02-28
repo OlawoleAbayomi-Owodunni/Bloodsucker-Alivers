@@ -137,6 +137,7 @@ void Game::processGameEvents(sf::Event& event)
 	{
 		switch (m_currentGamemode)
 		{
+#pragma region Menu input handling
 		case Gamemode::Menu:
 			switch (event.key.code)
 			{
@@ -170,17 +171,19 @@ void Game::processGameEvents(sf::Event& event)
 			}
 
 			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1))
-			{ 
-				m_cursorPos = 0; 
+			{
+				m_cursorPos = 0;
 			}
-			if (m_cursorPos < 0) 
-			{ 
+			if (m_cursorPos < 0)
+			{
 				m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1;
 			}
 
 			m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 			break;
+#pragma endregion
+
 
 		case Gamemode::Gameplay:
 			switch (event.key.code)

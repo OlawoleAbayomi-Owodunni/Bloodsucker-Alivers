@@ -21,7 +21,10 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_enemyState = CharacterState::WalkSideState;
 	m_previousState = CharacterState::None;
 
-	m_enemyTime = seconds(0.2f);
+	m_deathFrameCounter = 0;
+	m_currentEnemyFrame = 0;
+
+	m_enemyTime = seconds(0.1f);
 
 	m_rectangle.setSize(sf::Vector2f(40.0f, 80.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -55,8 +58,11 @@ void Enemy::update(double dt, Player& t_player)
 {
 	//m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
 
-	move(t_player);
-
+	if (m_enemyState == CharacterState::WalkSideState)
+	{
+		move(t_player);
+	}
+	
 	if (m_enemyState != m_previousState)
 	{
 		setFrames();
@@ -75,6 +81,8 @@ void Enemy::render(sf::RenderWindow& t_window)
 void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 {
 	m_health = 100.0f;
+	m_enemyState = CharacterState::WalkSideState;
+	m_deathFrameCounter = 0;
 
 	float xPos = rand() % 3200 + 1;
 	float yPos = rand() % 1800 + 1;
@@ -151,6 +159,16 @@ sf::Vector2f Enemy::getPosition()
 	return m_position;
 }
 
+void Enemy::setState(CharacterState t_state)
+{
+	m_enemyState = t_state;
+}
+
+CharacterState Enemy::getState()
+{
+	return m_enemyState;
+}
+
 sf::RectangleShape Enemy::getRectangle()
 {
 	return m_rectangle;
@@ -178,6 +196,12 @@ void Enemy::animate()
 		{
 			m_currentEnemyFrame = 0;
 		}
+
+		if (m_enemyState == CharacterState::DeadState)
+		{
+			m_deathFrameCounter++;
+		}
+
 		m_enemyClock.restart();
 	}
 
@@ -206,9 +230,30 @@ void Enemy::setFrames()
 		addFrame(IntRect{ 480,192,160,160 });
 		addFrame(IntRect{ 640,192,160,160 });
 		break;
+	case CharacterState::DeadState:
+		addFrame(IntRect{ 3744,0,160,160 });
+		addFrame(IntRect{ 3904,0,160,160 });
+		addFrame(IntRect{ 4064,0,160,160 });
+		addFrame(IntRect{ 4224,0,160,160 });
+		addFrame(IntRect{ 4384,0,160,160 });
+		
+		addFrame(IntRect{ 4544,0,160,160 });
+		addFrame(IntRect{ 4704,0,160,160 });
+		addFrame(IntRect{ 4864,0,160,160 });
+		addFrame(IntRect{ 5024,0,160,160 });
+		addFrame(IntRect{ 5184,0,160,160 });
+		
+		addFrame(IntRect{ 5344,0,160,160 });
+		addFrame(IntRect{ 5504,0,160,160 });
+		break;
 	default:
 		break;
 	}
+}
+
+int Enemy::getDeathFrameCounter()
+{
+	return m_deathFrameCounter;
 }
 
 void Enemy::playHitSound()

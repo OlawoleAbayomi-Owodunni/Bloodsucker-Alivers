@@ -410,6 +410,12 @@ void Game::update(double dt)
 		for (auto enemy : m_enemies)
 		{
 			enemy->update(dt, m_player);
+
+			if (enemy->getDeathFrameCounter() > 10)
+			{
+				dropLoot(enemy);
+				enemy->initialisePosition(m_player.getPosition());
+			}
 		}
 
 		for (auto orb : m_xpOrbs)
@@ -540,94 +546,64 @@ void Game::checkCollisions()
 #pragma region Enemies
 	for (auto enemy : m_enemies)
 	{
-		//Player to Enemy
-		if (CollisionDetection::playerEnemyCollision(m_player, enemy))
+		if (enemy->getState() != CharacterState::DeadState)
 		{
-			m_player.decreaseHealth();
-		}
-
-		//Enemy to Dash
-		if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
-		{
-			enemy->decreaseHealth(100.0f);
-
-			if (enemy->getHealth() < 0)
+			//Player to Enemy
+			if (CollisionDetection::playerEnemyCollision(m_player, enemy))
 			{
-				if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
-				{
-					m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
-				}
-
-				if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
-				{
-					m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-				}
-
-				enemy->initialisePosition(m_player.getPosition());
+				m_player.decreaseHealth();
 			}
-		}
 
-		//Bullet to Enemy
-		for (auto weapon : m_player.getWeapon())
-		{
-			if (weapon->getType() == WeaponType::Pistol || weapon->getType() == WeaponType::AssaultRifle) // If bullet is meant to delete when collided with enemy
+			//Enemy to Dash
+			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
 			{
-				for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();) // this line is the issue. it needs to be permanent. it gets destroyed so no work
+				enemy->decreaseHealth(100.0f);
+
+				if (enemy->getHealth() < 0)
 				{
-					if (CollisionDetection::bulletEnemyCollision((*it), enemy))
+					enemy->setState(CharacterState::DeadState);
+				}
+			}
+
+			//Bullet to Enemy
+			for (auto weapon : m_player.getWeapon())
+			{
+				if (weapon->getType() == WeaponType::Pistol || weapon->getType() == WeaponType::AssaultRifle) // If bullet is meant to delete when collided with enemy
+				{
+					for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();) // this line is the issue. it needs to be permanent. it gets destroyed so no work
 					{
-						enemy->decreaseHealth((*it)->getDamage());
-
-						if (enemy->getHealth() < 0)
+						if (CollisionDetection::bulletEnemyCollision((*it), enemy))
 						{
-							if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+							enemy->decreaseHealth((*it)->getDamage());
+
+							if (enemy->getHealth() < 0)
 							{
-								m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+
+								delete* it; // Delete the bullet object
+								it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
 							}
-
-							if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
-							{
-								m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-							}
-
-							enemy->playHitSound();
-
-							enemy->initialisePosition(m_player.getPosition());
-
-							delete* it; // Delete the bullet object
-							it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
+						}
+						else
+						{
+							++it;
 						}
 					}
-					else
-					{
-						++it;
-					}
 				}
-			}
-			else
-			{
-				for (auto bullet  : weapon->getBullets())
+				else
 				{
-					if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
+					for (auto bullet : weapon->getBullets())
 					{
-						enemy->decreaseHealth(bullet->getDamage());
-
-						if (enemy->getHealth() < 0)
+						if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 						{
-							if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+							enemy->decreaseHealth(bullet->getDamage());
+
+							if (enemy->getHealth() < 0)
 							{
-								m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
 							}
-
-							if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
-							{
-								m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-							}
-
-							enemy->playHitSound();
-
-							enemy->initialisePosition(m_player.getPosition());
-
 						}
 					}
 				}
@@ -736,4 +712,17 @@ void Game::createRandomWeapons()
 
 	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150)));
 	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150)));
+}
+
+void Game::dropLoot(Enemy* t_enemy)
+{
+	if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+	{
+		m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], t_enemy->getPosition()));
+	}
+
+	if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+	{
+		m_pickups.push_back(new Pickup(m_holder["starterAtlas"], t_enemy->getPosition(), PickupType::Health));
+	}
 }

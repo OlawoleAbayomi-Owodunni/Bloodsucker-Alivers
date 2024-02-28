@@ -96,6 +96,7 @@ protected:
 
 	void createRandomWeapons();
 
+	void dropLoot(Enemy* t_enemy);
 
 	void playSound();
 

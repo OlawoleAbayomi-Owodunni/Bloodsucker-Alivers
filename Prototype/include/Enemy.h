@@ -26,6 +26,9 @@ public:
 	void setPosition(float t_x, float t_y);
 	sf::Vector2f getPosition();
 
+	void setState(CharacterState t_state);
+	CharacterState getState();
+
 	void calculatePushFactor();
 
 	void decreaseHealth(float t_damage);
@@ -36,6 +39,7 @@ public:
 	void animate();
 	void addFrame(sf::IntRect& t_frame);
 	void setFrames();
+	int getDeathFrameCounter();
 
 	void playHitSound();
 
@@ -62,6 +66,8 @@ private:
 	int m_currentEnemyFrame;
 	Time m_enemyTime;
 	Clock m_enemyClock;
+
+	int m_deathFrameCounter;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 	

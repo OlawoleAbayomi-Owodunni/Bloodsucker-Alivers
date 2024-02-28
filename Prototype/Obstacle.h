@@ -23,11 +23,13 @@ public:
 	~Obstacle();
 
 	void update(double dt);
-	void render(sf::RenderWindow& t_window);
+	void renderBottom(sf::RenderWindow& t_window);
+	void renderTop(sf::RenderWindow& t_window);
 
 private:
 	RectangleShape m_rectangle;
 	Vector2f m_position;
 
-	Sprite m_sprite;
+	Sprite m_topSprite;
+	Sprite m_bottomSprite;
 };

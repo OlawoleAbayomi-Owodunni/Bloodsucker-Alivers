@@ -46,7 +46,10 @@ Player::Player()
 	m_direction = Direction::East;
 	m_canDash = false;
 	m_dashBarFillAmount = 0;
-	
+	m_maxDashCharges = 0;
+	m_currentDashCharges = 0;
+	m_dashDistance = 150.0f;
+
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
 
@@ -78,10 +81,10 @@ Player::Player()
 	m_dashSprite.setScale(0.5f, 0.5f);
 	m_dashSprite.setPosition(m_position);
 
-	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
+	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
-	m_rectangle.setPosition(m_position);
+	m_rectangle.setPosition(m_position.x, m_position.y + 20.0f);
 
 	//XP Bar sprite setup
 	m_xpBarSprite.setTexture(playerTextures);
@@ -101,21 +104,43 @@ Player::Player()
 	m_xpBar.setPosition(800.0f, 40.0f);
 
 	//Dash Bar sprite setup
-	m_dashBarSprite.setTexture(playerTextures);
-	m_dashBarSprite.setTextureRect(IntRect{ 0, 1614, 34, 164 });
-	m_dashBarSprite.setOrigin(17, 82);
-	m_dashBarSprite.setScale(2.0f, 2.0f);
-	m_dashBarSprite.setPosition(1480.0f, 680.0f);
+	m_dashBarLeftSprite.setTexture(playerTextures);
+	m_dashBarLeftSprite.setTextureRect(IntRect{ 0, 1614, 34, 164 });
+	m_dashBarLeftSprite.setOrigin(17, 82);
+	m_dashBarLeftSprite.setScale(2.0f, 2.0f);
+	m_dashBarLeftSprite.setPosition(1480.0f, 680.0f);
+	m_dashBarLeftSprite.setRotation(270.0f);
 
-	m_emptyDashBar.setSize(sf::Vector2f(24.0f, 244.0f));
-	m_emptyDashBar.setOrigin(m_emptyDashBar.getSize().x / 2.0f, m_emptyDashBar.getSize().y / 2.0f);
-	m_emptyDashBar.setFillColor(Color::Black);
-	m_emptyDashBar.setPosition(1480.0f, 666.0f);
+	m_emptyDashBarLeft.setSize(sf::Vector2f(24.0f, 244.0f));
+	m_emptyDashBarLeft.setOrigin(m_emptyDashBarLeft.getSize().x / 2.0f, 136);
+	m_emptyDashBarLeft.setFillColor(Color::Black);
+	m_emptyDashBarLeft.setPosition(1480.0f, 680.0f);
+	m_emptyDashBarLeft.setRotation(270.0f);
 
-	m_dashBar.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
-	m_dashBar.setOrigin(m_dashBar.getSize().x / 2.0f, -122.0f);
-	m_dashBar.setFillColor(sf::Color::White);
-	m_dashBar.setPosition(1480.0f, 666.0f);
+	m_dashBarLeft.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBarLeft.setOrigin(m_dashBarLeft.getSize().x / 2.0f, -108.0f);
+	m_dashBarLeft.setFillColor(sf::Color::White);
+	m_dashBarLeft.setPosition(1480.0f, 680.0f);
+	m_dashBarLeft.setRotation(270.0f);
+
+	m_dashBarRightSprite.setTexture(playerTextures);
+	m_dashBarRightSprite.setTextureRect(IntRect{ 0, 1614, 34, 164 });
+	m_dashBarRightSprite.setOrigin(17, 82);
+	m_dashBarRightSprite.setScale(2.0f, 2.0f);
+	m_dashBarRightSprite.setPosition(1480.0f, 680.0f);
+	m_dashBarRightSprite.setRotation(90.0f);
+
+	m_emptyDashBarRight.setSize(sf::Vector2f(24.0f, 244.0f));
+	m_emptyDashBarRight.setOrigin(m_emptyDashBarLeft.getSize().x / 2.0f, 136);
+	m_emptyDashBarRight.setFillColor(Color::Black);
+	m_emptyDashBarRight.setPosition(1480.0f, 680.0f);
+	m_emptyDashBarRight.setRotation(90.0f);
+
+	m_dashBarRight.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBarRight.setOrigin(m_dashBarLeft.getSize().x / 2.0f, -108.0f);
+	m_dashBarRight.setFillColor(sf::Color::White);
+	m_dashBarRight.setPosition(1480.0f, 680.0f);
+	m_dashBarRight.setRotation(90.0f);
 
 	//Halo Sprite setup
 	m_haloSprite.setTexture(playerTextures);
@@ -182,7 +207,7 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 	animate();
 }
 
-void Player::render(sf::RenderWindow& t_window)
+void Player::renderPlayer(sf::RenderWindow& t_window)
 {
 	for (auto weapon : m_weapons)
 	{
@@ -211,16 +236,23 @@ void Player::render(sf::RenderWindow& t_window)
 	t_window.draw(m_currentHealthBar);
 
 	t_window.draw(m_playerSprite);
+}
 
+void Player::renderHUD(sf::RenderWindow& t_window)
+{
 	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
 	t_window.draw(m_xpBarSprite);
 
 	if (m_level > 1)
 	{
-		t_window.draw(m_emptyDashBar);
-		t_window.draw(m_dashBar);
-		t_window.draw(m_dashBarSprite);
+		t_window.draw(m_emptyDashBarLeft);
+		t_window.draw(m_dashBarLeft);
+		t_window.draw(m_dashBarLeftSprite);
+
+		t_window.draw(m_emptyDashBarRight);
+		t_window.draw(m_dashBarRight);
+		t_window.draw(m_dashBarRightSprite);
 	}
 }
 
@@ -330,19 +362,19 @@ void Player::handleKeyInput()
 			m_dashRect.setPosition(-1000.0f,-1000.0f);
 		}*/
 
-		if (m_movementVector.x != 0.0f || m_movementVector.y != 0.0f)
-		{
-			if (m_dashCooldownClock.getElapsedTime() > m_dashCooldownTime)
+			if (m_movementVector.x != 0.0f || m_movementVector.y != 0.0f)
 			{
-				dash();
-				m_dashCooldownClock.restart();
+				if (m_currentDashCharges > 0 && m_canDash)
+				{
+					dash();
+					m_dashCooldownClock.restart();
+				}
 			}
-		}
-		else if (!m_canDash && m_movementVector.x == 0.0f && m_movementVector.y == 0.0f)
-		{
-			m_canDash = true;
-			m_dashRect.setPosition(-1000.0f, -1000.0f);
-		}
+			else if (!m_canDash && m_movementVector.x == 0.0f && m_movementVector.y == 0.0f)
+			{
+				m_canDash = true;
+				m_dashRect.setPosition(-1000.0f, -1000.0f);
+			}
 
 		for (int i = 0; i < m_afterImages.size(); i++)
 		{
@@ -408,21 +440,46 @@ sf::RectangleShape Player::getDashCollider()
 #pragma region Setters
 void Player::setPosition(sf::View& t_view)
 {
-	sf::Vector2f cameraPos(t_view.getCenter());
+	if (m_position.x < 40)
+	{
+		m_position.x = 40;
+	}
+	else if (m_position.x > 3160)
+	{
+		m_position.x = 3160;
+	}
 
-	m_rectangle.setPosition(m_position);
+	if (m_position.y < 50)
+	{
+		m_position.y = 50;
+	}
+	else if (m_position.y > 1750)
+	{
+		m_position.y = 1750;
+	}
+
+	sf::Vector2f cameraPos(t_view.getCenter());
+	sf::Vector2f xpBarPos = sf::Vector2f(cameraPos.x, cameraPos.y - 410.0f);
+	sf::Vector2f dashBarLeftPos = sf::Vector2f(cameraPos.x - 250.0f, cameraPos.y + 400.0f);
+	sf::Vector2f dashBarRightPos = sf::Vector2f(cameraPos.x + 250.0f, cameraPos.y + 400.0f);
+
+	m_rectangle.setPosition(m_position.x, m_position.y + 20.0f);
 	m_playerSprite.setPosition(m_position);
 
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 
-	m_xpBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
-	m_emptyXPBar.setPosition(cameraPos.x, cameraPos.y - 410.0F);
-	m_xpBarSprite.setPosition(cameraPos.x, cameraPos.y - 410.0f);
+	m_xpBar.setPosition(xpBarPos);
+	m_emptyXPBar.setPosition(xpBarPos);
+	m_xpBarSprite.setPosition(xpBarPos);
 
-	m_dashBarSprite.setPosition(cameraPos.x + 680.0f, cameraPos.y + 230.0f);
-	m_emptyDashBar.setPosition(cameraPos.x + 680.0f, cameraPos.y + 216.0f);
-	m_dashBar.setPosition(cameraPos.x + 680.0f, cameraPos.y + 216.0f);
+	m_dashBarLeftSprite.setPosition(dashBarLeftPos);
+	m_emptyDashBarLeft.setPosition(dashBarLeftPos);
+	m_dashBarLeft.setPosition(dashBarLeftPos);
+
+	m_dashBarRightSprite.setPosition(dashBarRightPos);
+	m_emptyDashBarRight.setPosition(dashBarRightPos);
+	m_dashBarRight.setPosition(dashBarRightPos);
 
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
 }
@@ -492,6 +549,36 @@ void Player::upgradeGun(WeaponType t_type)
 	}
 }
 
+void Player::upgradeDash()
+{
+	switch (m_level)
+	{
+	case 2:		// 1st charge
+		m_maxDashCharges = 1;
+		break;
+	case 3:		// cd -0.5s
+		m_dashCooldownTime = seconds(3.5f);
+		break;
+	case 4:		// 2nd charge
+		m_maxDashCharges = 2;
+		break;
+	case 5:		// AOE
+		break;
+	case 6:		// distance & 3rd charge
+		m_maxDashCharges = 3;
+		m_dashDistance = 200.0f;
+		break;
+	case 7:		// cd -0.5s
+		m_dashCooldownTime = seconds(3.0f);
+		break;
+	case 8:		// 4th charge
+		m_maxDashCharges = 4;
+		break;
+	default:
+		break;
+	}
+}
+
 void Player::giveWeapon(WeaponType t_type)
 {
 	bool weaponEquipped = false;
@@ -521,7 +608,6 @@ void Player::giveWeapon(WeaponType t_type)
 			if (weapon->getType() == t_type) {
 				weaponEquipped = true;
 			}
-
 		}
 
 		if (weaponEquipped) {
@@ -557,20 +643,18 @@ void Player::increaseHealth()
 
 void Player::dash()
 {
-	if (m_canDash)
-	{
 		m_canDash = false;
 		m_dashStateClock.restart();
 
 		m_dashSound.stop();
 		m_dashSound.play();
 
-		sf::Vector2f heading = m_movementVector * DASH_DISTANCE;
+		sf::Vector2f heading = m_movementVector * m_dashDistance;
 
 		for (unsigned int i = 0; i < AFTERIMAGE_COUNT; i++)
 		{
 			AfterImageData data{
-				m_position + (m_movementVector * (DASH_DISTANCE * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
+				m_position + (m_movementVector * (m_dashDistance * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
 				static_cast<float>(i) / AFTERIMAGE_COUNT, m_dashSprite
 			};
 
@@ -582,7 +666,8 @@ void Player::dash()
 
 		if (abs(static_cast<int>(dashAngle)) % 90 == 0)
 		{
-			m_dashRect.setSize(sf::Vector2f(distance, 60.0f));
+			distance += 200.0f;
+			m_dashRect.setSize(sf::Vector2f(distance, 120.0f));
 		}
 		else
 		{
@@ -594,7 +679,7 @@ void Player::dash()
 		m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
 
 		m_position += heading;
-	}
+		m_currentDashCharges--;
 }
 
 void Player::updateDashbar()
@@ -604,14 +689,18 @@ void Player::updateDashbar()
 	if (m_dashBarFillAmount <= -244.0f)
 	{
 		m_dashBarFillAmount = -244.0f;
-		m_dashBar.setFillColor(sf::Color::White);
+		m_dashBarLeft.setFillColor(sf::Color::White);
+		m_dashBarRight.setFillColor(sf::Color::White);
+		m_currentDashCharges = m_maxDashCharges;
 	}
 	else
 	{
-		m_dashBar.setFillColor(sf::Color::Red);
+		m_dashBarLeft.setFillColor(sf::Color::Red);
+		m_dashBarRight.setFillColor(sf::Color::Red);
 	}
 
-	m_dashBar.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBarLeft.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBarRight.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
 }
 
 void Player::increaseXP()
@@ -626,6 +715,8 @@ void Player::checkXP()
 		m_level++;
 		m_xpRequired *= 2;
 		m_xp = 0;
+
+		upgradeDash();
 	}
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 }

@@ -29,9 +29,11 @@
     <ClInclude Include="include\ScreenSize.h" />
     <ClInclude Include="include\Weapon.h" />
     <ClInclude Include="include\XPOrb.h" />
+    <ClInclude Include="Obstacle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="src\Bullet.cpp" />
     <ClCompile Include="src\CollisionDetection.cpp" />
     <ClCompile Include="src\Enemy.cpp" />

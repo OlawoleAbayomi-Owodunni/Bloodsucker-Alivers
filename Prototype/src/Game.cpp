@@ -35,6 +35,7 @@ void Game::init()
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
+	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
 	
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
@@ -54,6 +55,15 @@ void Game::init()
 		enemy->initialisePosition(m_player.getPosition());
 	}
 	m_currentLevel = 1;
+
+	//OBSTACLES
+	for (int i = 0; i < 2; i++)
+	{
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
+	}
 
 	//FONT
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
@@ -289,7 +299,7 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma endregion
 
-
+#pragma region Care Package input handling
 		case Gamemode::CarePackage:
 			switch (event.key.code)
 			{
@@ -323,23 +333,27 @@ void Game::processGameEvents(sf::Event& event)
 			m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
 			break;
 
+#pragma endregion
 
+#pragma region Gameplay input handling
 		case Gamemode::Gameplay:
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Escape:
-					m_currentGamemode = Gamemode::Pause;
-					pauseBgSprite.setPosition(m_playerCamera.getCenter());
-					m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
-					m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
-					m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-					m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				m_currentGamemode = Gamemode::Pause;
+				pauseBgSprite.setPosition(m_playerCamera.getCenter());
+				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
+				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
+				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
 				break;
 
 			default:
 				break;
 			}
 			break;
+#pragma endregion
+
 		}
 	}
 }
@@ -445,6 +459,11 @@ void Game::render()
 	{
 		m_window.draw(bgSprite);
 
+		for (auto obstacle : m_obstacles)
+		{
+			obstacle->renderBottom(m_window);
+		}
+
 		for (auto pickup : m_pickups)
 		{
 			pickup->render(m_window);
@@ -460,7 +479,8 @@ void Game::render()
 			enemy->render(m_window);
 		}
 
-		m_player.render(m_window);
+		m_player.renderPlayer(m_window);
+		m_player.renderHUD(m_window);
 
 		//Render pause menu
 		if (m_currentGamemode == Gamemode::Pause)
@@ -545,62 +565,66 @@ void Game::checkCollisions()
 		//Bullet to Enemy
 		for (auto weapon : m_player.getWeapon())
 		{
-			//for (auto bullet  : weapon->getBullets())
-			//{
-			//	if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
-			//	{
-			//		enemy->decreaseHealth(bullet->getDamage());
-
-			//		if (enemy->getHealth() < 0)
-			//		{
-			//			if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
-			//			{
-			//				m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
-			//			}
-
-			//			if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
-			//			{
-			//				m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-			//			}
-
-			//			enemy->playHitSound();
-
-			//			enemy->initialisePosition(m_player.getPosition());
-
-			//		}
-			//	}
-			//}
-
-			for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();) // this line is the issue. it needs to be permanent. it gets destroyed so no work
+			if (weapon->getType() == WeaponType::Pistol || weapon->getType() == WeaponType::AssaultRifle) // If bullet is meant to delete when collided with enemy
 			{
-				if (CollisionDetection::bulletEnemyCollision((*it), enemy))
+				for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();) // this line is the issue. it needs to be permanent. it gets destroyed so no work
 				{
-					enemy->decreaseHealth((*it)->getDamage());
-
-					if (enemy->getHealth() < 0)
+					if (CollisionDetection::bulletEnemyCollision((*it), enemy))
 					{
-						if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
-						{
-							m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
-						}
+						enemy->decreaseHealth((*it)->getDamage());
 
-						if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+						if (enemy->getHealth() < 0)
 						{
-							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
-						}
+							if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+							{
+								m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+							}
 
-						enemy->initialisePosition(m_player.getPosition());
+							if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+							{
+								m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
+							}
 
-						if (weapon->getType() == WeaponType::Pistol)
-						{
+							enemy->playHitSound();
+
+							enemy->initialisePosition(m_player.getPosition());
+
 							delete* it; // Delete the bullet object
 							it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
 						}
 					}
+					else
+					{
+						++it;
+					}
 				}
-				else
+			}
+			else
+			{
+				for (auto bullet  : weapon->getBullets())
 				{
-					++it;
+					if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
+					{
+						enemy->decreaseHealth(bullet->getDamage());
+
+						if (enemy->getHealth() < 0)
+						{
+							if (rand() % 4 != 0)	// 75% chance enemy spawns an XP Orb on death
+							{
+								m_xpOrbs.push_back(new XPOrb(m_holder["starterAtlas"], enemy->getPosition()));
+							}
+
+							if (rand() % 10 == 0)	// 10% chance enemy spawns Health Pickup on death
+							{
+								m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
+							}
+
+							enemy->playHitSound();
+
+							enemy->initialisePosition(m_player.getPosition());
+
+						}
+					}
 				}
 			}
 		}

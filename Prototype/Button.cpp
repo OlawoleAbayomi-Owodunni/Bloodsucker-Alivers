@@ -68,6 +68,7 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 
 #pragma endregion
 
+#pragma region Upgrade Button setup
 	case ButtonType::UpgradeHealth:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
@@ -110,7 +111,26 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 
 		m_text.setString("ASSAULT\nRIFLE +");
 		break;
+#pragma endregion
+
+	case ButtonType::GetPistol:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("Pistol");
+		break;
+	case ButtonType::GetRifle:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(0.75f, 0.75f);
+
+		m_text.setString("Assault\nRifle");
+		break;
 	}
+
+
+
 
 	m_text.setOrigin(m_text.getGlobalBounds().width / 2.0f, m_text.getGlobalBounds().height / 2.0f);
 	m_text.setPosition(m_pos);

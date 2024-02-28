@@ -32,7 +32,8 @@ enum class Gamemode
 	Menu,
 	Gameplay,
 	Pause,
-	Upgrade
+	Upgrade,
+	CarePackage
 };
 
 class Game
@@ -92,6 +93,8 @@ protected:
 	void levelUpSpawner();
 	void createRandomUpgrades();
 
+	void createRandomWeapons();
+
 
 	void playSound();
 
@@ -137,6 +140,8 @@ protected:
 
 	Sprite levelUpBGSprite;
 	vector<Button*> m_upgradeButtons;
+	vector<Button*> m_weaponButtons;
+
 
 	Sprite m_cursorSprite;
 	int m_cursorPos; 

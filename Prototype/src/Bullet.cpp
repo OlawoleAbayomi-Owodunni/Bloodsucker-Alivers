@@ -153,7 +153,7 @@ void Bullet::render(sf::RenderWindow& t_window)
 
 #pragma region GETTERS AND SETTERS
 #pragma region Getters
-sf::CircleShape Bullet::getCircle()
+sf::CircleShape& Bullet::getCircle()
 {
 	return m_circle;
 }

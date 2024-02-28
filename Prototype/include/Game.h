@@ -14,6 +14,7 @@
 #include "Enemy.h"
 #include "XPOrb.h"
 #include "Pickup.h"
+#include "Obstacle.h"
 #include "CollisionDetection.h"
 
 #include "Button.h"
@@ -108,6 +109,7 @@ protected:
 	std::vector<Enemy*> m_enemies;
 	std::vector<XPOrb*> m_xpOrbs;
 	std::vector<Pickup*> m_pickups;
+	std::vector<Obstacle*> m_obstacles;
 
 	sf::SoundBuffer m_pickupSoundBuffer;
 	sf::Sound m_pickupSound;

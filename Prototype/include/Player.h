@@ -49,7 +49,9 @@ public:
 	~Player();
 
 	void update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies);
-	void render(sf::RenderWindow& t_window);
+	void renderPlayer(sf::RenderWindow& t_window);
+	void renderHUD(sf::RenderWindow& t_window);
+	
 	void handleKeyInput();
 	void rumbleStart();
 	void rumbleStop();
@@ -70,6 +72,7 @@ public:
 	void levelUp(Gamemode& t_gamemode);
 	void upgradePlayer(PlayerUpgrade t_type);
 	void upgradeGun(WeaponType t_type);
+	void upgradeDash();
 	void carePackage(Gamemode& t_gamemode);
 	void giveWeapon(WeaponType t_type);
 
@@ -84,7 +87,6 @@ public:
 	std::vector<Weapon*> getWeapon();
 
 private:
-	const float DASH_DISTANCE{ 150.0f };
 	const float AFTERIMAGE_COUNT{ 16.0f };
 
 	std::vector<AfterImageData> m_afterImages{};
@@ -105,10 +107,13 @@ private:
 
 	Direction m_direction;
 
+	float m_dashDistance;
 	bool m_canDash;
 	Clock m_dashCooldownClock;
 	Time m_dashCooldownTime;
 	float m_dashBarFillAmount;
+	int m_maxDashCharges;
+	int m_currentDashCharges;
 
 	sf::RectangleShape m_rectangle;
 
@@ -121,8 +126,10 @@ private:
 	sf::RectangleShape m_dashRect;
 	sf::RectangleShape m_dashRectBounds;
 
-	sf::RectangleShape m_dashBar;
-	sf::RectangleShape m_emptyDashBar;
+	sf::RectangleShape m_dashBarLeft;
+	sf::RectangleShape m_emptyDashBarLeft;
+	sf::RectangleShape m_dashBarRight;
+	sf::RectangleShape m_emptyDashBarRight;
 
 	std::vector<Weapon*> m_weapons;
 
@@ -153,5 +160,6 @@ private:
 
 	Sprite m_xpBarSprite;
 
-	Sprite m_dashBarSprite;
+	Sprite m_dashBarLeftSprite;
+	Sprite m_dashBarRightSprite;
 };

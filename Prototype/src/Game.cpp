@@ -35,6 +35,7 @@ void Game::init()
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
+	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
 	
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
@@ -54,6 +55,15 @@ void Game::init()
 		enemy->initialisePosition(m_player.getPosition());
 	}
 	m_currentLevel = 1;
+
+	//OBSTACLES
+	for (int i = 0; i < 2; i++)
+	{
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
+	}
 
 	//FONT
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
@@ -407,6 +417,11 @@ void Game::render()
 	{
 		m_window.draw(bgSprite);
 
+		for (auto obstacle : m_obstacles)
+		{
+			obstacle->render(m_window);
+		}
+
 		for (auto pickup : m_pickups)
 		{
 			pickup->render(m_window);
@@ -422,7 +437,8 @@ void Game::render()
 			enemy->render(m_window);
 		}
 
-		m_player.render(m_window);
+		m_player.renderPlayer(m_window);
+		m_player.renderHUD(m_window);
 
 		//Render pause menu
 		if (m_currentGamemode == Gamemode::Pause)

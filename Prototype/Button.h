@@ -31,7 +31,15 @@ enum ButtonType
 	UpgradeXP,
 	UpgradeArmor,
 	UpgradePistol,
-	UpgradeAR
+	UpgradeAR,
+	//UpgradeSniper,
+	//UpgradeRPG
+
+	//CAREPACKAGE BUTTONS
+	GetPistol,
+	GetRifle,
+	//GetSniper,
+	//GetRPG
 };
 //I'm thinking we make every button in the constructor based off the button type passed. A lot of enums but automation assured
 //either check if we can do an enum within an enum or have a different class of buttons that handle upgrades

@@ -250,6 +250,7 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma endregion
 
+#pragma region Upgrade input handling
 		case Gamemode::Upgrade:
 			switch (event.key.code)
 			{
@@ -282,7 +283,8 @@ void Game::processGameEvents(sf::Event& event)
 					m_player.upgradeGun(WeaponType::AssaultRifle);
 					break;
 				}
-				m_currentGamemode = Gamemode::Gameplay;
+				createRandomWeapons();
+				m_currentGamemode = Gamemode::CarePackage;
 				break;
 			default:
 				break;
@@ -295,23 +297,63 @@ void Game::processGameEvents(sf::Event& event)
 			m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
 			break;
 
+#pragma endregion
 
+#pragma region Care Package input handling
+		case Gamemode::CarePackage:
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Up:
+				m_cursorPos--;
+				break;
+			case sf::Keyboard::Down:
+				m_cursorPos++;
+				break;
+
+			case Keyboard::Enter:
+				switch (m_cursorButtonType)
+				{
+				case ButtonType::GetPistol:
+					m_player.giveWeapon(WeaponType::Pistol);
+					break;
+				case ButtonType::GetRifle:
+					m_player.giveWeapon(WeaponType::AssaultRifle);
+					break;
+				}
+				m_currentGamemode = Gamemode::Gameplay;
+				break;
+			default:
+				break;
+			}
+
+			if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) { m_cursorPos = 0; }
+			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1; }
+
+			m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+			m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+			break;
+
+#pragma endregion
+
+#pragma region Gameplay input handling
 		case Gamemode::Gameplay:
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Escape:
-					m_currentGamemode = Gamemode::Pause;
-					pauseBgSprite.setPosition(m_playerCamera.getCenter());
-					m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
-					m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
-					m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-					m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				m_currentGamemode = Gamemode::Pause;
+				pauseBgSprite.setPosition(m_playerCamera.getCenter());
+				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
+				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
+				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
 				break;
 
 			default:
 				break;
 			}
 			break;
+#pragma endregion
+
 		}
 	}
 }
@@ -413,7 +455,7 @@ void Game::render()
 	m_window.clear(sf::Color(0, 0, 0, 0));
 	
 #pragma region GAMEPLAY
-	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause || m_currentGamemode == Gamemode::Upgrade)
+	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause || m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage)
 	{
 		m_window.draw(bgSprite);
 
@@ -466,10 +508,18 @@ void Game::render()
 			}
 			m_window.draw(m_cursorSprite);
 		}
+
+		if (m_currentGamemode == Gamemode::CarePackage)
+		{
+			m_window.draw(levelUpBGSprite);
+			for (auto buttons : m_weaponButtons)
+			{
+				buttons->render(m_window);
+			}
+			m_window.draw(m_cursorSprite);
+		}
 	}
 #pragma endregion
-
-
 
 	if (m_currentGamemode == Gamemode::Menu)
 	{
@@ -483,8 +533,6 @@ void Game::render()
 
 	m_window.display();
 }
-
-
 
 #pragma region COLLISION HANDLER
 void Game::checkCollisions()
@@ -676,4 +724,16 @@ void Game::createRandomUpgrades()
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180)));
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y)));
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton3, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 180)));
+}
+
+void Game::createRandomWeapons()
+{
+	m_weaponButtons.clear();
+
+	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
+	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
+	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol)); }
+
+	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150)));
+	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150)));
 }

@@ -27,7 +27,7 @@ public:
 	void update(double dt, WeaponType t_type);
 	void render(sf::RenderWindow& t_window);
 
-	sf::CircleShape getCircle();
+	sf::CircleShape& getCircle();
 	float getDamage();
 	sf::Vector2f getPosition();
 

@@ -16,6 +16,8 @@
 #include "Pickup.h"
 #include "CollisionDetection.h"
 
+#include "Button.h"
+
 /// <summary>
 /// @brief Main class for the SFML Playground project.
 /// 
@@ -122,7 +124,7 @@ protected:
 	int x_drawFrameCount{ 0 };				// draws per second counter.
 #endif // TEST_FPS
 
-
 	//MENU VARIABLES
 	Sprite menuBgSprite;
+	vector<Button*> m_menuButtons;
 };

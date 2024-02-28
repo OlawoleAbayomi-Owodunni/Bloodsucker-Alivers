@@ -33,7 +33,8 @@ void Game::init()
 	//THOR
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
-	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/GPmenu.png"));
+	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
+	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
 	
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
@@ -70,10 +71,14 @@ void Game::init()
 	//MAIN MENU INITIALISER
 	Texture& mainMenuBgTexture = m_holder["mainMenuBG"];
 	menuBgSprite.setTexture(mainMenuBgTexture);
-	menuBgSprite.setTextureRect(IntRect{ 0,0,150,80 });
-	menuBgSprite.setOrigin(150.0f / 2.0f, 80.0f / 2.0f);
+	menuBgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
+	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	menuBgSprite.setPosition(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
-	menuBgSprite.setScale(10.0f, 10.0f);
+
+	m_menuButtons.push_back(new Button(ButtonType::Play, m_holder, m_arialFont, Vector2f(550, 535)));
+	m_menuButtons.push_back(new Button(ButtonType::Tutorial, m_holder, m_arialFont, Vector2f(1050, 535)));
+	m_menuButtons.push_back(new Button(ButtonType::Credits, m_holder, m_arialFont, Vector2f(550, 680)));
+	m_menuButtons.push_back(new Button(ButtonType::Exit, m_holder, m_arialFont, Vector2f(1050, 680)));
 }
 
 #pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
@@ -277,6 +282,9 @@ void Game::render()
 	if (m_currentGamemode == Gamemode::Menu)
 	{
 		m_window.draw(menuBgSprite);
+		for (auto buttons : m_menuButtons) {
+			buttons->render(m_window);
+		}
 	}
 
 

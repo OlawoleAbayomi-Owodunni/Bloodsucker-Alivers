@@ -78,10 +78,10 @@ Player::Player()
 	m_dashSprite.setScale(0.5f, 0.5f);
 	m_dashSprite.setPosition(m_position);
 
-	m_rectangle.setSize(sf::Vector2f(48.0f, 100.0f));
+	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
-	m_rectangle.setPosition(m_position);
+	m_rectangle.setPosition(m_position.x, m_position.y + 20.0f);
 
 	//XP Bar sprite setup
 	m_xpBarSprite.setTexture(playerTextures);
@@ -408,9 +408,27 @@ sf::RectangleShape Player::getDashCollider()
 #pragma region Setters
 void Player::setPosition(sf::View& t_view)
 {
+	if (m_position.x < 40)
+	{
+		m_position.x = 40;
+	}
+	else if (m_position.x > 3160)
+	{
+		m_position.x = 3160;
+	}
+
+	if (m_position.y < 50)
+	{
+		m_position.y = 50;
+	}
+	else if (m_position.y > 1750)
+	{
+		m_position.y = 1750;
+	}
+
 	sf::Vector2f cameraPos(t_view.getCenter());
 
-	m_rectangle.setPosition(m_position);
+	m_rectangle.setPosition(m_position.x, m_position.y + 20.0f);
 	m_playerSprite.setPosition(m_position);
 
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);

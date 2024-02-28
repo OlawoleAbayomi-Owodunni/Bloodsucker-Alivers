@@ -255,29 +255,24 @@ void Game::processGameEvents(sf::Event& event)
 				{
 				case ButtonType::UpgradeHealth:
 					m_player.upgradePlayer(PlayerUpgrade::Health);
-					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradeSpeed:
 					m_player.upgradePlayer(PlayerUpgrade::Speed);
-					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradeXP:
 					m_player.upgradePlayer(PlayerUpgrade::XP);
-					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradeArmor:
 					m_player.upgradePlayer(PlayerUpgrade::Armor);
-					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradePistol:
 					m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
-					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				case ButtonType::UpgradeAR:
 					m_player.upgradeGun(WeaponType::AssaultRifle);
-					m_currentGamemode = Gamemode::Gameplay;
 					break;
 				}
+				m_currentGamemode = Gamemode::Gameplay;
 				break;
 			default:
 				break;
@@ -549,6 +544,8 @@ void Game::checkCollisions()
 						{
 							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
 						}
+
+						enemy->playHitSound();
 
 						enemy->initialisePosition(m_player.getPosition());
 

@@ -113,7 +113,7 @@ void Weapon::render(sf::RenderWindow& t_window)
 	}
 }
 
-std::vector<Bullet*> Weapon::getBullets()
+std::vector<Bullet*>& Weapon::getBullets()
 {
 	return m_bullets;
 }

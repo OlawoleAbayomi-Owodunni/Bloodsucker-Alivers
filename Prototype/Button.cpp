@@ -48,6 +48,25 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 		m_text.setString("CREDITS");
 		break;
 #pragma endregion
+		
+#pragma region Pause Button setup
+	case ButtonType::Resume:
+		m_bgSprite.setTextureRect(IntRect{ 0, 0, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(1.0f, 1.0f);
+
+		m_text.setString("RESUME");
+		break;
+
+	case ButtonType::ToMenu:
+		m_bgSprite.setTextureRect(IntRect{ 0, 0, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(1.0f, 1.0f);
+
+		m_text.setString("TO MENU");
+		break;
+
+#pragma endregion
 
 	}
 

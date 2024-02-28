@@ -84,9 +84,13 @@ void Game::init()
 
 	//PAUSE MENU INITIALISER 
 	pauseBgSprite.setTexture(UITexture);
-	pauseBgSprite.setTextureRect(IntRect{ 0, 1840, 400, 600 });
-	pauseBgSprite.setOrigin(200, 300);
+	pauseBgSprite.setTextureRect(IntRect{ 0, 1965, 600, 275 });
+	pauseBgSprite.setOrigin(300, 275.0F / 2.0F);
+	pauseBgSprite.setScale(2.5f, 2.5f);
 	pauseBgSprite.setPosition(m_playerCamera.getCenter());
+
+	m_pauseButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y)));
+	m_pauseButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y)));
 
 	//CURSOR INITIALISER
 	m_cursorPos = 0;
@@ -177,14 +181,8 @@ void Game::processGameEvents(sf::Event& event)
 				}
 			}
 
-			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1))
-			{
-				m_cursorPos = 0;
-			}
-			if (m_cursorPos < 0)
-			{
-				m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1;
-			}
+			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) { m_cursorPos = 0; }
+			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1; }
 
 			m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
@@ -195,14 +193,38 @@ void Game::processGameEvents(sf::Event& event)
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Escape:
-				m_currentGamemode = Gamemode::Menu;
-				break;
-			case Keyboard::Enter:
 				m_currentGamemode = Gamemode::Gameplay;
+				break;
+
+			case sf::Keyboard::Left:
+				m_cursorPos--;
+				break;
+			case sf::Keyboard::Right:
+				m_cursorPos++;
+				break;
+
+			case Keyboard::Enter:
+				switch (m_cursorButtonType)
+				{
+				case ButtonType::Resume:
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				case ButtonType::ToMenu:
+					m_currentGamemode = Gamemode::Menu;
+					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+					break;
+				}
 				break;
 			default:
 				break;
 			}
+
+			if (m_cursorPos > (static_cast<int>(m_pauseButtons.size()) - 1)) { m_cursorPos = 0; }
+			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_pauseButtons.size()) - 1; }
+
+			m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+			m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
 			break;
 
 		case Gamemode::Gameplay:
@@ -211,6 +233,8 @@ void Game::processGameEvents(sf::Event& event)
 			case sf::Keyboard::Escape:
 					m_currentGamemode = Gamemode::Pause;
 					pauseBgSprite.setPosition(m_playerCamera.getCenter());
+					m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
 				break;
 
 			default:
@@ -342,6 +366,11 @@ void Game::render()
 		if (m_currentGamemode == Gamemode::Pause)
 		{
 			m_window.draw(pauseBgSprite);
+			for (auto buttons : m_pauseButtons)
+			{
+				buttons->render(m_window);
+			}
+			m_window.draw(m_cursorSprite);
 		}
 	}
 #pragma endregion

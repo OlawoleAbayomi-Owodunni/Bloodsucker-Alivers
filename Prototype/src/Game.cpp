@@ -98,9 +98,7 @@ void Game::init()
 	levelUpBGSprite.setOrigin(400.0f, 300.0f);
 	levelUpBGSprite.setScale(1.3f, 1.3f);
 	levelUpBGSprite.setPosition(m_playerCamera.getCenter());
-
-	createRandomUpgrades();
-
+	//no need to setup buttons in constructor since they are randomised everytime
 
 	//CURSOR INITIALISER
 	m_cursorPos = 0;
@@ -241,6 +239,56 @@ void Game::processGameEvents(sf::Event& event)
 			break;
 
 #pragma endregion
+
+		case Gamemode::Upgrade:
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Up:
+				m_cursorPos--;
+				break;
+			case sf::Keyboard::Down:
+				m_cursorPos++;
+				break;
+
+			case Keyboard::Enter:
+				switch (m_cursorButtonType)
+				{
+				case ButtonType::UpgradeHealth:
+					m_player.upgradePlayer(PlayerUpgrade::Health);
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				case ButtonType::UpgradeSpeed:
+					m_player.upgradePlayer(PlayerUpgrade::Speed);
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				case ButtonType::UpgradeXP:
+					m_player.upgradePlayer(PlayerUpgrade::XP);
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				case ButtonType::UpgradeArmor:
+					m_player.upgradePlayer(PlayerUpgrade::Armor);
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				case ButtonType::UpgradePistol:
+					m_player.upgradePlayer(PlayerUpgrade::Weapon); // go back to player and refreactor to allow for pistol and ar
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				case ButtonType::UpgradeAR:
+					m_player.upgradePlayer(PlayerUpgrade::Weapon);
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+				}
+				break;
+			default:
+				break;
+			}
+
+			if (m_cursorPos > (static_cast<int>(m_upgradeButtons.size()) - 1)) { m_cursorPos = 0; }
+			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_upgradeButtons.size()) - 1; }
+
+			m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+			m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+			break;
 
 
 		case Gamemode::Gameplay:
@@ -400,6 +448,7 @@ void Game::render()
 			{
 				buttons->render(m_window);
 			}
+			m_window.draw(m_cursorSprite);
 		}
 	}
 #pragma endregion

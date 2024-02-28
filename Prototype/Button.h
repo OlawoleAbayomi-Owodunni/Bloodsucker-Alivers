@@ -31,12 +31,20 @@ enum ButtonType
 class Button
 {
 public:
-	Button(ButtonType t_type, ResourceHolder<Texture, string>& t_holder, Font& t_font, Vector2f t_pos); //pass in texture, font, 
+	Button(ButtonType t_type, Texture& t_holder, Font& t_font, Vector2f t_pos); //pass in texture, font, 
 
 	void render(sf::RenderWindow& t_window);
+
+	void buttonPressed();
+
+	Vector2f getPositon();
+	ButtonType getType();
 
 private:
 	Sprite m_bgSprite;
 	Text m_text;
+
+	Vector2f m_pos;
+	ButtonType m_type;
 };
 

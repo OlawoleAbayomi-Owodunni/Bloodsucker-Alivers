@@ -35,6 +35,7 @@ void Game::init()
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
+	m_holder.acquire("tempCursor", thor::Resources::fromFile<sf::Texture>("resources/sprites/Add.png"));
 	
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
@@ -75,10 +76,19 @@ void Game::init()
 	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	menuBgSprite.setPosition(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
 
-	m_menuButtons.push_back(new Button(ButtonType::Play, m_holder, m_arialFont, Vector2f(550, 535)));
-	m_menuButtons.push_back(new Button(ButtonType::Tutorial, m_holder, m_arialFont, Vector2f(1050, 535)));
-	m_menuButtons.push_back(new Button(ButtonType::Credits, m_holder, m_arialFont, Vector2f(550, 680)));
-	m_menuButtons.push_back(new Button(ButtonType::Exit, m_holder, m_arialFont, Vector2f(1050, 680)));
+	m_menuButtons.push_back(new Button(ButtonType::Play, m_holder["UIAtlas"], m_arialFont, Vector2f(550, 535)));
+	m_menuButtons.push_back(new Button(ButtonType::Tutorial, m_holder["UIAtlas"], m_arialFont, Vector2f(1050, 535)));
+	m_menuButtons.push_back(new Button(ButtonType::Credits, m_holder["UIAtlas"], m_arialFont, Vector2f(550, 680)));
+	m_menuButtons.push_back(new Button(ButtonType::Exit, m_holder["UIAtlas"], m_arialFont, Vector2f(1050, 680)));
+
+	m_cursorPos = 0;
+	Texture& cursorTexture = m_holder["tempCursor"];
+	m_cursorSprite.setTexture(cursorTexture);
+	m_cursorSprite.setTextureRect(IntRect{ 0,0,150,150 });
+	m_cursorSprite.setOrigin(75.0f, 75.0f);
+	m_cursorSprite.setScale(0.25f, 0.25f);
+	m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+	m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 }
 
 #pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
@@ -125,30 +135,77 @@ void Game::processGameEvents(sf::Event& event)
 	// check if the event is a a mouse button release
 	if (sf::Event::KeyPressed == event.type)
 	{
-		switch (event.key.code)
+		switch (m_currentGamemode)
 		{
-		case sf::Keyboard::Escape:
-			if (m_currentGamemode == Gamemode::Gameplay)
+		case Gamemode::Menu:
+			switch (event.key.code)
 			{
-				m_currentGamemode = Gamemode::Pause;
-			}
-			else
-			{
+			case sf::Keyboard::Escape:
 				m_window.close();
+
+			case sf::Keyboard::Up:
+				m_cursorPos--;
+				break;
+			case sf::Keyboard::Down:
+				m_cursorPos++;
+				break;
+			case sf::Keyboard::Left:
+				m_cursorPos--;
+				break;
+			case sf::Keyboard::Right:
+				m_cursorPos++;
+				break;
+
+			case sf::Keyboard::Enter:
+				switch (m_cursorButtonType)
+				{
+				case ButtonType::Play:
+					m_currentGamemode = Gamemode::Gameplay;
+					break;
+					//CASE FOR TUTORIAL AND CASE FOR CREDITS
+				case ButtonType::Exit:
+					m_window.close();
+					break;
+				}
+			}
+
+			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1))
+			{ 
+				m_cursorPos = 0; 
+			}
+			if (m_cursorPos < 0) 
+			{ 
+				m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1;
+			}
+
+			m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+			m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+			break;
+
+		case Gamemode::Gameplay:
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Escape:
+					m_currentGamemode = Gamemode::Pause;
+				break;
+
+			default:
+				break;
 			}
 			break;
-		case sf::Keyboard::Enter:
-			if (m_currentGamemode == Gamemode::Menu || m_currentGamemode == Gamemode::Pause)
+
+		case Gamemode::Pause:
+			switch (event.key.code)
 			{
-				m_currentGamemode = Gamemode::Gameplay;
-			}
-			break;
-		case Keyboard::M:
-			if (m_currentGamemode == Gamemode::Gameplay)
-			{
+			case sf::Keyboard::Escape:
 				m_currentGamemode = Gamemode::Menu;
+				break;
+			case Keyboard::Enter:
+				m_currentGamemode = Gamemode::Gameplay;
+				break;
+			default:
+				break;
 			}
-		default:
 			break;
 		}
 	}
@@ -285,6 +342,7 @@ void Game::render()
 		for (auto buttons : m_menuButtons) {
 			buttons->render(m_window);
 		}
+		m_window.draw(m_cursorSprite);
 	}
 
 

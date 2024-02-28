@@ -127,4 +127,8 @@ protected:
 	//MENU VARIABLES
 	Sprite menuBgSprite;
 	vector<Button*> m_menuButtons;
+
+	Sprite m_cursorSprite;
+	int m_cursorPos; 
+	ButtonType m_cursorButtonType;
 };

@@ -15,7 +15,7 @@ public:
 	WeaponType getType();
 	int getWeaponLevel();
 
-	void upgradeWeapon();
+	void upgradeWeapon(WeaponType t_type);
 
 private:
 	sf::Clock m_timer;

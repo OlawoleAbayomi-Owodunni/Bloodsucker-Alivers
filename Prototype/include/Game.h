@@ -111,7 +111,7 @@ protected:
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 
 	Sprite bgSprite;
-
+	
 	Clock rumbleTimer;
 
 #ifdef TEST_FPS

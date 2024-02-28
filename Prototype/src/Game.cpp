@@ -93,25 +93,8 @@ void Game::run()
 			timeSinceLastUpdate -= timePerFrame;
 			processEvents(); // at least 60 fps
 			update(timePerFrame.asMilliseconds()); //60 fps
-#ifdef TEST_FPS
-			x_secondTime += timePerFrame;
-			x_updateFrameCount++;
-			if (x_secondTime.asSeconds() > 1)
-			{
-				std::string updatesPS = "UPS " + std::to_string(x_updateFrameCount - 1);
-				x_updateFPS.setString(updatesPS);
-				std::string drawsPS = "DPS " + std::to_string(x_drawFrameCount);
-				x_drawFPS.setString(drawsPS);
-				x_updateFrameCount = 0;
-				x_drawFrameCount = 0;
-				x_secondTime = sf::Time::Zero;
-			}
-#endif
 		}
 		render(); // as many as possible
-#ifdef TEST_FPS
-		x_drawFrameCount++;
-#endif
 	}
 }
 
@@ -355,6 +338,8 @@ void Game::checkCollisions()
 						{
 							m_pickups.push_back(new Pickup(m_holder["starterAtlas"], enemy->getPosition(), PickupType::Health));
 						}
+
+						enemy->playHitSound();
 
 						enemy->initialisePosition(m_player.getPosition());
 

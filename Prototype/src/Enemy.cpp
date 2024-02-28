@@ -8,6 +8,13 @@ Enemy::Enemy(sf::Texture& t_texture)
 {
 	m_allEnemies.push_back(this);
 
+	if (!m_hitSoundBuffer.loadFromFile("resources/sounds/enemy_hit.wav"))
+	{
+		std::cout << "error loading enemy hit sound";
+	}
+	m_hitSound.setBuffer(m_hitSoundBuffer);
+	m_hitSound.setVolume(2.0f);
+
 	m_health = 100.0f;
 	m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
 
@@ -202,4 +209,10 @@ void Enemy::setFrames()
 	default:
 		break;
 	}
+}
+
+void Enemy::playHitSound()
+{
+	m_hitSound.stop();
+	m_hitSound.play();
 }

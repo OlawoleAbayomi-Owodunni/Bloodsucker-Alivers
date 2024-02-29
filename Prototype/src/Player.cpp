@@ -69,9 +69,9 @@ Player::Player()
 	{
 		m_haloFrames.push_back(IntRect{ 160 * i,1351,160,64 });
 	}
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_slashFrames.push_back(IntRect{ 1560 + 128 * i, 484, 128, 128 });
+		m_slashFrames.push_back(IntRect{ 1560 + 400 * i, 484, 400, 200 });
 	}
 
 	m_currentPlayerFrame = 0;
@@ -102,9 +102,9 @@ Player::Player()
 	m_dashSprite.setPosition(m_position);
 
 	m_slashSprite.setTexture(playerTextures);
-	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 128, 128 });
-	m_slashSprite.setOrigin(64.0f, 64.0f);
-	m_slashSprite.setScale(2.0f, 2.0f);
+	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 400, 200 });
+	m_slashSprite.setOrigin(200.0f, 100.0f);
+	m_slashSprite.setScale(1.0f, 1.0f);
 	m_slashSprite.setPosition(-1000.0f,-1000.0f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
@@ -464,6 +464,7 @@ void Player::handleKeyInput()
 			m_playerState = CharacterState::WalkSideState;
 			m_playerSprite.setScale(-0.5f, 0.5f);
 			m_dashSprite.setScale(-0.5f, 0.5f);
+			m_slashSprite.setScale(-1.0f, 1.0f);
 			m_movementVector.x -= m_speed;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
@@ -472,6 +473,7 @@ void Player::handleKeyInput()
 			m_playerState = CharacterState::WalkSideState;
 			m_playerSprite.setScale(0.5f, 0.5f);
 			m_dashSprite.setScale(0.5f, 0.5f);
+			m_slashSprite.setScale(1.0f, 1.0f);
 			m_movementVector.x += m_speed;
 		}
 	}

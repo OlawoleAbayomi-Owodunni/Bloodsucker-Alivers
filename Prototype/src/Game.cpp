@@ -29,6 +29,7 @@ void Game::init()
 	m_window.setVerticalSyncEnabled(true);
 
 	m_currentGamemode = Gamemode::Menu;
+	hasGameOverTimerStarted = false;
 
 #pragma region THOR
 	//THOR
@@ -142,6 +143,7 @@ void Game::startGame()
 
 	m_player.initialise();
 	m_currentLevel = 1;
+	hasGameOverTimerStarted = false;
 
 	////VECTOR INTIALISATION
 	//ENEMY
@@ -632,6 +634,17 @@ void Game::update(double dt)
 #pragma region Gameplay Gamemode logic
 	if (m_currentGamemode == Gamemode::Gameplay) //switching between screens
 	{
+		if (!m_player.getAliveState() && !hasGameOverTimerStarted){
+			m_gameOverTimer.restart();
+			hasGameOverTimerStarted = true;
+		}
+		if (m_gameOverTimer.getElapsedTime().asSeconds() > 1.5f && !m_player.getAliveState()) {
+			isGameOver = false;
+			//switch to game over game mode here
+			startGame();
+		}
+		
+
 		sf::Vector2f targetPosition = m_player.getPosition();
 		sf::Vector2f interpolatedPosition = m_playerCamera.getCenter();
 

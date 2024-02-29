@@ -30,6 +30,8 @@ Player::Player()
 	m_dashSound.setVolume(3.0f);
 
 	//Base variable initialiser
+	isPlayerAlive = true;
+
 	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
@@ -205,6 +207,7 @@ Player::~Player()
 
 void Player::initialise()
 {
+	isPlayerAlive = true;
 	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
@@ -599,6 +602,11 @@ bool& Player::getRumbleState()
 	return isDashRumbling;
 }
 
+bool& Player::getAliveState()
+{
+	return isPlayerAlive;
+}
+
 sf::RectangleShape Player::getDashCollider()
 {
 	return m_dashRect;
@@ -676,6 +684,7 @@ void Player::setHealth()
 	{
 		m_health = 0;
 		m_playerState = CharacterState::DeadState;
+		isPlayerAlive = false;
 	}
 	else if (m_health > m_maxHealth)
 	{
@@ -685,13 +694,7 @@ void Player::setHealth()
 	m_currentHealthBar.setSize(sf::Vector2f((m_health / m_maxHealth) * 50.0f, 6.0f));
 }
 
-
 #pragma endregion
-
-void Player::pushBack()
-{
-	m_position = m_previousPosition;
-}
 
 #pragma endregion
 
@@ -827,6 +830,10 @@ void Player::giveWeapon(WeaponType t_type)
 
 #pragma endregion
 
+void Player::pushBack()
+{
+	m_position = m_previousPosition;
+}
 
 void Player::decreaseHealth()
 {

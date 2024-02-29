@@ -93,6 +93,7 @@ public:
 	sf::CircleShape getSlashCollider();
 	std::vector<Weapon*> getWeapon();
 	bool& getRumbleState();
+	bool& getAliveState();
 private:
 	const float AFTERIMAGE_COUNT{ 16.0f };
 
@@ -186,4 +187,7 @@ private:
 	//RUMBLE TIMERS
 	bool isDashRumbling;
 	Clock dashRumbleTimer;
+
+	bool isPlayerAlive;
+	Clock gameOverTimer;
 };

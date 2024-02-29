@@ -40,53 +40,19 @@ enum class Gamemode
 class Game
 {
 public:
-	/// <summary>
-	/// @brief Default constructor that initialises the SFML window, 
-	///   and sets vertical sync enabled. 
-	/// </summary>
 	Game();
 
-	/// <summary>
-	/// @brief the main game loop.
-	/// 
-	/// A complete loop involves processing SFML events, updating and drawing all game objects.
-	/// The actual elapsed time for a single game loop is calculated. If this value is 
-	///  greater than the target time for one loop (1 / 60), then (and only then) is an update 
-	///  operation performed.
-	/// The target is at least one update and one render cycle per game loop, but typically 
-	///  more render than update operations will be performed as we expect our game loop to
-	///  complete in less than the target time.
-	/// </summary>
 	void run();
 
 protected:
-	/// <summary>
-	/// @brief Once-off game initialisation code
-	/// </summary>	
 	void init();
-	/// <summary>
-	/// @brief Placeholder to perform updates to all game objects.
-	/// </summary>
-	/// <param name="time">update delta time</param>
+	
 	void update(double dt);
 
-	/// <summary>
-	/// @brief Draws the background and foreground game objects in the SFML window.
-	/// The render window is always cleared to black before anything is drawn.
-	/// </summary>
 	void render();
 
-	/// <summary>
-	/// @brief Checks for events.
-	/// Allows window to function and exit. 
-	/// Events are passed on to the Game::processGameEvents() method.
-	/// </summary>	
 	void processEvents();
 
-	/// <summary>
-	/// @brief Handles all user input.
-	/// </summary>
-	/// <param name="event">system event</param>
 	void processGameEvents(sf::Event&);
 
 	void checkCollisions();
@@ -155,4 +121,8 @@ protected:
 	Sprite m_cursorSprite;
 	int m_cursorPos; 
 	ButtonType m_cursorButtonType;
+
+	Clock m_gameOverTimer;
+	bool hasGameOverTimerStarted;
+	bool isGameOver;
 };

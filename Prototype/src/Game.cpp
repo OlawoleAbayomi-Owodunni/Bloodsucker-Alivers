@@ -53,8 +53,9 @@ void Game::init()
 	//ENEMIES
 	for (int i = 0; i < 12; i++)
 	{
-		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition()));
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
+	m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
 
 	m_currentLevel = 1;
 
@@ -136,6 +137,8 @@ void Game::init()
 void Game::startGame()
 {
 	m_currentGamemode = Gamemode::Gameplay;
+	m_bossTimer.restart();
+	m_bossSpawned = false;
 
 	m_player.initialise();
 	m_currentLevel = 1;
@@ -144,7 +147,7 @@ void Game::startGame()
 	//ENEMY
 	m_enemies.clear();
 	for (int i = 0; i < 12; i++) {
-		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition()));
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
 
 	m_xpOrbs.clear();
@@ -686,6 +689,12 @@ void Game::update(double dt)
 			pickup->update(dt);
 		}
 
+		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 150.0f)
+		{
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
+			m_bossSpawned = true;
+		}
+
 		//std::cout << m_enemies.size() << std::endl;
 
 		levelUpSpawner();
@@ -838,11 +847,21 @@ void Game::checkCollisions()
 			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
 			{
-				enemy->decreaseHealth(100.0f);
-
-				if (enemy->getHealth() < 0)
+				switch (enemy->getType())
 				{
+				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Boss:
+					enemy->decreaseHealth(5.0f);
+
+					if (enemy->getHealth() < 0)
+					{
+						enemy->setState(CharacterState::DeadState);
+					}
+					break;
+				default:
+					break;
 				}
 			}
 #pragma endregion
@@ -851,11 +870,21 @@ void Game::checkCollisions()
 			//Slash to Enemy
 			if (CollisionDetection::playerSlashEnemyCollision(m_player, enemy))
 			{
-				enemy->decreaseHealth(100.0f);
-
-				if (enemy->getHealth() < 0)
+				switch (enemy->getType())
 				{
+				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Boss:
+					enemy->decreaseHealth(10.0f);
+
+					if (enemy->getHealth() < 0)
+					{
+						enemy->setState(CharacterState::DeadState);
+					}
+					break;
+				default:
+					break;
 				}
 			}
 #pragma endregion
@@ -870,20 +899,33 @@ void Game::checkCollisions()
 					{
 						if (CollisionDetection::bulletEnemyCollision((*it), enemy))
 						{
-							enemy->decreaseHealth((*it)->getDamage());
+							switch (enemy->getType())
+							{
+							case EnemyType::Small:
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Boss:
+								enemy->playHitSound();
+								enemy->decreaseHealth((*it)->getDamage());
+
+								enemy->setColour(sf::Color::Red);
+
+								if (enemy->getHealth() < 0.0f)
+								{
+									enemy->setState(CharacterState::DeadState);
+								}
+								break;
+							default:
+								break;
+							}
 
 							m_player.weakRumbleStart();
 							enemyHitRumbleTimer.restart();
 							eIsRumbling = true;
 
-							if (enemy->getHealth() < 0)
-							{
-								enemy->playHitSound();
-								enemy->setState(CharacterState::DeadState);
-
-								delete* it; // Delete the bullet object
-								it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
-							}
+							delete* it; // Delete the bullet object
+							it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
 						}
 						else
 						{
@@ -897,12 +939,22 @@ void Game::checkCollisions()
 					{
 						if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 						{
-							enemy->decreaseHealth(bullet->getDamage());
-
-							if (enemy->getHealth() < 0)
+							switch (enemy->getType())
 							{
+							case EnemyType::Small:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Boss:
+								enemy->playHitSound();
+								enemy->decreaseHealth(bullet->getDamage() / 100.0f);
+
+								if (enemy->getHealth() < 0)
+								{
+									enemy->setState(CharacterState::DeadState);
+								}
+							default:
+								break;
 							}
 						}
 					}
@@ -1011,7 +1063,7 @@ void Game::levelUpSpawner()
 	{
 		for (int i = 0; i < 6; i++)
 		{
-			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition()));
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 		}
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;

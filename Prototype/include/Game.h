@@ -121,6 +121,8 @@ protected:
 	sf::Sound m_pickupSound;
 
 	int m_currentLevel;
+	Clock m_bossTimer;
+	bool m_bossSpawned;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 

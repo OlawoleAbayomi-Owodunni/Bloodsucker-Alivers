@@ -10,6 +10,8 @@
 const float JOYSTICK_THRESHOLD = 50.0f; // Adjust as needed
 // Define the rumble intensity (in the range [0, 65535])
 const float RUMBLE_THRESHOLD = 16000;
+const float STRONG_RUMBLE_THRESHOLD = 32000;
+const float WEAK_RUMBLE_THRESHOLD = 10000;
 
 #pragma region CONSTRUCTOR
 Player::Player()
@@ -263,7 +265,7 @@ void Player::handleKeyInput()
 	XINPUT_STATE state;
 	memset(&state, 0, sizeof(XINPUT_STATE));
 
-	///// Movement
+#pragma region Movement
 	// Keyboard
 	m_movementVector = sf::Vector2f(0.0f, 0.0f);
 	m_previousPosition = m_position;
@@ -311,25 +313,6 @@ void Player::handleKeyInput()
 		}
 	}
 
-	//	// Map input to movement controls
-	//	if (xAxis == 100) { 
-	//		m_direction = Direction::East; 
-	//	}
-	//	else if (xAxis == -100) { 
-	//		m_direction = Direction::West;
-	//	}
-	//	else if (yAxis == 100) { 
-	//		m_direction = Direction::South;
-	//	}
-	//	else { 
-	//		m_direction = Direction::North;
-	//	}
-
-	//	//cout << xAxis << "\n" << yAxis << "\n\n";
-	//	if (std::abs(xAxis) > JOYSTICK_THRESHOLD) {
-	//		m_position.x += (xAxis / 100) * m_speed;
-	//}
-
 	m_position += m_movementVector * m_speedModifier;
 
 	// Checking Idle state
@@ -341,7 +324,9 @@ void Player::handleKeyInput()
 	{
 		m_playerState = CharacterState::IdleState;
 	}
+#pragma endregion
 
+#pragma region Dash Timer Logic
 	// Dash
 	if (m_level > 1)
 	{
@@ -370,6 +355,9 @@ void Player::handleKeyInput()
 				{
 					dash();
 					m_dashCooldownClock.restart();
+					strongRumbleStart();
+					dashRumbleTimer.restart();
+					isDashRumbling = true;
 				}
 			}
 			else if (!m_canDash && m_movementVector.x == 0.0f && m_movementVector.y == 0.0f)
@@ -390,9 +378,16 @@ void Player::handleKeyInput()
 				i--;
 			}
 		}
+
+		if (dashRumbleTimer.getElapsedTime().asSeconds() > 0.5f && isDashRumbling) {
+			isDashRumbling = false;
+		}
 	}
 }
 
+#pragma endregion
+
+#pragma region Rumble
 void Player::rumbleStart()
 {
 	XINPUT_VIBRATION vibration;
@@ -408,6 +403,27 @@ void Player::rumbleStop()
 	memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
 	XInputSetState(0, &vibration);
 }
+
+void Player::strongRumbleStart()
+{
+	XINPUT_VIBRATION vibration;
+	memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
+	vibration.wLeftMotorSpeed = STRONG_RUMBLE_THRESHOLD;
+	vibration.wRightMotorSpeed = STRONG_RUMBLE_THRESHOLD;
+	XInputSetState(0, &vibration);
+}
+
+void Player::weakRumbleStart()
+{
+	XINPUT_VIBRATION vibration;
+	memset(&vibration, 0, sizeof(XINPUT_VIBRATION)); // Clear memory using memset
+	vibration.wLeftMotorSpeed = WEAK_RUMBLE_THRESHOLD;
+	vibration.wRightMotorSpeed = WEAK_RUMBLE_THRESHOLD;
+	XInputSetState(0, &vibration);
+}
+#pragma endregion
+
+
 #pragma endregion
 
 #pragma region GETTERS & SETTERS
@@ -430,6 +446,11 @@ sf::RectangleShape Player::getRectangle()
 std::vector<Weapon*> Player::getWeapon()
 {
 	return m_weapons;
+}
+
+bool& Player::getRumbleState()
+{
+	return isDashRumbling;
 }
 
 sf::RectangleShape Player::getDashCollider()
@@ -534,6 +555,9 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 	}
 }
 
+#pragma endregion
+
+#pragma region Gun Upgrades
 void Player::upgradeGun(WeaponType t_type)
 {
 	switch (t_type)
@@ -555,7 +579,9 @@ void Player::upgradeGun(WeaponType t_type)
 		}
 	}
 }
+#pragma endregion
 
+#pragma region Dash Upgrades
 void Player::upgradeDash()
 {
 	switch (m_level)
@@ -585,7 +611,9 @@ void Player::upgradeDash()
 		break;
 	}
 }
+#pragma endregion
 
+#pragma region Care Package
 void Player::giveWeapon(WeaponType t_type)
 {
 	bool weaponEquipped = false;
@@ -687,6 +715,7 @@ void Player::dash()
 
 		m_position += heading;
 		m_currentDashCharges--;
+		
 }
 
 void Player::updateDashbar()

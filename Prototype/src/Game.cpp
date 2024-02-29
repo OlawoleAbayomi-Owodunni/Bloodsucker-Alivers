@@ -71,6 +71,10 @@ void Game::init()
 		std::cout << "Error loading font file";
 	}
 
+	//RUMBLE INITIALISER
+	pIsRumbling = false;
+	oIsRumbling = false;
+
 	//BACKGROUND
 	sf::Texture& bgTexture = m_holder["mapSprite"];
 	bgSprite.setTexture(bgTexture);
@@ -164,14 +168,16 @@ void Game::processEvents()
 void Game::processGameEvents(sf::Event& event)
 {
 	// check if the event is a a mouse button release
-	if (sf::Event::KeyPressed == event.type)
+	if (sf::Event::KeyPressed == event.type || Event::JoystickButtonPressed == event.type || Event::JoystickMoved == event.type)
 	{
 		switch (m_currentGamemode)
 		{
 #pragma region Menu input handling
 		case Gamemode::Menu:
+#pragma region Keyboard Input
 			switch (event.key.code)
 			{
+
 			case sf::Keyboard::Escape:
 				m_window.close();
 
@@ -199,18 +205,70 @@ void Game::processGameEvents(sf::Event& event)
 					m_window.close();
 					break;
 				}
+
 			}
 
-			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) { m_cursorPos = 0; }
-			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1; }
+#pragma endregion
 
+#pragma region Controller input
+			//D-Pad pressed
+			if (Event::JoystickMoved == event.type) {
+				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
+				{
+					if (event.joystickMove.position == -100) // Left
+						m_cursorPos--;
+					else if (event.joystickMove.position == 100) // Right
+						m_cursorPos++;
+				}
+				else if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
+				{
+					if (event.joystickMove.position == -100) // Up
+						m_cursorPos--;
+					else if (event.joystickMove.position == 100) // Down
+						m_cursorPos++;
+				}
+
+			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) { 
+				m_cursorPos = 0; 
+				m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+			}
+			if (m_cursorPos < 0) { 
+				m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1; 
+				m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+			}			
+			
 			m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+			}
+
+			//Button pressed
+			if (Event::JoystickButtonPressed == event.type) {
+				if (event.joystickButton.button == 0) { //0=A 7=Start
+					switch (m_cursorButtonType)
+					{
+					case ButtonType::Play:
+						m_currentGamemode = Gamemode::Gameplay;
+						m_player.rumbleStop();
+						break;
+						//CASE FOR TUTORIAL AND CASE FOR CREDITS
+					case ButtonType::Exit:
+						m_player.rumbleStop();
+						m_window.close();
+						break;
+					}
+				}
+			}
+#pragma endregion
+
 			break;
 #pragma endregion
 
 #pragma region Pause input handling
 		case Gamemode::Pause:
+#pragma region Keyboard Input
+
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Escape:
@@ -240,18 +298,65 @@ void Game::processGameEvents(sf::Event& event)
 			default:
 				break;
 			}
+#pragma endregion
 
-			if (m_cursorPos > (static_cast<int>(m_pauseButtons.size()) - 1)) { m_cursorPos = 0; }
-			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_pauseButtons.size()) - 1; }
+#pragma region Controller input
+			//D-Pad pressed
+			if (Event::JoystickMoved == event.type) {
+				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
+				{
+					if (event.joystickMove.position == -100) // Left
+						m_cursorPos--;
+					else if (event.joystickMove.position == 100) // Right
+						m_cursorPos++;
+				}
+
+			if (m_cursorPos > (static_cast<int>(m_pauseButtons.size()) - 1)) {
+				m_cursorPos = 0;
+				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+			}
+			if (m_cursorPos < 0) {
+				m_cursorPos = static_cast<int>(m_pauseButtons.size()) - 1;
+				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+			}
 
 			m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+			}
+
+			//Button pressed
+			if (Event::JoystickButtonPressed == event.type) {
+				if (event.joystickButton.button == 0) { //0=A 7=Start
+					switch (m_cursorButtonType)
+					{
+					case ButtonType::Resume:
+						m_currentGamemode = Gamemode::Gameplay;
+						m_player.rumbleStop();
+						break;
+					case ButtonType::ToMenu:
+						m_currentGamemode = Gamemode::Menu;
+						m_cursorPos = 0;
+						m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+						m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+						m_player.rumbleStop();
+						break;
+					}
+				}
+				if (event.joystickButton.button == 7) {
+					m_currentGamemode = Gamemode::Gameplay;
+				}
+			}
+#pragma endregion
+
 			break;
 
 #pragma endregion
 
 #pragma region Upgrade input handling
 		case Gamemode::Upgrade:
+#pragma region Keyboard Input
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Up:
@@ -289,18 +394,75 @@ void Game::processGameEvents(sf::Event& event)
 			default:
 				break;
 			}
+#pragma endregion
 
-			if (m_cursorPos > (static_cast<int>(m_upgradeButtons.size()) - 1)) { m_cursorPos = 0; }
-			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_upgradeButtons.size()) - 1; }
+#pragma region Controller input
+			//D-Pad pressed
+			if (Event::JoystickMoved == event.type) {
+				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
+				{
+					if (event.joystickMove.position == -100) // Up
+						m_cursorPos++;
+					else if (event.joystickMove.position == 100) // Down
+						m_cursorPos--;
+				}
+
+			if (m_cursorPos > (static_cast<int>(m_upgradeButtons.size()) - 1)) {
+				m_cursorPos = 0;
+				m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+			}
+			if (m_cursorPos < 0) {
+				m_cursorPos = static_cast<int>(m_upgradeButtons.size()) - 1;
+				m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+			}
 
 			m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
-			m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+			m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();		
+			}
+
+			//Button pressed
+			if (Event::JoystickButtonPressed == event.type) {
+				if (event.joystickButton.button == 0) { //0=A 7=Start
+					switch (m_cursorButtonType)
+					{
+					case ButtonType::UpgradeHealth:
+						m_player.upgradePlayer(PlayerUpgrade::Health);
+						break;
+					case ButtonType::UpgradeSpeed:
+						m_player.upgradePlayer(PlayerUpgrade::Speed);
+						break;
+					case ButtonType::UpgradeXP:
+						m_player.upgradePlayer(PlayerUpgrade::XP);
+						break;
+					case ButtonType::UpgradeArmor:
+						m_player.upgradePlayer(PlayerUpgrade::Armor);
+						break;
+					case ButtonType::UpgradePistol:
+						m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
+						break;
+					case ButtonType::UpgradeAR:
+						m_player.upgradeGun(WeaponType::AssaultRifle);
+						break;
+					}
+					createRandomWeapons();
+					m_currentGamemode = Gamemode::CarePackage; 
+					m_cursorPos = 0;
+					m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+					m_player.rumbleStop();
+				}
+			}
+#pragma endregion
+
 			break;
 
 #pragma endregion
 
 #pragma region Care Package input handling
 		case Gamemode::CarePackage:
+#pragma region Keyboard Input
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Up:
@@ -325,18 +487,58 @@ void Game::processGameEvents(sf::Event& event)
 			default:
 				break;
 			}
+#pragma endregion
 
-			if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) { m_cursorPos = 0; }
-			if (m_cursorPos < 0) { m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1; }
+#pragma region Controller input
+			//D-Pad pressed
+			if (Event::JoystickMoved == event.type) {
+				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
+				{
+					if (event.joystickMove.position == -100) // Up
+						m_cursorPos--;
+					else if (event.joystickMove.position == 100) // Down
+						m_cursorPos++;
+				}
+
+			if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
+				m_cursorPos = 0;
+				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+			}
+			if (m_cursorPos < 0) {
+				m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1;
+				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+			}
 
 			m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+			}
+
+			//Button pressed
+			if (Event::JoystickButtonPressed == event.type) {
+				if (event.joystickButton.button == 0) { //0=A 7=Start
+					switch (m_cursorButtonType)
+					{
+					case ButtonType::GetPistol:
+						m_player.giveWeapon(WeaponType::Pistol);
+						break;
+					case ButtonType::GetRifle:
+						m_player.giveWeapon(WeaponType::AssaultRifle);
+						break;
+					}
+					m_currentGamemode = Gamemode::Gameplay;
+				}
+			}
+#pragma endregion
+
 			break;
 
 #pragma endregion
 
 #pragma region Gameplay input handling
 		case Gamemode::Gameplay:
+#pragma region Keyboard Input
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Escape:
@@ -344,6 +546,7 @@ void Game::processGameEvents(sf::Event& event)
 				pauseBgSprite.setPosition(m_playerCamera.getCenter());
 				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
 				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
+				m_cursorPos = 0;
 				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
 				break;
@@ -351,6 +554,21 @@ void Game::processGameEvents(sf::Event& event)
 			default:
 				break;
 			}
+#pragma endregion
+
+#pragma region Controller Input
+			if (event.joystickButton.button == 7) {
+				m_currentGamemode = Gamemode::Pause;
+				pauseBgSprite.setPosition(m_playerCamera.getCenter());
+				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
+				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
+				m_cursorPos = 0;
+				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				m_player.rumbleStop();
+			}
+#pragma endregion
+
 			break;
 #pragma endregion
 
@@ -427,6 +645,20 @@ void Game::update(double dt)
 		levelUpSpawner();
 
 		checkCollisions();
+
+		//Rumble timer logic
+		if (orbRumbleTimer.getElapsedTime().asSeconds() > 0.1f && oIsRumbling) {
+			oIsRumbling = false;
+		}
+		if (pickupRumbleTimer.getElapsedTime().asSeconds() > 0.01f && pIsRumbling) {
+			pIsRumbling = false;
+		}	
+		if (enemyHitRumbleTimer.getElapsedTime().asSeconds() > 0.05f && eIsRumbling) {
+			eIsRumbling = false;
+		}
+		if (!oIsRumbling && !pIsRumbling && !eIsRumbling && !m_player.getRumbleState()) {
+			m_player.rumbleStop();
+		}
 	}
 
 #pragma endregion
@@ -458,7 +690,7 @@ void Game::render()
 	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause || m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage)
 	{
 		m_window.draw(bgSprite);
-
+#pragma region in game
 		for (auto obstacle : m_obstacles)
 		{
 			obstacle->renderBottom(m_window);
@@ -487,6 +719,9 @@ void Game::render()
 			obstacle->renderTop(m_window);
 		}
 
+#pragma endregion
+
+#pragma region pause menu
 		//Render pause menu
 		if (m_currentGamemode == Gamemode::Pause)
 		{
@@ -497,7 +732,9 @@ void Game::render()
 			}
 			m_window.draw(m_cursorSprite);
 		}
+#pragma endregion
 
+#pragma region Level up and acquisition menu
 		//Render level up menu
 		if (m_currentGamemode == Gamemode::Upgrade)
 		{
@@ -518,9 +755,12 @@ void Game::render()
 			}
 			m_window.draw(m_cursorSprite);
 		}
+#pragma endregion
+
 	}
 #pragma endregion
 
+#pragma region MENUS
 	if (m_currentGamemode == Gamemode::Menu)
 	{
 		m_window.draw(menuBgSprite);
@@ -529,7 +769,7 @@ void Game::render()
 		}
 		m_window.draw(m_cursorSprite);
 	}
-
+#pragma endregion
 
 	m_window.display();
 }
@@ -540,12 +780,15 @@ void Game::checkCollisions()
 #pragma region Enemies
 	for (auto enemy : m_enemies)
 	{
+#pragma region Enemy -> Player
 		//Player to Enemy
 		if (CollisionDetection::playerEnemyCollision(m_player, enemy))
 		{
 			m_player.decreaseHealth();
 		}
+#pragma endregion
 
+#pragma region Enemy -> Dash
 		//Enemy to Dash
 		if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
 		{
@@ -567,6 +810,9 @@ void Game::checkCollisions()
 			}
 		}
 
+#pragma endregion
+
+#pragma region Bullet -> Enemy
 		//Bullet to Enemy
 		for (auto weapon : m_player.getWeapon())
 		{
@@ -577,6 +823,10 @@ void Game::checkCollisions()
 					if (CollisionDetection::bulletEnemyCollision((*it), enemy))
 					{
 						enemy->decreaseHealth((*it)->getDamage());
+
+						m_player.weakRumbleStart();
+						enemyHitRumbleTimer.restart();
+						eIsRumbling = true;
 
 						if (enemy->getHealth() < 0)
 						{
@@ -633,6 +883,9 @@ void Game::checkCollisions()
 				}
 			}
 		}
+
+#pragma endregion
+
 	}
 
 #pragma endregion
@@ -643,7 +896,8 @@ void Game::checkCollisions()
 		if (CollisionDetection::playerOrbCollision(m_player, *it))
 		{
 			m_player.rumbleStart();
-			rumbleTimer.restart();
+			orbRumbleTimer.restart();
+			oIsRumbling = true; //Orb has rumbled = ohr
 
 			m_player.playSound(m_pickupSound);
 			m_player.increaseXP();
@@ -658,9 +912,7 @@ void Game::checkCollisions()
 	}
 	//cout << rumbleTimer.getElapsedTime().asSeconds() << "\n";
 
-	if (rumbleTimer.getElapsedTime().asSeconds() > 0.1f) {
-		m_player.rumbleStop();
-	}
+
 
 #pragma endregion
 
@@ -670,6 +922,10 @@ void Game::checkCollisions()
 		if (CollisionDetection::playerPickupCollision(m_player, *it))
 		{
 			m_player.increaseHealth();
+
+			m_player.rumbleStart();
+			pickupRumbleTimer.restart();
+			pIsRumbling = true; // pickup is rumbling
 
 			delete* it; // Delete the pickup object
 			it = m_pickups.erase(it); // Remove the pickup pointer from the vector
@@ -682,6 +938,7 @@ void Game::checkCollisions()
 
 #pragma endregion
 
+
 	for (auto obstacle : m_obstacles)
 	{
 		if (CollisionDetection::playerObstacleCollision(m_player, obstacle))
@@ -689,6 +946,7 @@ void Game::checkCollisions()
 			m_player.pushBack();
 		}
 	}
+
 
 }
 #pragma endregion
@@ -704,10 +962,17 @@ void Game::levelUpSpawner()
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;
 		levelUpBGSprite.setPosition(m_playerCamera.getCenter());
+
+		
+
 		createRandomUpgrades();
+		m_cursorPos = 0;
+		m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+		m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
 	}
 }
 
+#pragma region Button Functions
 void Game::createRandomUpgrades()
 {
 	m_upgradeButtons.clear();
@@ -737,3 +1002,5 @@ void Game::createRandomWeapons()
 	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150)));
 	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150)));
 }
+#pragma endregion
+

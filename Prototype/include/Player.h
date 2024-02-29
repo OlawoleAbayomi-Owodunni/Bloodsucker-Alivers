@@ -54,6 +54,8 @@ public:
 	
 	void handleKeyInput();
 	void rumbleStart();
+	void strongRumbleStart();
+	void weakRumbleStart();
 	void rumbleStop();
 	
 	void setPosition(sf::View& t_view);
@@ -86,7 +88,7 @@ public:
 	sf::RectangleShape getRectangle();
 	sf::RectangleShape getDashCollider();
 	std::vector<Weapon*> getWeapon();
-
+	bool& getRumbleState();
 private:
 	const float AFTERIMAGE_COUNT{ 16.0f };
 
@@ -164,4 +166,8 @@ private:
 
 	Sprite m_dashBarLeftSprite;
 	Sprite m_dashBarRightSprite;
+
+	//RUMBLE TIMERS
+	bool isDashRumbling;
+	Clock dashRumbleTimer;
 };

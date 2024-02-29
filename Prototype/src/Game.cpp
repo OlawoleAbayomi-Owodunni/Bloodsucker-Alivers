@@ -260,9 +260,9 @@ void Game::processGameEvents(sf::Event& event)
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
 					if (event.joystickMove.position == -100) // Up
-						m_cursorPos--;
-					else if (event.joystickMove.position == 100) // Down
 						m_cursorPos++;
+					else if (event.joystickMove.position == 100) // Down
+						m_cursorPos--;
 				}
 
 			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) { 
@@ -288,6 +288,7 @@ void Game::processGameEvents(sf::Event& event)
 					case ButtonType::Play:
 						m_currentGamemode = Gamemode::Gameplay;
 						m_player.rumbleStop();
+						startGame();
 						break;
 						//CASE FOR TUTORIAL AND CASE FOR CREDITS
 					case ButtonType::Exit:

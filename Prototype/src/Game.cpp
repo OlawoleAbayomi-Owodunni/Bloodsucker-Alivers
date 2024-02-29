@@ -30,13 +30,16 @@ void Game::init()
 
 	m_currentGamemode = Gamemode::Menu;
 
+#pragma region THOR
 	//THOR
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
 	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
 	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
-	
+#pragma endregion
+
+#pragma region SOUND
 	//SOUND
 	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
 	{
@@ -44,7 +47,9 @@ void Game::init()
 	}
 	m_pickupSound.setBuffer(m_pickupSoundBuffer);
 	m_pickupSound.setVolume(15.0f);
+#pragma endregion
 
+#pragma region ENEMIES & OBSTACLEES INITIALISER
 	//ENEMIES
 	for (int i = 0; i < 12; i++)
 	{
@@ -64,7 +69,9 @@ void Game::init()
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
 	}
+#pragma endregion
 
+#pragma region OTHERS (Font, Rumble, Background)
 	//FONT
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
 	{
@@ -81,7 +88,9 @@ void Game::init()
 	bgSprite.setTextureRect(IntRect{ 0,0,3200,1800 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
+#pragma endregion
 
+#pragma region MENU INITIALISERS
 	//MAIN MENU INITIALISER
 	Texture& mainMenuBgTexture = m_holder["mainMenuBG"];
 	Texture& UITexture = m_holder["UIAtlas"];
@@ -90,10 +99,10 @@ void Game::init()
 	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	menuBgSprite.setPosition(m_menuCamera.getCenter());
 
-	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 535)));
-	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(1050, 535)));
-	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 680)));
-	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(1050, 680)));
+	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200)));
+	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 400)));
+	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 600)));
+	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 800)));
 
 
 	//PAUSE MENU INITIALISER 
@@ -122,6 +131,9 @@ void Game::init()
 	m_cursorSprite.setScale(0.9f, 1.0f);
 	m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 	m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+
+#pragma endregion
+
 }
 
 #pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
@@ -184,12 +196,6 @@ void Game::processGameEvents(sf::Event& event)
 			case sf::Keyboard::Down:
 				m_cursorPos++;
 				break;
-			case sf::Keyboard::Left:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Right:
-				m_cursorPos++;
-				break;
 
 			case sf::Keyboard::Enter:
 				switch (m_cursorButtonType)
@@ -210,14 +216,7 @@ void Game::processGameEvents(sf::Event& event)
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
-				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
-				{
-					if (event.joystickMove.position == -100) // Left
-						m_cursorPos--;
-					else if (event.joystickMove.position == 100) // Right
-						m_cursorPos++;
-				}
-				else if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
+				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
 					if (event.joystickMove.position == -100) // Up
 						m_cursorPos--;
@@ -387,6 +386,10 @@ void Game::processGameEvents(sf::Event& event)
 				}
 				createRandomWeapons();
 				m_currentGamemode = Gamemode::CarePackage;
+				m_cursorPos = 0;
+				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+				m_player.rumbleStop();
 				break;
 			default:
 				break;
@@ -573,8 +576,6 @@ void Game::processGameEvents(sf::Event& event)
 	}
 }
 
-
-////////////////////////////////////////////////////////////
 void Game::update(double dt)
 {
 	//switching camera modes
@@ -682,9 +683,6 @@ void Game::update(double dt)
 	}
 }
 
-
-
-////////////////////////////////////////////////////////////
 void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));

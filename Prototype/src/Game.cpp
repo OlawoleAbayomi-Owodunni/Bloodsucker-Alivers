@@ -124,6 +124,16 @@ void Game::init()
 	levelUpBGSprite.setPosition(m_playerCamera.getCenter());
 	//no need to setup buttons in constructor since they are randomised everytime
 
+	//GAME OVER INITIALISER
+	gameOverBGSprite.setTexture(UITexture);
+	gameOverBGSprite.setTextureRect(IntRect{ 0, 901, 800, 600 });
+	gameOverBGSprite.setOrigin(400.0f, 300.0f);
+	gameOverBGSprite.setScale(1.5, 1.5f);
+	gameOverBGSprite.setPosition(m_playerCamera.getCenter());
+
+	m_gameoverButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y + 300)));
+	m_gameoverButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y + 300)));
+
 	//CURSOR INITIALISER
 	m_cursorPos = 0;
 	m_cursorSprite.setTexture(UITexture);
@@ -616,6 +626,58 @@ void Game::processGameEvents(sf::Event& event)
 			break;
 #pragma endregion
 
+#pragma region Game over input handling
+		case Gamemode::GameOver:
+#pragma region Controller input
+			//D-Pad pressed
+			if (Event::JoystickMoved == event.type) {
+				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
+				{
+					if (event.joystickMove.position == -100) // Left
+						m_cursorPos--;
+					else if (event.joystickMove.position == 100) // Right
+						m_cursorPos++;
+				}
+
+				if (m_cursorPos > (static_cast<int>(m_gameoverButtons.size()) - 1)) {
+					m_cursorPos = 0;
+					m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
+				}
+				if (m_cursorPos < 0) {
+					m_cursorPos = static_cast<int>(m_gameoverButtons.size()) - 1;
+					m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
+				}
+
+				m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
+			}
+
+			//Button pressed
+			if (Event::JoystickButtonPressed == event.type) {
+				if (event.joystickButton.button == 0) { //0=A 7=Start
+					switch (m_cursorButtonType)
+					{
+					case ButtonType::Play:
+						m_currentGamemode = Gamemode::Gameplay;
+						startGame();
+						break;
+					case ButtonType::ToMenu:
+						m_currentGamemode = Gamemode::Menu;
+						m_cursorPos = 0;
+						m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+						m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+						m_player.rumbleStop();
+						break;
+					}
+				}
+				break;
+			}
+
+#pragma endregion
+#pragma endregion
+
 		}
 	}
 }
@@ -641,7 +703,9 @@ void Game::update(double dt)
 		if (m_gameOverTimer.getElapsedTime().asSeconds() > 1.5f && !m_player.getAliveState()) {
 			isGameOver = false;
 			//switch to game over game mode here
-			startGame();
+			m_currentGamemode = Gamemode::GameOver;
+			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
+			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
 		}
 		
 
@@ -743,7 +807,9 @@ void Game::render()
 	m_window.clear(sf::Color(0, 0, 0, 0));
 	
 #pragma region GAMEPLAY
-	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause || m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage)
+	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause ||
+		m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage ||
+		m_currentGamemode == Gamemode::GameOver)
 	{
 		m_window.draw(bgSprite);
 #pragma region in game
@@ -777,7 +843,7 @@ void Game::render()
 		m_player.renderHUD(m_window);
 
 #pragma endregion
-
+		 
 #pragma region pause menu
 		//Render pause menu
 		if (m_currentGamemode == Gamemode::Pause)
@@ -814,6 +880,15 @@ void Game::render()
 		}
 #pragma endregion
 
+		if (m_currentGamemode == Gamemode::GameOver)
+		{
+			m_window.draw(gameOverBGSprite);
+			for (auto buttons : m_gameoverButtons)
+			{
+				buttons->render(m_window);
+			}
+			m_window.draw(m_cursorSprite);
+		}
 	}
 #pragma endregion
 

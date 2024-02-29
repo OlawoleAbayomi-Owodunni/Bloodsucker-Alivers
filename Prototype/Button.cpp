@@ -127,6 +127,7 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 
 		m_text.setString("Assault\nRifle");
 		break;
+
 	}
 
 

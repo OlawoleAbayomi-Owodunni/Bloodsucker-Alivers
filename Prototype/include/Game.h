@@ -34,7 +34,8 @@ enum class Gamemode
 	Gameplay,
 	Pause,
 	Upgrade,
-	CarePackage
+	CarePackage,
+	GameOver
 };
 
 class Game
@@ -117,6 +118,8 @@ protected:
 	vector<Button*> m_upgradeButtons;
 	vector<Button*> m_weaponButtons;
 
+	Sprite gameOverBGSprite;
+	vector<Button*> m_gameoverButtons;
 
 	Sprite m_cursorSprite;
 	int m_cursorPos; 

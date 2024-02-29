@@ -208,7 +208,7 @@ Player::~Player()
 void Player::initialise()
 {
 	isPlayerAlive = true;
-	m_maxHealth = 200.0f;
+	m_maxHealth = 0.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;

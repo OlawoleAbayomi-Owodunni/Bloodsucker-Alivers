@@ -786,12 +786,15 @@ void Game::checkCollisions()
 	{
 		if (enemy->getState() != CharacterState::DeadState)
 		{
+#pragma region Player -> Enemy
 			//Player to Enemy
 			if (CollisionDetection::playerEnemyCollision(m_player, enemy))
 			{
 				m_player.decreaseHealth();
 			}
+#pragma endregion
 
+#pragma region Dash -> Enemy
 			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
 			{
@@ -802,7 +805,9 @@ void Game::checkCollisions()
 					enemy->setState(CharacterState::DeadState);
 				}
 			}
+#pragma endregion
 
+#pragma region Slash -> Enemy
 			//Slash to Enemy
 			if (CollisionDetection::playerSlashEnemyCollision(m_player, enemy))
 			{
@@ -813,7 +818,9 @@ void Game::checkCollisions()
 					enemy->setState(CharacterState::DeadState);
 				}
 			}
+#pragma endregion
 
+#pragma region Bullet -> Enemy
 			//Bullet to Enemy
 			for (auto weapon : m_player.getWeapon())
 			{
@@ -861,12 +868,13 @@ void Game::checkCollisions()
 					}
 				}
 			}
+
+#pragma endregion
+
 		}
 	}
 
 #pragma endregion
-
-
 
 #pragma region Orbs
 	for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
@@ -914,7 +922,6 @@ void Game::checkCollisions()
 
 #pragma endregion
 
-
 	for (auto obstacle : m_obstacles)
 	{
 		if (CollisionDetection::playerObstacleCollision(m_player, obstacle))
@@ -922,8 +929,6 @@ void Game::checkCollisions()
 			m_player.pushBack();
 		}
 	}
-
-
 }
 #pragma endregion
 

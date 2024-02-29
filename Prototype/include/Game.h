@@ -100,6 +100,8 @@ protected:
 
 	void playSound();
 
+	void startGame();
+
 	// Font used for all text
 	sf::Font m_arialFont;
 	// main window

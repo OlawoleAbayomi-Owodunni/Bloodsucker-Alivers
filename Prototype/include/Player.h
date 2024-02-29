@@ -49,6 +49,8 @@ public:
 	Player();
 	~Player();
 
+	void initialise();
+
 	void update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies);
 	void renderPlayer(sf::RenderWindow& t_window);
 	void renderHUD(sf::RenderWindow& t_window);

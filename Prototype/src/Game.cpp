@@ -136,6 +136,47 @@ void Game::init()
 
 }
 
+void Game::startGame()
+{
+	m_currentGamemode = Gamemode::Gameplay;
+
+	m_player.initialise();
+	m_currentLevel = 1;
+
+	////VECTOR INTIALISATION
+	//ENEMY
+	m_enemies.clear();
+	for (int i = 0; i < 12; i++) {
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+	}
+	for (auto enemy : m_enemies) {
+		enemy->initialisePosition(m_player.getPosition());
+	}
+
+	m_xpOrbs.clear();
+	m_pickups.clear();
+
+	//OBSTACLES
+	m_obstacles.clear();
+	for (int i = 0; i < 2; i++)
+	{
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
+	}
+
+	orbRumbleTimer.restart();
+	pickupRumbleTimer.restart();
+	enemyHitRumbleTimer.restart();
+
+	oIsRumbling = false;
+	pIsRumbling = false; 
+	eIsRumbling = false;
+
+	m_cursorPos = 0;
+}
+
 #pragma region USELESS FUNCTIONS (LIKE RUN AND PROCESS EVENTS)
 ////////////////////////////////////////////////////////////
 void Game::run()
@@ -996,4 +1037,3 @@ void Game::dropLoot(Enemy* t_enemy)
 		m_pickups.push_back(new Pickup(m_holder["starterAtlas"], t_enemy->getPosition(), PickupType::Health));
 	}
 }
-

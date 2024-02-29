@@ -203,6 +203,115 @@ Player::~Player()
 {
 }
 
+void Player::initialise()
+{
+	m_maxHealth = 200.0f;
+	m_health = m_maxHealth;
+	m_speed = 2.0f;
+	m_level = 1;
+	m_xp = 0;
+	m_xpRequired = 10.0f;
+
+	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
+	m_previousPosition = m_position;
+	m_movementVector = sf::Vector2f(0.0f, 0.0f);
+
+	m_speedModifier = 1;
+	m_xpModifier = 1;
+	m_armorModifier = 1;
+
+	m_direction = Direction::East;
+	m_canDash = false;
+	m_dashBarFillAmount = 0;
+	m_maxDashCharges = 0;
+	m_currentDashCharges = 0;
+	m_dashDistance = 150.0f;
+	m_dashHasAOE = false;
+
+	m_playerState = CharacterState::IdleState;
+	m_previousState = CharacterState::None;
+
+	m_dashCooldownClock.restart();
+	//Time m_dashCooldownTime; couldn't find initialiser
+	
+	m_weapons.clear();
+	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+
+	m_currentPlayerFrame = 0;
+	m_currentHaloFrame = 0;
+	m_currentSlashFrame = 0;
+
+	m_playerTime = seconds(0.1f);
+	m_haloTime = seconds(0.2f);
+	m_slashTime = seconds(0.1f);
+
+	m_dashStateTime = seconds(1.0f);
+	m_dashCooldownTime = seconds(4.0f);
+	m_dashAOETime = seconds(0.5f);
+
+	//RUMBLE TIMERS
+	isDashRumbling = false;
+	dashRumbleTimer.restart();
+
+#pragma region Sprite Initialiser
+	//SPRITE INITIALISER
+	m_playerSprite.setPosition(m_position);
+
+	m_rectangle.setPosition(m_position.x, m_position.y + 20.0f);
+
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+
+	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
+	m_xpBar.setOrigin(500.0f, m_xpBar.getSize().y / 2.0f);
+	m_xpBar.setPosition(800.0f, 40.0f);
+	m_emptyXPBar.setPosition(800.0f, 40.0f);
+	m_xpBarSprite.setPosition(800.0f, 40.0f);
+
+	m_dashRect.setPosition(-1000.0f, -1000.0f);
+	m_dashRectBounds.setPosition(m_dashRect.getPosition());
+
+	m_dashSprite.setPosition(m_position);
+	m_slashSprite.setPosition(m_position);
+	m_slashCircle.setPosition(-1000.0f, -1000.0f);
+
+	//Dash Bar sprite setup
+	m_dashBarLeftSprite.setPosition(1480.0f, 680.0f);
+
+	m_emptyDashBarLeft.setOrigin(m_emptyDashBarLeft.getSize().x / 2.0f, 136);
+	m_emptyDashBarLeft.setPosition(1480.0f, 680.0f);
+
+	m_dashBarLeft.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBarLeft.setOrigin(m_dashBarLeft.getSize().x / 2.0f, -108.0f);
+	m_dashBarLeft.setPosition(1480.0f, 680.0f);
+
+	m_dashBarRightSprite.setPosition(1480.0f, 680.0f);
+
+	m_emptyDashBarRight.setOrigin(m_emptyDashBarLeft.getSize().x / 2.0f, 136);
+	m_emptyDashBarRight.setPosition(1480.0f, 680.0f);
+
+	m_dashBarRight.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+	m_dashBarRight.setOrigin(m_dashBarLeft.getSize().x / 2.0f, -108.0f);
+	m_dashBarRight.setPosition(1480.0f, 680.0f);
+
+	//Halo Sprite setup
+	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
+
+	//Health bar setup
+	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
+	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+
+	m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 50.0f, 6.0f));
+	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
+	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
+
+	//Dash setup
+	m_dashRect.setOrigin(m_dashRect.getSize().x / 2.0f, m_dashRect.getSize().y / 2.0f);
+	m_dashRect.setPosition(-1000.0f, -1000.0f);
+#pragma endregion
+
+}
+
 void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 {
 	if (m_playerState != CharacterState::DeadState)

@@ -29,6 +29,12 @@ Player::Player()
 	m_dashSound.setBuffer(m_dashSoundBuffer);
 	m_dashSound.setVolume(3.0f);
 
+	//FONT & TEXT
+	if (!m_font.loadFromFile("BebasNeue.otf"))
+	{
+		std::cout << "Error loading font file";
+	}
+
 	//Base variable initialiser
 	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
@@ -36,7 +42,7 @@ Player::Player()
 	m_level = 1;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
-
+	
 	//Upgrade modifiers
 	m_speedModifier = 1;
 	m_xpModifier = 1;
@@ -192,6 +198,16 @@ Player::Player()
 	m_dashRect.setOrigin(m_dashRect.getSize().x / 2.0f, m_dashRect.getSize().y / 2.0f);
 	m_dashRect.setFillColor(sf::Color::White);
 	m_dashRect.setPosition(-1000.0f, -1000.0f);
+
+	//XP Bar Text
+	m_xpBarText.setFont(m_font);
+	m_xpBarText.setCharacterSize(18.0f);
+	m_xpBarText.setFillColor(sf::Color::White);
+	m_xpBarText.setOutlineColor(sf::Color::Black);
+	m_xpBarText.setOutlineThickness(2.0f);
+	m_xpBarText.setString(std::to_string(static_cast<int>(m_xp)) + " / " + std::to_string(static_cast<int>(m_xpRequired)));
+	m_xpBarText.setOrigin(m_xpBarText.getGlobalBounds().width / 2.0f, m_xpBarText.getGlobalBounds().height / 2.0f);
+	m_xpBarText.setPosition(800.0f, 40.0f);
 #pragma endregion
 
 }
@@ -392,6 +408,7 @@ void Player::renderHUD(sf::RenderWindow& t_window)
 	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
 	t_window.draw(m_xpBarSprite);
+	t_window.draw(m_xpBarText);
 
 	if (m_level > 1)
 	{
@@ -646,6 +663,7 @@ void Player::setPosition(sf::View& t_view)
 	m_xpBar.setPosition(xpBarPos);
 	m_emptyXPBar.setPosition(xpBarPos);
 	m_xpBarSprite.setPosition(xpBarPos);
+	m_xpBarText.setPosition(xpBarPos.x, xpBarPos.y - 2.0f);
 
 	m_dashBarLeftSprite.setPosition(dashBarLeftPos);
 	m_emptyDashBarLeft.setPosition(dashBarLeftPos);
@@ -924,6 +942,10 @@ void Player::checkXP()
 
 		upgradeDash();
 	}
+
+	m_xpBarText.setString(std::to_string(static_cast<int>(m_xp)) + " / " + std::to_string(static_cast<int>(m_xpRequired)));
+	m_xpBarText.setOrigin(m_xpBarText.getGlobalBounds().width / 2.0f, m_xpBarText.getGlobalBounds().height / 2.0f);
+
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 }
 

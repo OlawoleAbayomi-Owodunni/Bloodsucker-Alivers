@@ -29,6 +29,8 @@ public:
 	RectangleShape getRectangle();
 
 private:
+	static std::vector<Obstacle*> m_allObstacles;
+
 	RectangleShape m_rectangle;
 	Vector2f m_position;
 

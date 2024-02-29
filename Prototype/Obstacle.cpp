@@ -1,7 +1,11 @@
 #include "Obstacle.h"
 
+std::vector<Obstacle*> Obstacle::m_allObstacles{};
+
 Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 {
+	m_allObstacles.push_back(this);
+
 	m_position.x = rand() % 3200 + 1;
 	m_position.y = rand() % 1800 + 1;
 
@@ -11,6 +15,16 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 		m_position.x = rand() % 3200 + 1;
 		m_position.y = rand() % 1800 + 1;
 	}
+
+	/*for (Obstacle const* other : m_allObstacles)
+	{
+		if (m_position.x > other->m_position.x - 100.0f && m_position.x < other->m_position.x + 100.0f &&
+			m_position.y > other->m_position.y - 100.0f && m_position.y < other->m_position.y + 100.0f)
+		{
+			m_position.x = rand() % 3200 + 1;
+			m_position.y = rand() % 1800 + 1;
+		}
+	}*/
 	
 	m_topSprite.setTexture(t_texture);
 	m_bottomSprite.setTexture(t_texture);
@@ -39,11 +53,11 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 		m_rectangle.setPosition(m_position.x, m_position.y);
 		break;
 	case ObstacleType::Tree:
-		m_topSprite.setTextureRect(IntRect{ 0,321,320,160 });
-		m_bottomSprite.setTextureRect(IntRect{ 0,481,320,160 });
+		m_topSprite.setTextureRect(IntRect{ 0,321,320,240 });
+		m_bottomSprite.setTextureRect(IntRect{ 0,561,320,80 });
 		
-		m_rectangle.setSize(sf::Vector2f(120.0f, 110.0f));
-		m_rectangle.setPosition(m_position.x - 20.0f, m_position.y - 25.0f);
+		m_rectangle.setSize(sf::Vector2f(100.0f, 30.0f));
+		m_rectangle.setPosition(m_position.x - 30.0f, m_position.y - 25.0f);
 		break;
 	default:
 		break;
@@ -52,8 +66,8 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 
-	m_topSprite.setOrigin(160, 80);
-	m_bottomSprite.setOrigin(160, 80);
+	m_topSprite.setOrigin(m_topSprite.getTextureRect().width / 2.0f, m_topSprite.getTextureRect().height / 2.0f);
+	m_bottomSprite.setOrigin(m_bottomSprite.getTextureRect().width / 2.0f, m_bottomSprite.getTextureRect().height / 2.0f);
 
 	m_topSprite.setPosition(m_position.x, m_position.y - 160.0f);
 	m_bottomSprite.setPosition(m_position);
@@ -70,7 +84,7 @@ void Obstacle::update(double dt)
 
 void Obstacle::renderBottom(sf::RenderWindow& t_window)
 {
-	t_window.draw(m_rectangle);
+	//t_window.draw(m_rectangle);
 	t_window.draw(m_bottomSprite);
 }
 

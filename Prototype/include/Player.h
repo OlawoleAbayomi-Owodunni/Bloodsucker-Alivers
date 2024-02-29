@@ -96,6 +96,8 @@ public:
 private:
 	const float AFTERIMAGE_COUNT{ 16.0f };
 
+	sf::Font m_font;
+
 	std::vector<AfterImageData> m_afterImages{};
 	
 	float m_maxHealth;
@@ -108,6 +110,7 @@ private:
 	int m_level;
 	float m_xp;
 	float m_xpRequired;
+	sf::Text m_xpBarText;
 
 	float m_speedModifier;
 	float m_xpModifier;

@@ -15,7 +15,7 @@ enum class CharacterState;
 class Enemy
 {
 public:
-	Enemy(sf::Texture& t_texture);
+	Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos);
 	~Enemy();
 
 	void update(double dt, Player& t_player);

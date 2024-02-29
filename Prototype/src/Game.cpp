@@ -53,12 +53,9 @@ void Game::init()
 	//ENEMIES
 	for (int i = 0; i < 12; i++)
 	{
-		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition()));
 	}
-	for (auto enemy : m_enemies)
-	{
-		enemy->initialisePosition(m_player.getPosition());
-	}
+
 	m_currentLevel = 1;
 
 	//OBSTACLES
@@ -147,10 +144,7 @@ void Game::startGame()
 	//ENEMY
 	m_enemies.clear();
 	for (int i = 0; i < 12; i++) {
-		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
-	}
-	for (auto enemy : m_enemies) {
-		enemy->initialisePosition(m_player.getPosition());
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition()));
 	}
 
 	m_xpOrbs.clear();
@@ -1011,13 +1005,11 @@ void Game::levelUpSpawner()
 	{
 		for (int i = 0; i < 6; i++)
 		{
-			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition()));
 		}
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;
 		levelUpBGSprite.setPosition(m_playerCamera.getCenter());
-
-		
 
 		createRandomUpgrades();
 		m_cursorPos = 0;

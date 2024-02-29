@@ -99,7 +99,7 @@ Player::Player()
 	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 128, 128 });
 	m_slashSprite.setOrigin(64.0f, 64.0f);
 	m_slashSprite.setScale(2.0f, 2.0f);
-	m_slashSprite.setPosition(m_position);
+	m_slashSprite.setPosition(-1000.0f,-1000.0f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -272,7 +272,7 @@ void Player::initialise()
 	m_dashRectBounds.setPosition(m_dashRect.getPosition());
 
 	m_dashSprite.setPosition(m_position);
-	m_slashSprite.setPosition(m_position);
+	m_slashSprite.setPosition(-1000.0f, -1000.0f);
 	m_slashCircle.setPosition(-1000.0f, -1000.0f);
 
 	//Dash Bar sprite setup
@@ -666,6 +666,11 @@ void Player::setPosition(sf::View& t_view)
 				m_slashSprite.setPosition(m_position);
 				m_slashCircle.setPosition(m_position);
 			}
+		}
+		else
+		{
+			m_slashSprite.setPosition(sf::Vector2f(-1000.0f,-1000.0f));
+			m_slashCircle.setPosition(sf::Vector2f(-1000.0f, -1000.0f));
 		}
 	}
 }

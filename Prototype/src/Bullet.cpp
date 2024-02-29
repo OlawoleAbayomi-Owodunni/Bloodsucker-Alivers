@@ -21,10 +21,6 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 	m_sprite.setScale(1.0f, 1.0f);
 	m_sprite.setPosition(m_position);
 
-	for (int i = 0; i < 16; i++)
-	{
-		m_frames.push_back(IntRect{ 32 * i,658,32,32 });
-	}
 	m_currentFrame = 0;
 	m_time = seconds(0.1f);
 #pragma endregion
@@ -44,6 +40,11 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 	case WeaponType::Pistol:
 		m_damage = 32.0f;	// default 12
 		
+		for (int i = 0; i < 16; i++)
+		{
+			m_frames.push_back(IntRect{ 512 + 32 * i,658,32,32 });
+		}
+
 		m_position = t_playerPos;
 
 		for (auto enemy : t_enemies)
@@ -77,6 +78,11 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 #pragma region Assault Rifle
 	case WeaponType::AssaultRifle:
 		m_damage = 24.0f;	// default 24
+
+		for (int i = 0; i < 16; i++)
+		{
+			m_frames.push_back(IntRect{ 32 * i,658,32,32 });
+		}
 
 		m_position = t_playerPos;
 

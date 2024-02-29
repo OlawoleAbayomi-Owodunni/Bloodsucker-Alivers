@@ -4,7 +4,7 @@
 
 std::vector<Enemy*> Enemy::m_allEnemies{};
 
-Enemy::Enemy(sf::Texture& t_texture)
+Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos)
 {
 	m_allEnemies.push_back(this);
 
@@ -14,6 +14,8 @@ Enemy::Enemy(sf::Texture& t_texture)
 	}
 	m_hitSound.setBuffer(m_hitSoundBuffer);
 	m_hitSound.setVolume(2.0f);
+
+	initialisePosition(t_playerPos);
 
 	m_health = 100.0f;
 	m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);

@@ -124,7 +124,11 @@ protected:
 
 	Sprite bgSprite;
 	
-	Clock rumbleTimer;
+	Clock orbRumbleTimer;
+	Clock pickupRumbleTimer;
+	Clock enemyHitRumbleTimer;
+
+	bool oIsRumbling, pIsRumbling, eIsRumbling;
 
 #ifdef TEST_FPS
 	sf::Text x_updateFPS;					// text used to display updates per second.

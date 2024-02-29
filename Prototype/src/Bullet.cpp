@@ -28,11 +28,12 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 #pragma region GUN TYPE INITIALISER (CALCULATIONS DONE HERE)
 	pistolSpeed = 10.0f;
 	arSpeed = 7.5f;
+	sniperSpeed = 20.0f;
 
 	float distance;
-	float shortestDistance;
+	float targetDistance;
 	sf::Vector2f displacement;
-	sf::Vector2f shortestDisplacement;
+	sf::Vector2f targetDisplacement;
 
 	switch (t_weaponType)
 	{
@@ -56,21 +57,21 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 			if (enemy == t_enemies.at(0))
 			{
-				shortestDistance = distance;
-				shortestDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				shortestDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				targetDistance = distance;
+				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
 			}
 
-			if (distance < shortestDistance)
+			if (distance < targetDistance)
 			{
-				shortestDistance = distance;
-				shortestDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				shortestDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				targetDistance = distance;
+				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
 			}
 		}
 
-		shortestDisplacement = shortestDisplacement / shortestDistance;
-		m_velocity = shortestDisplacement * pistolSpeed;
+		targetDisplacement = targetDisplacement / targetDistance;
+		m_velocity = targetDisplacement * sniperSpeed;
 		break;
 
 #pragma endregion
@@ -104,6 +105,41 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 			break;
 		}
 		break;
+	case WeaponType::Sniper:
+		m_damage = 10.0f;	// default 12
+
+		for (int i = 0; i < 16; i++)
+		{
+			m_frames.push_back(IntRect{ 512 + 32 * i,658,32,32 });
+		}
+
+		m_position = t_playerPos;
+
+		for (auto enemy : t_enemies)
+		{
+			displacement.x = enemy->getPosition().x - t_playerPos.x;
+			displacement.y = enemy->getPosition().y - t_playerPos.y;
+
+			distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+			if (enemy == t_enemies.at(0))
+			{
+				targetDistance = distance;
+				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+			}
+
+			if (distance > targetDistance)
+			{
+				targetDistance = distance;
+				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+			}
+		}
+
+		targetDisplacement = targetDisplacement / targetDistance;
+		m_velocity = targetDisplacement * sniperSpeed;
+		break;
 
 #pragma endregion
 
@@ -122,27 +158,9 @@ Bullet::~Bullet()
 void Bullet::update(double dt, WeaponType t_type)
 {
 #pragma region BULLET MOVEMENT
-	switch (t_type)
-	{
-#pragma region Pistol
 
-	case WeaponType::Pistol:
-		m_position += m_velocity;
-		break;
+	m_position += m_velocity;
 
-#pragma endregion
-
-#pragma region Assault Rifle
-
-	case WeaponType::AssaultRifle:
-		m_position += m_velocity;
-		break;
-
-#pragma endregion
-
-	default:
-		break;
-	}
 #pragma endregion
 
 	animate();

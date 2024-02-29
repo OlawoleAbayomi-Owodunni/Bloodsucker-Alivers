@@ -251,7 +251,7 @@ void Player::initialise()
 	//Time m_dashCooldownTime; couldn't find initialiser
 	
 	m_weapons.clear();
-	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+	m_weapons.push_back(new Weapon(WeaponType::Sniper)); // all we need to do to player to add a new weapon
 
 	m_currentPlayerFrame = 0;
 	m_currentHaloFrame = 0;

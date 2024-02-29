@@ -689,7 +689,7 @@ void Game::update(double dt)
 			pickup->update(dt);
 		}
 
-		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 150.0f)
+		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 120.0f)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
 			m_bossSpawned = true;

@@ -25,11 +25,13 @@ public:
 	void update(double dt);
 	void renderBottom(sf::RenderWindow& t_window);
 	void renderTop(sf::RenderWindow& t_window);
-	
+
 	RectangleShape getRectangle();
 
 private:
 	static std::vector<Obstacle*> m_allObstacles;
+
+	ObstacleType m_type;
 
 	RectangleShape m_rectangle;
 	Vector2f m_position;

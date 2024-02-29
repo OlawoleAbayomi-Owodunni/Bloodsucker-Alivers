@@ -6,6 +6,8 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 {
 	m_allObstacles.push_back(this);
 
+	m_type = t_type;
+
 	m_position.x = rand() % 3200 + 1;
 	m_position.y = rand() % 1800 + 1;
 
@@ -15,16 +17,6 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 		m_position.x = rand() % 3200 + 1;
 		m_position.y = rand() % 1800 + 1;
 	}
-
-	/*for (Obstacle const* other : m_allObstacles)
-	{
-		if (m_position.x > other->m_position.x - 100.0f && m_position.x < other->m_position.x + 100.0f &&
-			m_position.y > other->m_position.y - 100.0f && m_position.y < other->m_position.y + 100.0f)
-		{
-			m_position.x = rand() % 3200 + 1;
-			m_position.y = rand() % 1800 + 1;
-		}
-	}*/
 	
 	m_topSprite.setTexture(t_texture);
 	m_bottomSprite.setTexture(t_texture);
@@ -79,12 +71,45 @@ Obstacle::~Obstacle()
 
 void Obstacle::update(double dt)
 {
+	for (Obstacle const* other : m_allObstacles)
+	{
+		
+		if (m_position != other->m_position)
+		{
+			if (m_position.x > other->m_position.x - 160.0f && m_position.x < other->m_position.x + 160.0f &&
+				m_position.y > other->m_position.y - 160.0f && m_position.y < other->m_position.y + 160.0f)
+			{
+				m_position.x = rand() % 3200 + 1;
+				m_position.y = rand() % 1800 + 1;
+			}
+		}
+	}
 
+	switch (m_type)
+	{
+	case ObstacleType::Rock1:
+		m_rectangle.setPosition(m_position.x, m_position.y);
+		break;
+	case ObstacleType::Rock2:
+		m_rectangle.setPosition(m_position.x, m_position.y - 20.0f);
+		break;
+	case ObstacleType::Rock3:
+		m_rectangle.setPosition(m_position.x, m_position.y);
+		break;
+	case ObstacleType::Tree:
+		m_rectangle.setPosition(m_position.x - 30.0f, m_position.y - 25.0f);
+		break;
+	default:
+		break;
+	}
+
+	m_topSprite.setPosition(m_position.x, m_position.y - 160.0f);
+	m_bottomSprite.setPosition(m_position);
 }
 
 void Obstacle::renderBottom(sf::RenderWindow& t_window)
 {
-	//t_window.draw(m_rectangle);
+	t_window.draw(m_rectangle);
 	t_window.draw(m_bottomSprite);
 }
 

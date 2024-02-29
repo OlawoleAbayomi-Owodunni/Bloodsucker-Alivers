@@ -13,7 +13,8 @@ enum class ObstacleType
 	Rock1,
 	Rock2,
 	Rock3,
-	Tree
+	Tree,
+	Building
 };
 
 class Obstacle
@@ -29,7 +30,7 @@ public:
 	RectangleShape getRectangle();
 
 private:
-	static std::vector<Obstacle*> m_allObstacles;
+	//static std::vector<Obstacle*> m_allObstacles;
 
 	ObstacleType m_type;
 

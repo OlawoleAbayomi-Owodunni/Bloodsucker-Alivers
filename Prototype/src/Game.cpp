@@ -158,6 +158,7 @@ void Game::startGame()
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Building));
 	}
 
 	orbRumbleTimer.restart();

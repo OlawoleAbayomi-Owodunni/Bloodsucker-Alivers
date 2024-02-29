@@ -4,6 +4,13 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 {
 	m_position.x = rand() % 3200 + 1;
 	m_position.y = rand() % 1800 + 1;
+
+	while (m_position.x > 550.0f && m_position.x < 1050.0f &&
+		m_position.y > 200.0f && m_position.y < 700.0f)
+	{
+		m_position.x = rand() % 3200 + 1;
+		m_position.y = rand() % 1800 + 1;
+	}
 	
 	m_topSprite.setTexture(t_texture);
 	m_bottomSprite.setTexture(t_texture);

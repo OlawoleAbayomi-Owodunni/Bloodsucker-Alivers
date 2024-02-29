@@ -86,6 +86,7 @@ public:
 
 	sf::RectangleShape getRectangle();
 	sf::RectangleShape getDashCollider();
+	sf::CircleShape getSlashCollider();
 	std::vector<Weapon*> getWeapon();
 
 private:
@@ -117,6 +118,7 @@ private:
 	float m_dashBarFillAmount;
 	int m_maxDashCharges;
 	int m_currentDashCharges;
+	bool m_dashHasAOE;
 
 	sf::RectangleShape m_rectangle;
 
@@ -128,6 +130,8 @@ private:
 
 	sf::RectangleShape m_dashRect;
 	sf::RectangleShape m_dashRectBounds;
+
+	sf::CircleShape m_slashCircle;
 
 	sf::RectangleShape m_dashBarLeft;
 	sf::RectangleShape m_emptyDashBarLeft;
@@ -151,8 +155,16 @@ private:
 	Time m_haloTime;
 	Clock m_haloClock;
 
+	std::vector<sf::IntRect> m_slashFrames;
+	int m_currentSlashFrame;
+	Time m_slashTime;
+	Clock m_slashClock;
+
 	Time m_dashStateTime;
 	Clock m_dashStateClock;
+
+	Time m_dashAOETime;
+	Clock m_dashAOEClock;
 
 	SoundBuffer m_dashSoundBuffer;
 	Sound m_dashSound;
@@ -160,6 +172,7 @@ private:
 	Sprite m_playerSprite;
 	Sprite m_dashSprite;
 	Sprite m_haloSprite;
+	Sprite m_slashSprite;
 
 	Sprite m_xpBarSprite;
 

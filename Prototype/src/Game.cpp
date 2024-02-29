@@ -554,8 +554,19 @@ void Game::checkCollisions()
 				m_player.decreaseHealth();
 			}
 
-			//Enemy to Dash
+			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
+			{
+				enemy->decreaseHealth(100.0f);
+
+				if (enemy->getHealth() < 0)
+				{
+					enemy->setState(CharacterState::DeadState);
+				}
+			}
+
+			//Slash to Enemy
+			if (CollisionDetection::playerSlashEnemyCollision(m_player, enemy))
 			{
 				enemy->decreaseHealth(100.0f);
 

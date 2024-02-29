@@ -28,7 +28,7 @@ Player::Player()
 	m_dashSound.setVolume(3.0f);
 
 	//Base variable initialiser
-	m_maxHealth = 100.0f;
+	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
@@ -49,6 +49,7 @@ Player::Player()
 	m_maxDashCharges = 0;
 	m_currentDashCharges = 0;
 	m_dashDistance = 150.0f;
+	m_dashHasAOE = false;
 
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
@@ -60,12 +61,22 @@ Player::Player()
 	{
 		m_haloFrames.push_back(IntRect{ 160 * i,1351,160,64 });
 	}
+	for (int i = 0; i < 5; i++)
+	{
+		m_slashFrames.push_back(IntRect{ 1560 + 128 * i, 484, 128, 128 });
+	}
+
+	m_currentPlayerFrame = 0;
 	m_currentHaloFrame = 0;
+	m_currentSlashFrame = 0;
 
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
+	m_slashTime = seconds(0.1f);
+
 	m_dashStateTime = seconds(1.0f);
 	m_dashCooldownTime = seconds(4.0f);
+	m_dashAOETime = seconds(0.5f);
 
 #pragma region SPRITES
 	sf::Texture& playerTextures = m_holder["starterAtlas"];
@@ -82,10 +93,21 @@ Player::Player()
 	m_dashSprite.setScale(0.5f, 0.5f);
 	m_dashSprite.setPosition(m_position);
 
+	m_slashSprite.setTexture(playerTextures);
+	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 128, 128 });
+	m_slashSprite.setOrigin(64.0f, 64.0f);
+	m_slashSprite.setScale(2.0f, 2.0f);
+	m_slashSprite.setPosition(m_position);
+
 	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::White);
 	m_rectangle.setPosition(m_position.x, m_position.y + 20.0f);
+
+	m_slashCircle.setRadius(130.0f);
+	m_slashCircle.setOrigin(130.0f, 130.0f);
+	m_slashCircle.setFillColor(sf::Color::Red);
+	m_slashCircle.setPosition(-1000.0f,-1000.0f);
 
 	//XP Bar sprite setup
 	m_xpBarSprite.setTexture(playerTextures);
@@ -158,7 +180,7 @@ Player::Player()
 	m_emptyHealthBar.setOutlineThickness(2.0f);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
 
-	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+	m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 50.0f, 6.0f));
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y - 60.0f);
@@ -240,6 +262,18 @@ void Player::renderPlayer(sf::RenderWindow& t_window)
 	t_window.draw(m_currentHealthBar);
 
 	t_window.draw(m_playerSprite);
+
+	if (m_dashHasAOE)
+	{
+		if (m_playerState == CharacterState::DashState)
+		{
+			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
+			{
+				//t_window.draw(m_slashCircle);
+				t_window.draw(m_slashSprite);
+			}
+		}
+	}
 }
 
 void Player::renderHUD(sf::RenderWindow& t_window)
@@ -440,6 +474,11 @@ sf::RectangleShape Player::getDashCollider()
 	return m_dashRect;
 }
 
+sf::CircleShape Player::getSlashCollider()
+{
+	return m_slashCircle;
+}
+
 #pragma endregion
 
 #pragma region Setters
@@ -487,6 +526,18 @@ void Player::setPosition(sf::View& t_view)
 	m_dashBarRight.setPosition(dashBarRightPos);
 
 	m_haloSprite.setPosition(sf::Vector2f(m_position.x, m_position.y + 42.0f));
+
+	if (m_dashHasAOE)
+	{
+		if (m_playerState == CharacterState::DashState)
+		{
+			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
+			{
+				m_slashSprite.setPosition(m_position);
+				m_slashCircle.setPosition(m_position);
+			}
+		}
+	}
 }
 
 void Player::setHealth()
@@ -574,6 +625,7 @@ void Player::upgradeDash()
 		m_maxDashCharges = 2;
 		break;
 	case 5:		// AOE
+		m_dashHasAOE = true;
 		break;
 	case 6:		// distance & 3rd charge
 		m_maxDashCharges = 3;
@@ -776,6 +828,26 @@ void Player::animate()
 	}
 
 	m_haloSprite.setTextureRect(m_haloFrames[m_currentHaloFrame]);
+
+	if (m_dashHasAOE)
+	{
+		if (m_playerState == CharacterState::DashState)
+		{
+			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
+			{
+				if (m_slashClock.getElapsedTime() > m_slashTime)
+				{
+					if (m_currentSlashFrame + 1 < m_slashFrames.size())
+					{
+						m_currentSlashFrame++;
+					}
+					m_slashClock.restart();
+				}
+
+				m_slashSprite.setTextureRect(m_slashFrames[m_currentSlashFrame]);
+			}
+		}
+	}
 }
 
 void Player::addFrame(sf::IntRect& t_frame)
@@ -787,6 +859,9 @@ void Player::setFrames()
 {
 	m_playerFrames.clear();
 	m_currentPlayerFrame = 0;
+	m_currentSlashFrame = 0;
+
+	m_dashAOEClock.restart();
 
 	switch (m_playerState)
 	{

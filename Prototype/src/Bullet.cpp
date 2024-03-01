@@ -18,7 +18,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 	m_sprite.setTexture(t_texture);
 	m_sprite.setTextureRect(IntRect{ 0,658,32,32 });
 	m_sprite.setOrigin(16, 16);
-	m_sprite.setScale(1.0f, 1.0f);
+	m_sprite.setScale(1.5f, 1.5f);
 	m_sprite.setPosition(m_position);
 
 	m_currentFrame = 0;
@@ -71,7 +71,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 		}
 
 		targetDisplacement = targetDisplacement / targetDistance;
-		m_velocity = targetDisplacement * sniperSpeed;
+		m_velocity = targetDisplacement * pistolSpeed;
 		break;
 
 #pragma endregion
@@ -110,7 +110,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		for (int i = 0; i < 16; i++)
 		{
-			m_frames.push_back(IntRect{ 512 + 32 * i,658,32,32 });
+			m_frames.push_back(IntRect{ 1034 + 32 * i,658,32,32 });
 		}
 
 		m_position = t_playerPos;

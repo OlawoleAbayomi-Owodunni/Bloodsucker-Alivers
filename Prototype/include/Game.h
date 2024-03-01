@@ -136,9 +136,12 @@ protected:
 	int m_cursorPos; 
 	ButtonType m_cursorButtonType;
 
+	bool inMenu;
+
 	Clock m_gameOverTimer;
 	bool hasGameOverTimerStarted;
 	bool isGameOver;
+	bool firstStart;
 
 	int score;
 	int smallEK;

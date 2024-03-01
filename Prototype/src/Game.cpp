@@ -30,6 +30,8 @@ void Game::init()
 
 	m_currentGamemode = Gamemode::Menu;
 	hasGameOverTimerStarted = false;
+	firstStart = true;
+	inMenu = false;
 
 #pragma region THOR
 	//THOR
@@ -38,6 +40,7 @@ void Game::init()
 	m_holder.acquire("mainMenuBG", thor::Resources::fromFile<sf::Texture>("resources/sprites/menu.png"));
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
 	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
+	m_holder.acquire("tutorialMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/InformationScreen.png"));
 #pragma endregion
 
 #pragma region SOUND
@@ -125,9 +128,10 @@ void Game::init()
 	menuBgSprite.setPosition(m_menuCamera.getCenter());
 
 	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200), Vector2f(1.0f, 1.0f)));
-	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 400), Vector2f(1.0f, 1.0f)));
-	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 600), Vector2f(1.0f, 1.0f)));
-	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 800), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(550, 320), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 440), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 560), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 680), Vector2f(1.0f, 1.0f)));
 
 
 	//PAUSE MENU INITIALISER 
@@ -147,6 +151,7 @@ void Game::init()
 	levelUpBGSprite.setScale(1.3f, 1.3f);
 	levelUpBGSprite.setPosition(m_playerCamera.getCenter());
 	//no need to setup buttons in constructor since they are randomised everytime
+
 
 	////GAME OVER INITIALISER
 	gameOverBGSprite.setTexture(UITexture);
@@ -170,6 +175,7 @@ void Game::init()
 	m_scoreVarBGSprite.setScale(2.0f, 1.5f);
 	m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
 
+#pragma region Text
 	m_statsText.setFont(m_arialFont);
 	m_statsText.setStyle(sf::Text::Bold);
 	m_statsText.setStyle(sf::Text::Underlined);
@@ -262,6 +268,9 @@ void Game::init()
 	m_scoreText.setOrigin(m_scoreText.getGlobalBounds().width / 2.0f, m_scoreText.getGlobalBounds().height / 2.0f);
 	m_scoreText.setPosition(m_scoreSprite.getPosition().x + 150, m_scoreSprite.getPosition().y);
 
+#pragma endregion
+
+
 	//CURSOR INITIALISER
 	m_cursorPos = 0;
 	m_cursorSprite.setTexture(UITexture);
@@ -284,6 +293,18 @@ void Game::startGame()
 	m_player.initialise();
 	m_currentLevel = 1;
 	hasGameOverTimerStarted = false;
+
+	m_gameplayMusic.play();
+	m_menuMusic.stop();
+
+	score = 0;
+	smallEK = 0;
+	normalEK = 0;
+	bigEK = 0;
+	bossEK = 0;
+	updateCount = 0;
+	timeSurvived = -2;
+
 
 	////VECTOR INTIALISATION
 	//ENEMY
@@ -425,22 +446,39 @@ void Game::processGameEvents(sf::Event& event)
 
 			//Button pressed
 			if (Event::JoystickButtonPressed == event.type) {
-				if (event.joystickButton.button == 0) { //0=A 7=Start
-					switch (m_cursorButtonType)
-					{
-					case ButtonType::Play:
-						m_currentGamemode = Gamemode::Gameplay;
-						m_menuMusic.stop();
-						m_gameplayMusic.play();
-
-						m_player.rumbleStop();
-						startGame();
-						break;
-						//CASE FOR TUTORIAL AND CASE FOR CREDITS
-					case ButtonType::Exit:
-						m_player.rumbleStop();
-						m_window.close();
-						break;
+				if (!inMenu) {
+					if (event.joystickButton.button == 0); { //0=A 7=Start
+						switch (m_cursorButtonType)
+						{
+						case ButtonType::Play:
+							m_currentGamemode = Gamemode::Gameplay;
+							firstStart = false;
+							m_player.rumbleStop();
+							startGame();
+							break;
+						case ButtonType::Resume:
+							if (!firstStart) {
+								m_currentGamemode = Gamemode::Gameplay;
+								m_menuMusic.stop();
+								m_gameplayMusic.play();
+							}
+							break;
+						case ButtonType::Tutorial:
+							inMenu = true;
+							menuBgSprite.setTexture(m_holder["tutorialMenu"]);
+							break;
+							//CASE FOR TUTORIAL AND CASE FOR CREDITS
+						case ButtonType::Exit:
+							m_player.rumbleStop();
+							m_window.close();
+							break;
+						}
+					}
+				}	
+				else {
+					if (event.joystickButton.button == 1) {
+						inMenu = false;
+						menuBgSprite.setTexture(m_holder["mainMenuBG"]);
 					}
 				}
 			}
@@ -805,6 +843,10 @@ void Game::processGameEvents(sf::Event& event)
 						break;
 					case ButtonType::ToMenu:
 						m_currentGamemode = Gamemode::Menu;
+
+						m_menuMusic.play();
+						m_gameplayMusic.stop();
+
 						m_cursorPos = 0;
 						m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 						m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
@@ -1123,10 +1165,13 @@ void Game::render()
 	if (m_currentGamemode == Gamemode::Menu)
 	{
 		m_window.draw(menuBgSprite);
-		for (auto buttons : m_menuButtons) {
-			buttons->render(m_window);
+		if (!inMenu) {
+			for (auto buttons : m_menuButtons) {
+				buttons->render(m_window);
+			}
+			m_window.draw(m_cursorSprite);
 		}
-		m_window.draw(m_cursorSprite);
+
 	}
 #pragma endregion
 

@@ -60,7 +60,7 @@ protected:
 
 	void levelUpSpawner();
 	void createRandomUpgrades();
-
+	void setDashInfo();
 	void createRandomWeapons();
 
 	void dropLoot(Enemy* t_enemy);
@@ -125,6 +125,14 @@ protected:
 	Sprite levelUpBGSprite;
 	vector<Button*> m_upgradeButtons;
 	vector<Button*> m_weaponButtons;
+
+	Sprite dashInfoImgBGSprite;
+	Sprite dashInfoTxtBGSprite;
+	Sprite dashInfoImgSprite;
+	Text dashInfoTxt;
+	Text dashDescriptionText;
+	vector<IntRect> dashInfoFrames;
+
 
 	Sprite gameOverBGSprite;
 	vector<Button*> m_gameoverButtons;

@@ -230,11 +230,11 @@ Player::~Player()
 void Player::initialise()
 {
 	isPlayerAlive = true;
-	m_maxHealth = 0.0f;
+	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
-	m_xp = 0;
+	m_xp = 8;
 	m_xpRequired = 10.0f;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
@@ -785,6 +785,7 @@ void Player::upgradeGun(WeaponType t_type)
 #pragma region Dash Upgrades
 void Player::upgradeDash()
 {
+	//include damage upgrades
 	switch (m_level)
 	{
 	case 2:		// 1st charge
@@ -943,6 +944,11 @@ void Player::updateDashbar()
 
 	m_dashBarLeft.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
 	m_dashBarRight.setSize(sf::Vector2f(24.0f, m_dashBarFillAmount));
+}
+
+int Player::getDashLevel()
+{
+	return (m_level - 1);
 }
 
 void Player::increaseXP()

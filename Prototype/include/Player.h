@@ -71,6 +71,7 @@ public:
 
 	void dash();
 	void updateDashbar();
+	int getDashLevel();
 
 	void increaseXP();
 	void checkXP();

@@ -119,6 +119,7 @@ void Game::init()
 #pragma endregion
 
 #pragma region MENU INITIALISERS
+#pragma region main menu
 	//MAIN MENU INITIALISER
 	Texture& mainMenuBgTexture = m_holder["mainMenuBG"];
 	Texture& UITexture = m_holder["UIAtlas"];
@@ -132,8 +133,9 @@ void Game::init()
 	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 440), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 560), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 680), Vector2f(1.0f, 1.0f)));
+#pragma endregion
 
-
+#pragma region pause menu
 	//PAUSE MENU INITIALISER 
 	pauseBgSprite.setTexture(UITexture);
 	pauseBgSprite.setTextureRect(IntRect{ 0, 1965, 600, 275 });
@@ -144,6 +146,9 @@ void Game::init()
 	m_pauseButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y), Vector2f(1.0f, 1.0f)));
 	m_pauseButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y), Vector2f(1.0f, 1.0f)));
 
+#pragma endregion
+
+#pragma region upgrade menu
 	//UPGRADE MENU INITIALISER
 	levelUpBGSprite.setTexture(UITexture);
 	levelUpBGSprite.setTextureRect(IntRect{ 0, 300, 800, 600 });
@@ -152,7 +157,36 @@ void Game::init()
 	levelUpBGSprite.setPosition(m_playerCamera.getCenter());
 	//no need to setup buttons in constructor since they are randomised everytime
 
+	dashInfoImgBGSprite.setTexture(UITexture);
+	dashInfoImgBGSprite.setTextureRect(IntRect({ 1000, 0, 250, 250 }));
+	dashInfoImgBGSprite.setOrigin(125.0f, 125.0f);
+	dashInfoImgBGSprite.setPosition(m_playerCamera.getCenter());
 
+	dashInfoTxtBGSprite.setTexture(UITexture);
+	dashInfoTxtBGSprite.setTextureRect(IntRect({ 1250, 0, 250, 250 }));
+	dashInfoTxtBGSprite.setOrigin(125.0f, 125.0f);
+	dashInfoTxtBGSprite.setPosition(m_playerCamera.getCenter());
+
+	dashInfoImgSprite.setTexture(m_holder["starterAtlas"]);
+	dashInfoImgSprite.setTextureRect(IntRect({ 0, 1778, 200, 160 }));
+	dashInfoImgSprite.setOrigin(100.0f, 80.0f);
+
+	dashInfoTxt.setFont(m_arialFont);
+	dashInfoTxt.setStyle(sf::Text::Bold);
+	dashInfoTxt.setCharacterSize(40U);
+	dashInfoTxt.setOutlineColor(sf::Color::Black);
+	dashInfoTxt.setOutlineThickness(3U);
+	dashInfoTxt.setFillColor(sf::Color::White);
+
+	dashDescriptionText.setFont(m_arialFont);
+	dashDescriptionText.setStyle(sf::Text::Bold);
+	dashDescriptionText.setCharacterSize(25U);
+	dashDescriptionText.setOutlineColor(sf::Color::Black);
+	dashDescriptionText.setOutlineThickness(2.0f);
+	dashDescriptionText.setFillColor(sf::Color::White);
+#pragma endregion
+
+#pragma region game over menu
 	////GAME OVER INITIALISER
 	gameOverBGSprite.setTexture(UITexture);
 	gameOverBGSprite.setTextureRect(IntRect{ 0, 901, 800, 600 });
@@ -270,7 +304,9 @@ void Game::init()
 
 #pragma endregion
 
+#pragma endregion
 
+#pragma region cursor
 	//CURSOR INITIALISER
 	m_cursorPos = 0;
 	m_cursorSprite.setTexture(UITexture);
@@ -279,6 +315,8 @@ void Game::init()
 	m_cursorSprite.setScale(0.9f, 1.0f);
 	m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 	m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+
+#pragma endregion
 
 #pragma endregion
 
@@ -312,7 +350,7 @@ void Game::startGame()
 	for (int i = 0; i < 10; i++) {
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
-
+	
 	m_xpOrbs.clear();
 	m_pickups.clear();
 
@@ -447,7 +485,7 @@ void Game::processGameEvents(sf::Event& event)
 			//Button pressed
 			if (Event::JoystickButtonPressed == event.type) {
 				if (!inMenu) {
-					if (event.joystickButton.button == 0); { //0=A 7=Start
+					if (event.joystickButton.button == 0) { //0=A 7=Start
 						switch (m_cursorButtonType)
 						{
 						case ButtonType::Play:
@@ -894,7 +932,9 @@ void Game::update(double dt)
 #pragma region Sprites
 			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
 			m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
-
+			gameOverBGSprite.setPosition(m_playerCamera.getCenter());
+			m_gameoverButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 275, m_playerCamera.getCenter().y + 365));
+			m_gameoverButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 275, m_playerCamera.getCenter().y + 365));
 #pragma endregion
 
 #pragma region Text
@@ -1039,16 +1079,6 @@ void Game::update(double dt)
 	{
 		//m_player.levelUp(m_currentGamemode);
 	}
-
-	if (m_currentGamemode == Gamemode::Menu)
-	{
-		//Do menu based stuff
-	}
-
-	if (m_currentGamemode == Gamemode::Pause)
-	{
-		//Do pause based stuff
-	}
 }
 
 void Game::render()
@@ -1115,6 +1145,13 @@ void Game::render()
 			{
 				buttons->render(m_window);
 			}
+
+			m_window.draw(dashInfoImgBGSprite);
+			m_window.draw(dashInfoTxtBGSprite);
+			m_window.draw(dashInfoImgSprite);
+			m_window.draw(dashInfoTxt);
+			m_window.draw(dashDescriptionText);
+
 			m_window.draw(m_cursorSprite);
 		}
 
@@ -1129,6 +1166,7 @@ void Game::render()
 		}
 #pragma endregion
 
+#pragma region Game over menu
 		if (m_currentGamemode == Gamemode::GameOver)
 		{
 			m_window.draw(gameOverBGSprite);
@@ -1158,6 +1196,9 @@ void Game::render()
 			//m_window.draw(rect);
 			m_window.draw(m_cursorSprite);
 		}
+
+#pragma endregion
+
 	}
 #pragma endregion
 
@@ -1427,6 +1468,45 @@ void Game::createRandomUpgrades()
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180), Vector2f(0.75f, 0.75f)));
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y), Vector2f(0.75f, 0.75f)));
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton3, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 180), Vector2f(0.75f, 0.75f)));
+
+	setDashInfo();
+}
+
+void Game::setDashInfo()
+{
+	String description;
+	switch (m_player.getDashLevel())
+	{
+	case 1:
+		description = "dash unlocked";
+		break;
+	case 2:
+		description = "cooldown reduced";
+		break;
+	case 3:
+		description = "2nd dash charge";
+		break;
+	case 4:
+		description = "slash after dash";
+		break;
+	case 5:
+		description = "distance increased\n3rd dash charge";
+		break;
+	case 6:
+		description = "cooldown reduced";
+		break;
+	case 7:
+		description = "4th dash charge";
+		break;
+	default:
+		description = "FULLY UPGRADED";
+		break;
+	}
+	dashInfoTxt.setString("DASH LEVEL " + to_string(m_player.getDashLevel()));//switch case in function to determine modifier text
+	dashInfoTxt.setOrigin(dashInfoTxt.getGlobalBounds().width / 2.0f, dashInfoTxt.getGlobalBounds().height / 2.0f);
+	dashDescriptionText.setString(description);
+	dashDescriptionText.setOrigin(dashDescriptionText.getGlobalBounds().width / 2.0f, dashDescriptionText.getGlobalBounds().height / 2.0f);
+	dashDescriptionText.setPosition(dashInfoTxt.getPosition().x, dashInfoTxt.getPosition().y + 60);
 }
 
 void Game::createRandomWeapons()
@@ -1459,6 +1539,11 @@ void Game::levelUpSpawner()
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;
 		levelUpBGSprite.setPosition(m_playerCamera.getCenter());
+
+		dashInfoImgBGSprite.setPosition(levelUpBGSprite.getPosition().x + 200, levelUpBGSprite.getPosition().y - 100);
+		dashInfoTxtBGSprite.setPosition(dashInfoImgBGSprite.getPosition().x, (dashInfoImgBGSprite.getPosition().y + 250) + 10);
+		dashInfoImgSprite.setPosition(dashInfoImgBGSprite.getPosition());
+		dashInfoTxt.setPosition(dashInfoTxtBGSprite.getPosition().x, dashInfoTxtBGSprite.getPosition().y - 50);
 
 		createRandomUpgrades();
 		m_cursorPos = 0;

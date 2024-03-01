@@ -38,6 +38,15 @@ Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type)
 		m_enemySprite.setTextureRect(IntRect{ 0,192,160,160 });
 		m_enemySprite.setScale(0.5f, 0.5f);
 		break;
+	case EnemyType::Big:
+		m_maxHealth = 100.0f;
+		m_health = 100.0f;
+		m_speed = 0.5f + ((rand() % 10) / 10.0f + 0.1f);
+		m_enemyTime = seconds(0.2f);
+		m_rectangle.setSize(sf::Vector2f(90.0f, 140.0f));
+		m_enemySprite.setTextureRect(IntRect{ 1587, 0, 320, 320 });
+		m_enemySprite.setScale(0.5f, 0.5f);
+		break;
 	case EnemyType::Boss:
 		m_maxHealth = 1000.0f;
 		m_health = 1000.0f;
@@ -92,7 +101,11 @@ void Enemy::update(double dt, Player& t_player)
 {
 	switch (m_type)
 	{
-	case EnemyType::Small:
+	case EnemyType::Big:
+		if (m_damageClock.getElapsedTime().asSeconds() > 0.5f)
+		{
+			m_enemySprite.setColor(sf::Color::White);
+		}
 		break;
 	case EnemyType::Boss:
 		m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 50.0f, 6.0f));
@@ -126,8 +139,6 @@ void Enemy::render(sf::RenderWindow& t_window)
 
 	switch (m_type)
 	{
-	case EnemyType::Small:
-		break;
 	case EnemyType::Boss:
 		t_window.draw(m_emptyHealthBar);
 		t_window.draw(m_currentHealthBar);
@@ -144,6 +155,9 @@ void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 	switch (m_type)
 	{
 	case EnemyType::Small:
+		m_health = 100.0f;
+		break;
+	case EnemyType::Big:
 		m_health = 100.0f;
 		break;
 	case EnemyType::Boss:
@@ -194,6 +208,9 @@ void Enemy::move(Player& t_player)
 		case EnemyType::Small:
 			m_enemySprite.setScale(0.5f, 0.5f);
 			break;
+		case EnemyType::Big:
+			m_enemySprite.setScale(0.5f, 0.5f);
+			break;
 		case EnemyType::Boss:
 			m_enemySprite.setScale(1.0f, 1.0f);
 			break;
@@ -206,6 +223,9 @@ void Enemy::move(Player& t_player)
 		switch (m_type)
 		{
 		case EnemyType::Small:
+			m_enemySprite.setScale(-0.5f, 0.5f);
+			break;
+		case EnemyType::Big:
 			m_enemySprite.setScale(-0.5f, 0.5f);
 			break;
 		case EnemyType::Boss:
@@ -335,8 +355,6 @@ void Enemy::setFrames()
 	case EnemyType::Small:
 		switch (m_enemyState)
 		{
-		case CharacterState::IdleState:
-			break;
 		case CharacterState::WalkSideState:
 			addFrame(IntRect{ 0,192,160,160 });
 			addFrame(IntRect{ 160,192,160,160 });
@@ -364,11 +382,43 @@ void Enemy::setFrames()
 			break;
 		}
 		break;
+	case EnemyType::Big:
+		switch (m_enemyState)
+		{
+		case CharacterState::WalkSideState:
+			addFrame(IntRect{ 1587,0,320,320 });
+			addFrame(IntRect{ 1907,0,320,320 });
+			addFrame(IntRect{ 2227,0,320,320 });
+			addFrame(IntRect{ 2547,0,320,320 });
+			addFrame(IntRect{ 2867,0,320,320 });
+			addFrame(IntRect{ 3187,0,320,320 });
+			break;
+		case CharacterState::DeadState:
+			addFrame(IntRect{ 0,2496,320,320 });
+			addFrame(IntRect{ 320,2496,320,320 });
+			addFrame(IntRect{ 640,2496,320,320 });
+			addFrame(IntRect{ 960,2496,320,320 });
+			addFrame(IntRect{ 1280,2496,320,320 });
+
+			addFrame(IntRect{ 1600,2496,320,320 });
+			addFrame(IntRect{ 1920,2496,320,320 });
+			addFrame(IntRect{ 2240,2496,320,320 });
+			addFrame(IntRect{ 2560,2496,320,320 });
+			addFrame(IntRect{ 2880,2496,320,320 });
+
+			addFrame(IntRect{ 3200,2496,320,320 });
+			addFrame(IntRect{ 3520,2496,320,320 });
+			addFrame(IntRect{ 3840,2496,320,320 });
+			addFrame(IntRect{ 4160,2496,320,320 });
+			addFrame(IntRect{ 4480,2496,320,320 });
+			addFrame(IntRect{ 4800,2496,320,320 });
+			break;
+		default:
+			break;
+		}
 	case EnemyType::Boss:
 		switch (m_enemyState)
 		{
-		case CharacterState::IdleState:
-			break;
 		case CharacterState::WalkSideState:
 			addFrame(IntRect{ 1587,0,320,320 });
 			addFrame(IntRect{ 1907,0,320,320 });

@@ -66,7 +66,7 @@ public:
 	void pushBack();
 
 	void setHealth();
-	void decreaseHealth();
+	void decreaseHealth(float t_damage);
 	void increaseHealth();
 
 	void dash();

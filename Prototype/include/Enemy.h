@@ -15,6 +15,7 @@ enum class CharacterState;
 enum class EnemyType
 {
 	Small,
+	Big,
 	Boss
 };
 

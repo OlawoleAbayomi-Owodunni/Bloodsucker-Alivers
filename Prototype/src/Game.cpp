@@ -146,7 +146,7 @@ void Game::startGame()
 	////VECTOR INTIALISATION
 	//ENEMY
 	m_enemies.clear();
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < 10; i++) {
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
 
@@ -835,14 +835,6 @@ void Game::checkCollisions()
 	{
 		if (enemy->getState() != CharacterState::DeadState)
 		{
-#pragma region Player -> Enemy
-			//Player to Enemy
-			if (CollisionDetection::playerEnemyCollision(m_player, enemy))
-			{
-				m_player.decreaseHealth();
-			}
-#pragma endregion
-
 #pragma region Dash -> Enemy
 			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
@@ -850,6 +842,9 @@ void Game::checkCollisions()
 				switch (enemy->getType())
 				{
 				case EnemyType::Small:
+					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Big:
 					enemy->setState(CharacterState::DeadState);
 					break;
 				case EnemyType::Boss:
@@ -873,6 +868,9 @@ void Game::checkCollisions()
 				switch (enemy->getType())
 				{
 				case EnemyType::Small:
+					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Big:
 					enemy->setState(CharacterState::DeadState);
 					break;
 				case EnemyType::Boss:
@@ -902,6 +900,10 @@ void Game::checkCollisions()
 							switch (enemy->getType())
 							{
 							case EnemyType::Small:
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Big:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
 								break;
@@ -945,6 +947,10 @@ void Game::checkCollisions()
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
 								break;
+							case EnemyType::Big:
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+								break;
 							case EnemyType::Boss:
 								enemy->playHitSound();
 								enemy->decreaseHealth(bullet->getDamage() / 100.0f);
@@ -963,6 +969,27 @@ void Game::checkCollisions()
 
 #pragma endregion
 
+#pragma region Player -> Enemy
+			//Player to Enemy
+			if (CollisionDetection::playerEnemyCollision(m_player, enemy))
+			{
+				switch (enemy->getType())
+				{
+				case EnemyType::Small:
+					m_player.decreaseHealth(1.0f);
+					break;
+				case EnemyType::Big:
+					m_player.decreaseHealth(2.0f);
+					break;
+				case EnemyType::Boss:
+					m_player.decreaseHealth(5.0f);
+					break;
+				default:
+					break;
+				}
+
+			}
+#pragma endregion
 		}
 	}
 
@@ -1061,10 +1088,15 @@ void Game::levelUpSpawner()
 {
 	if (m_player.getLevel() > m_currentLevel)
 	{
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 		}
+		for (int i = 0; i < 3; i++)
+		{
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Big));
+		}
+		
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;
 		levelUpBGSprite.setPosition(m_playerCamera.getCenter());

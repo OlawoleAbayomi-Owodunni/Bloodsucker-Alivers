@@ -853,9 +853,9 @@ void Player::giveWeapon(WeaponType t_type)
 #pragma endregion
 
 
-void Player::decreaseHealth()
+void Player::decreaseHealth(float t_damage)
 {
-	m_health -= 1.0f * m_armorModifier;
+	m_health -= t_damage * m_armorModifier;
 }
 
 void Player::increaseHealth()

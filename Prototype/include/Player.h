@@ -190,4 +190,12 @@ private:
 
 	bool isPlayerAlive;
 	Clock gameOverTimer;
+
+	int score;
+	int smallEK;
+	int normalEK;
+	int bigEK;
+	int bossEK;
+	int timeSurvived;
+	//run a math based timer for time survived
 };

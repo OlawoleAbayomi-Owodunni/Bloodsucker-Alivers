@@ -47,7 +47,7 @@ enum ButtonType
 class Button
 {
 public:
-	Button(ButtonType t_type, Texture& t_holder, Font& t_font, Vector2f t_pos); //pass in texture, font, 
+	Button(ButtonType t_type, Texture& t_holder, Font& t_font, Vector2f t_pos, Vector2f t_scale); //pass in texture, font, 
 
 	void render(sf::RenderWindow& t_window);
 

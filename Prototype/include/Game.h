@@ -120,6 +120,9 @@ protected:
 
 	Sprite gameOverBGSprite;
 	vector<Button*> m_gameoverButtons;
+	Sprite m_scoreVarBGSprite;
+	Sprite m_scoreSprite;
+	//Text for all the things to add
 
 	Sprite m_cursorSprite;
 	int m_cursorPos; 
@@ -128,4 +131,23 @@ protected:
 	Clock m_gameOverTimer;
 	bool hasGameOverTimerStarted;
 	bool isGameOver;
+
+	int score;
+	int smallEK;
+	int normalEK;
+	int bigEK;
+	int bossEK;
+	int totalEK;
+	int updateCount;
+	int timeSurvived;
+
+	Text m_scoreText;
+	Text m_smallEKText;
+	Text m_normalEKText;
+	Text m_bigEKText;
+	Text m_bossEKText;
+	Text m_totalEKText;
+	Text m_playerLevelText;
+	Text m_timeSurvivedText;
+	Text m_statsText;
 };

@@ -72,7 +72,7 @@ void Game::init()
 	}
 #pragma endregion
 
-#pragma region OTHERS (Font, Rumble, Background)
+#pragma region OTHERS (Font, Rumble, Background, score)
 	//FONT
 	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
 	{
@@ -89,6 +89,14 @@ void Game::init()
 	bgSprite.setTextureRect(IntRect{ 0,0,3200,1800 });
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
+
+	score = 0;
+	smallEK = 0;
+	normalEK = 0;
+	bigEK = 0;
+	bossEK = 0;
+	updateCount = 0;
+	timeSurvived = -2;
 #pragma endregion
 
 #pragma region MENU INITIALISERS
@@ -100,10 +108,10 @@ void Game::init()
 	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	menuBgSprite.setPosition(m_menuCamera.getCenter());
 
-	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200)));
-	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 400)));
-	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 600)));
-	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 800)));
+	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 400), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 600), Vector2f(1.0f, 1.0f)));
+	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 800), Vector2f(1.0f, 1.0f)));
 
 
 	//PAUSE MENU INITIALISER 
@@ -113,8 +121,8 @@ void Game::init()
 	pauseBgSprite.setScale(2.5f, 2.5f);
 	pauseBgSprite.setPosition(m_playerCamera.getCenter());
 
-	m_pauseButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y)));
-	m_pauseButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y)));
+	m_pauseButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y), Vector2f(1.0f, 1.0f)));
+	m_pauseButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y), Vector2f(1.0f, 1.0f)));
 
 	//UPGRADE MENU INITIALISER
 	levelUpBGSprite.setTexture(UITexture);
@@ -124,15 +132,119 @@ void Game::init()
 	levelUpBGSprite.setPosition(m_playerCamera.getCenter());
 	//no need to setup buttons in constructor since they are randomised everytime
 
-	//GAME OVER INITIALISER
+	////GAME OVER INITIALISER
 	gameOverBGSprite.setTexture(UITexture);
 	gameOverBGSprite.setTextureRect(IntRect{ 0, 901, 800, 600 });
 	gameOverBGSprite.setOrigin(400.0f, 300.0f);
 	gameOverBGSprite.setScale(1.5, 1.5f);
 	gameOverBGSprite.setPosition(m_playerCamera.getCenter());
 
-	m_gameoverButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y + 300)));
-	m_gameoverButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y + 300)));
+	m_gameoverButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x - 275, m_playerCamera.getCenter().y + 365), Vector2f(0.64f, 0.7f)));
+	m_gameoverButtons.push_back(new Button(ButtonType::ToMenu, UITexture, m_arialFont, Vector2f(m_playerCamera.getCenter().x + 275, m_playerCamera.getCenter().y + 365), Vector2f(0.64f, 0.7f)));
+
+	m_scoreSprite.setTexture(UITexture);
+	m_scoreSprite.setTextureRect(IntRect{ 0, 1503, 550, 150 });
+	m_scoreSprite.setOrigin(550.0f / 2.0f, 150.0f / 2);
+	m_scoreSprite.setScale(1.0f, 1.0f);
+	m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250); 
+
+	m_scoreVarBGSprite.setTexture(UITexture);
+	m_scoreVarBGSprite.setTextureRect(IntRect{ 1250, 0, 250, 250 });
+	m_scoreVarBGSprite.setOrigin(125, 125);
+	m_scoreVarBGSprite.setScale(2.0f, 1.5f);
+	m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
+
+	m_statsText.setFont(m_arialFont);
+	m_statsText.setStyle(sf::Text::Bold);
+	m_statsText.setStyle(sf::Text::Underlined);
+	m_statsText.setCharacterSize(40U);
+	m_statsText.setOutlineColor(sf::Color::Black);
+	m_statsText.setOutlineThickness(3U);
+	m_statsText.setFillColor(sf::Color::Red);
+	m_statsText.setOutlineThickness(2.0f);
+	m_statsText.setString("STATS");
+	m_statsText.setOrigin(m_statsText.getGlobalBounds().width / 2.0f, m_statsText.getGlobalBounds().height / 2.0f);
+	m_statsText.setPosition(m_scoreVarBGSprite.getPosition().x, m_scoreVarBGSprite.getPosition().y - 105);
+
+	m_smallEKText.setFont(m_arialFont);
+	m_smallEKText.setStyle(sf::Text::Bold);
+	m_smallEKText.setCharacterSize(25U);
+	m_smallEKText.setOutlineColor(sf::Color::Black);
+	m_smallEKText.setFillColor(sf::Color::White);
+	m_smallEKText.setOutlineThickness(2.0f);
+	m_smallEKText.setString("Small enemies killed: " + to_string(smallEK));
+	m_smallEKText.setOrigin(0.0f, m_smallEKText.getGlobalBounds().height / 2.0f);
+	m_smallEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 70);
+
+	m_normalEKText.setFont(m_arialFont);
+	m_normalEKText.setStyle(sf::Text::Bold);
+	m_normalEKText.setCharacterSize(25U);
+	m_normalEKText.setOutlineColor(sf::Color::Black);
+	m_normalEKText.setFillColor(sf::Color::White);
+	m_normalEKText.setOutlineThickness(2.0f);
+	m_normalEKText.setString("Normal enemies killed: " + to_string(normalEK));
+	m_normalEKText.setOrigin(0.0f, m_normalEKText.getGlobalBounds().height / 2.0f);
+	m_normalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 100);
+
+	m_bigEKText.setFont(m_arialFont);
+	m_bigEKText.setStyle(sf::Text::Bold);
+	m_bigEKText.setCharacterSize(25U);
+	m_bigEKText.setOutlineColor(sf::Color::Black);
+	m_bigEKText.setFillColor(sf::Color::White);
+	m_bigEKText.setOutlineThickness(2.0f);
+	m_bigEKText.setString("Big enemies killed: " + to_string(bigEK));
+	m_bigEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
+	m_bigEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 130);
+
+	m_bossEKText.setFont(m_arialFont);
+	m_bossEKText.setStyle(sf::Text::Bold);
+	m_bossEKText.setCharacterSize(25U);
+	m_bossEKText.setOutlineColor(sf::Color::Black);
+	m_bossEKText.setFillColor(sf::Color::White);
+	m_bossEKText.setOutlineThickness(2.0f);
+	m_bossEKText.setString("Boss enemies killed: " + to_string(bossEK));
+	m_bossEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
+	m_bossEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 160);
+
+	m_totalEKText.setFont(m_arialFont);
+	m_totalEKText.setStyle(sf::Text::Bold);
+	m_totalEKText.setCharacterSize(25U);
+	m_totalEKText.setOutlineColor(sf::Color::Black);
+	m_totalEKText.setFillColor(sf::Color::White);
+	m_totalEKText.setOutlineThickness(2.0f);
+	m_totalEKText.setString("TOTAL ENEMIES KILLED: " + to_string(totalEK));
+	m_totalEKText.setOrigin(0.0f, m_totalEKText.getGlobalBounds().height / 2.0f);
+	m_totalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 190);
+
+	m_playerLevelText.setFont(m_arialFont);
+	m_playerLevelText.setStyle(sf::Text::Bold);
+	m_playerLevelText.setCharacterSize(25U);
+	m_playerLevelText.setOutlineColor(sf::Color::Black);
+	m_playerLevelText.setFillColor(sf::Color::White);
+	m_playerLevelText.setOutlineThickness(2.0f);
+	m_playerLevelText.setString("Player Level: " + to_string(m_currentLevel));
+	m_playerLevelText.setOrigin(0.0f, m_playerLevelText.getGlobalBounds().height / 2.0f);
+	m_playerLevelText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 220);
+
+	m_timeSurvivedText.setFont(m_arialFont);
+	m_timeSurvivedText.setStyle(sf::Text::Bold);
+	m_timeSurvivedText.setCharacterSize(25U);
+	m_timeSurvivedText.setOutlineColor(sf::Color::Black);
+	m_timeSurvivedText.setFillColor(sf::Color::White);
+	m_timeSurvivedText.setOutlineThickness(2.0f);
+	m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvived) + " seconds");
+	m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
+	m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 250);
+
+	m_scoreText.setFont(m_arialFont);
+	m_scoreText.setStyle(sf::Text::Bold);
+	m_scoreText.setCharacterSize(30U);
+	m_scoreText.setOutlineColor(sf::Color::Black);
+	m_scoreText.setFillColor(sf::Color::White);
+	m_scoreText.setOutlineThickness(2.0f);
+	m_scoreText.setString(to_string(score));
+	m_scoreText.setOrigin(m_scoreText.getGlobalBounds().width / 2.0f, m_scoreText.getGlobalBounds().height / 2.0f);
+	m_scoreText.setPosition(m_scoreSprite.getPosition().x + 150, m_scoreSprite.getPosition().y);
 
 	//CURSOR INITIALISER
 	m_cursorPos = 0;
@@ -706,6 +818,55 @@ void Game::update(double dt)
 			m_currentGamemode = Gamemode::GameOver;
 			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
+			score = (((1 * smallEK) + (1.5 * normalEK) + (5 * bigEK) + (200 * bossEK)) / 100) * timeSurvived;
+
+#pragma region Menu UI setup
+#pragma region Sprites
+			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
+			m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
+
+#pragma endregion
+
+#pragma region Text
+			m_statsText.setPosition(m_scoreVarBGSprite.getPosition().x, m_scoreVarBGSprite.getPosition().y - 105);
+
+			m_smallEKText.setString("Small enemies killed: " + to_string(smallEK));
+			m_smallEKText.setOrigin(0.0f, m_smallEKText.getGlobalBounds().height / 2.0f);
+			m_smallEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 70);
+
+			m_normalEKText.setString("Normal enemies killed: " + to_string(normalEK));
+			m_normalEKText.setOrigin(0.0f, m_normalEKText.getGlobalBounds().height / 2.0f);
+			m_normalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 100);
+
+			m_bigEKText.setString("Big enemies killed: " + to_string(bigEK));
+			m_bigEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
+			m_bigEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 130);
+
+			m_bossEKText.setString("Boss enemies killed: " + to_string(bossEK));
+			m_bossEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
+			m_bossEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 160);
+
+			m_totalEKText.setString("TOTAL ENEMIES KILLED: " + to_string(totalEK));
+			m_totalEKText.setOrigin(0.0f, m_totalEKText.getGlobalBounds().height / 2.0f);
+			m_totalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 190);
+
+			m_playerLevelText.setString("Player Level: " + to_string(m_currentLevel));
+			m_playerLevelText.setOrigin(0.0f, m_playerLevelText.getGlobalBounds().height / 2.0f);
+			m_playerLevelText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 220);
+
+			m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvived) + " seconds");
+			m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
+			m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 250);
+
+			m_scoreText.setString(to_string(score));
+			m_scoreText.setOrigin(m_scoreText.getGlobalBounds().width / 2.0f, m_scoreText.getGlobalBounds().height / 2.0f);
+			m_scoreText.setPosition(m_scoreSprite.getPosition().x + 150, m_scoreSprite.getPosition().y);
+
+#pragma endregion
+
+#pragma endregion
+
+
 		}
 		
 
@@ -782,6 +943,13 @@ void Game::update(double dt)
 		if (!oIsRumbling && !pIsRumbling && !eIsRumbling && !m_player.getRumbleState()) {
 			m_player.rumbleStop();
 		}
+
+		//time in game
+		if (updateCount > 60) {
+			timeSurvived++;
+			updateCount = 0;
+		}
+		updateCount++;
 	}
 
 #pragma endregion
@@ -887,6 +1055,26 @@ void Game::render()
 			{
 				buttons->render(m_window);
 			}
+
+			m_window.draw(m_scoreVarBGSprite);
+			m_window.draw(m_scoreSprite);
+
+			m_window.draw(m_statsText);
+			m_window.draw(m_smallEKText);
+			m_window.draw(m_normalEKText);
+			m_window.draw(m_bigEKText);
+			m_window.draw(m_bossEKText);
+			m_window.draw(m_totalEKText);
+			m_window.draw(m_playerLevelText);
+			m_window.draw(m_timeSurvivedText);
+			m_window.draw(m_scoreText);
+			//RectangleShape rect;
+			//rect.setSize(m_smallEKText.getGlobalBounds().getSize());
+			//rect.setOutlineColor(Color::Red);
+			//rect.setOutlineThickness(2.0f);
+			//rect.setOrigin(m_smallEKText.getOrigin());
+			//rect.setPosition(m_smallEKText.getPosition());
+			//m_window.draw(rect);
 			m_window.draw(m_cursorSprite);
 		}
 	}
@@ -1074,9 +1262,9 @@ void Game::createRandomUpgrades()
 		randomUpgradeButton3 = static_cast<ButtonType>((rand() % 6) + static_cast<int>(ButtonType::UpgradeHealth));
 	}
 
-	m_upgradeButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180)));
-	m_upgradeButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y)));
-	m_upgradeButtons.push_back(new Button(randomUpgradeButton3, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 180)));
+	m_upgradeButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180), Vector2f(0.75f, 0.75f)));
+	m_upgradeButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y), Vector2f(0.75f, 0.75f)));
+	m_upgradeButtons.push_back(new Button(randomUpgradeButton3, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 180), Vector2f(0.75f, 0.75f)));
 }
 
 void Game::createRandomWeapons()
@@ -1087,8 +1275,8 @@ void Game::createRandomWeapons()
 	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
 	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol)); }
 
-	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150)));
-	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150)));
+	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150), Vector2f(0.75f, 0.75f)));
+	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150), Vector2f(0.75f, 0.75f)));
 }
 
 #pragma endregion

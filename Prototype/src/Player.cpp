@@ -196,6 +196,12 @@ Player::Player()
 	m_dashRect.setPosition(-1000.0f, -1000.0f);
 #pragma endregion
 
+	score = 0;
+	smallEK = 0;
+	normalEK = 0;
+	bigEK = 0;
+	bossEK = 0;
+	timeSurvived = 0;
 }
 
 #pragma endregion
@@ -312,6 +318,7 @@ void Player::initialise()
 	m_dashRect.setOrigin(m_dashRect.getSize().x / 2.0f, m_dashRect.getSize().y / 2.0f);
 	m_dashRect.setPosition(-1000.0f, -1000.0f);
 #pragma endregion
+
 
 }
 

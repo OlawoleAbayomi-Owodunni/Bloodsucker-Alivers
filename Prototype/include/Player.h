@@ -92,7 +92,7 @@ public:
 	sf::RectangleShape getRectangle();
 	sf::RectangleShape getDashCollider();
 	sf::CircleShape getSlashCollider();
-	std::vector<Weapon*> getWeapon();
+	std::vector<Weapon*> getWeapons();
 	bool& getRumbleState();
 	bool& getAliveState();
 private:
@@ -202,4 +202,9 @@ private:
 	int bossEK;
 	int timeSurvived;
 	//run a math based timer for time survived
+
+	bool isPistolEquipped;
+	bool isAREquipped;
+	bool isSniperEquipped;
+	bool isRPGEquipped;
 };

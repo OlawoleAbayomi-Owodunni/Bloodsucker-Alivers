@@ -74,42 +74,28 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("HEALTH");
+		m_text.setString("INCREASE HEALTH");
 		break;
 	case ButtonType::UpgradeSpeed:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("SPEED");
+		m_text.setString("INCREASE SPEED");
 		break;
 	case ButtonType::UpgradeXP:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("XP");
+		m_text.setString("XP X2");
 		break;
 	case ButtonType::UpgradeArmor:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("ARMOR");
-		break;
-	case ButtonType::UpgradePistol:
-		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
-		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
-
-		m_text.setString("PISTOL +");
-		break;
-	case ButtonType::UpgradeAR:
-		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
-		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
-
-		m_text.setString("ASSAULT\nRIFLE +");
+		m_text.setString("INCREASE ARMOR");
 		break;
 #pragma endregion
 
@@ -128,6 +114,22 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 
 		m_text.setString("Assault\nRifle");
 		break;
+
+	case ButtonType::UpgradePistol:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("PISTOL UPGRADE +");
+		break;
+	case ButtonType::UpgradeAR:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("RIFLE UPGRADE +");
+		break;
+
 #pragma endregion
 
 	}

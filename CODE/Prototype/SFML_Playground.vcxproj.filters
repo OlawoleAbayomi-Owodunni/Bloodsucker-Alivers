@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Menu">
+      <UniqueIdentifier>{15260bb8-e926-4c64-99bd-d4bc346da453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Gameplay">
+      <UniqueIdentifier>{a840486b-4536-40dc-a265-e0371e42e941}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Menu">
+      <UniqueIdentifier>{bbe9cc4e-ed0e-4d68-91e9-af18ea17a651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Gameplay">
+      <UniqueIdentifier>{7053c215-1e59-4fe7-a617-4cfa6f517730}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScreenSize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bullet.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CollisionDetection.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Enemy.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Pickup.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Player.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Weapon.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XPOrb.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Header Files\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Obstacle.h">
+      <Filter>Header Files\Gameplay</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bullet.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CollisionDetection.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Enemy.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pickup.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Weapon.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XPOrb.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Obstacle.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

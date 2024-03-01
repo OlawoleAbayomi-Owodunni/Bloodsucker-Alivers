@@ -205,6 +205,7 @@ void Enemy::move(Player& t_player)
 
 	m_velocity = (displacement / distance) * m_speed;
 	m_position += m_velocity;
+
 	m_position += m_pushFactor;
 
 	if (m_position.x < playerPos.x)
@@ -281,10 +282,34 @@ void Enemy::calculatePushFactor()
 	m_pushFactor *= 0.06f;
 }
 
-void Enemy::inverseMovement()
+void Enemy::adjustMovement()
 {
-	m_velocity.x *= -1;
-	m_velocity.y *= -1;
+	if (abs(m_velocity.x) > abs(m_velocity.y))
+	{
+		if (m_velocity.y > 0)
+		{
+			m_velocity.y -= 3.0f;
+		}
+		else
+		{
+			m_velocity.y += 3.0f;
+		}
+		
+		m_velocity.x = 0.0f;
+	}
+	else if (abs(m_velocity.x) < abs(m_velocity.y))
+	{
+		if (m_velocity.x > 0)
+		{
+			m_velocity.x -= 3.0f;
+		}
+		else
+		{
+			m_velocity.x += 3.0f;
+		}
+
+		m_velocity.y = 0.0f;
+	}
 
 	m_position += m_velocity;
 }

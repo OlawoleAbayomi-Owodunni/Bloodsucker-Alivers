@@ -1270,7 +1270,7 @@ void Game::checkCollisions()
 			{
 				if (CollisionDetection::enemyObstacleCollision(enemy, obstacle))
 				{
-					enemy->inverseMovement();
+					enemy->adjustMovement();
 				}
 			}
 			

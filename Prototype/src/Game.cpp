@@ -48,22 +48,38 @@ void Game::init()
 	}
 	m_pickupSound.setBuffer(m_pickupSoundBuffer);
 	m_pickupSound.setVolume(15.0f);
+
+	if (!m_menuMusicBuffer.loadFromFile("resources/sounds/menu_music.wav"))
+	{
+		std::cout << "error loading menu music";
+	}
+	m_menuMusic.setBuffer(m_menuMusicBuffer);
+	m_menuMusic.setLoop(true);
+	m_menuMusic.setVolume(1.0f);
+
+	if (!m_gameplayMusicBuffer.loadFromFile("resources/sounds/gameplay_music.wav"))
+	{
+		std::cout << "error loading gameplay music";
+	}
+	m_gameplayMusic.setBuffer(m_gameplayMusicBuffer);
+	m_gameplayMusic.setLoop(true);
+	m_gameplayMusic.setVolume(2.0f);
+
+	m_menuMusic.play();
 #pragma endregion
 
 #pragma region ENEMIES & OBSTACLEES INITIALISER
 	//ENEMIES
 	for (int i = 0; i < 12; i++)
 	{
-		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
-	for (auto enemy : m_enemies)
-	{
-		enemy->initialisePosition(m_player.getPosition());
-	}
+	m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
+
 	m_currentLevel = 1;
 
 	//OBSTACLES
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
@@ -262,6 +278,8 @@ void Game::init()
 void Game::startGame()
 {
 	m_currentGamemode = Gamemode::Gameplay;
+	m_bossTimer.restart();
+	m_bossSpawned = false;
 
 	m_player.initialise();
 	m_currentLevel = 1;
@@ -270,11 +288,8 @@ void Game::startGame()
 	////VECTOR INTIALISATION
 	//ENEMY
 	m_enemies.clear();
-	for (int i = 0; i < 12; i++) {
-		m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
-	}
-	for (auto enemy : m_enemies) {
-		enemy->initialisePosition(m_player.getPosition());
+	for (int i = 0; i < 10; i++) {
+		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
 
 	m_xpOrbs.clear();
@@ -282,12 +297,13 @@ void Game::startGame()
 
 	//OBSTACLES
 	m_obstacles.clear();
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Building));
 	}
 
 	orbRumbleTimer.restart();
@@ -367,6 +383,9 @@ void Game::processGameEvents(sf::Event& event)
 				{
 				case ButtonType::Play:
 					m_currentGamemode = Gamemode::Gameplay;
+					m_menuMusic.stop();
+					m_gameplayMusic.play();
+
 					break;
 					//CASE FOR TUTORIAL AND CASE FOR CREDITS
 				case ButtonType::Exit:
@@ -411,6 +430,9 @@ void Game::processGameEvents(sf::Event& event)
 					{
 					case ButtonType::Play:
 						m_currentGamemode = Gamemode::Gameplay;
+						m_menuMusic.stop();
+						m_gameplayMusic.play();
+
 						m_player.rumbleStop();
 						startGame();
 						break;
@@ -452,6 +474,9 @@ void Game::processGameEvents(sf::Event& event)
 					break;
 				case ButtonType::ToMenu:
 					m_currentGamemode = Gamemode::Menu;
+					m_menuMusic.play();
+					m_gameplayMusic.stop();
+
 					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 					break;
@@ -499,6 +524,9 @@ void Game::processGameEvents(sf::Event& event)
 						break;
 					case ButtonType::ToMenu:
 						m_currentGamemode = Gamemode::Menu;
+						m_menuMusic.play();
+						m_gameplayMusic.stop();
+
 						m_cursorPos = 0;
 						m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 						m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
@@ -914,6 +942,11 @@ void Game::update(double dt)
 			}
 		}
 
+		for (auto obstacle : m_obstacles)
+		{
+			obstacle->update(dt);
+		}
+
 		for (auto orb : m_xpOrbs)
 		{
 			orb->update(dt, m_player);
@@ -922,6 +955,12 @@ void Game::update(double dt)
 		for (auto pickup : m_pickups)
 		{
 			pickup->update(dt);
+		}
+
+		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 120.0f)
+		{
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
+			m_bossSpawned = true;
 		}
 
 		//std::cout << m_enemies.size() << std::endl;
@@ -1102,23 +1141,36 @@ void Game::checkCollisions()
 	{
 		if (enemy->getState() != CharacterState::DeadState)
 		{
-#pragma region Player -> Enemy
-			//Player to Enemy
-			if (CollisionDetection::playerEnemyCollision(m_player, enemy))
+			for (auto obstacle : m_obstacles)
 			{
-				m_player.decreaseHealth();
+				if (CollisionDetection::enemyObstacleCollision(enemy, obstacle))
+				{
+					enemy->inverseMovement();
+				}
 			}
-#pragma endregion
-
+			
 #pragma region Dash -> Enemy
 			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
 			{
-				enemy->decreaseHealth(100.0f);
-
-				if (enemy->getHealth() < 0)
+				switch (enemy->getType())
 				{
+				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Big:
+					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Boss:
+					enemy->decreaseHealth(5.0f);
+
+					if (enemy->getHealth() < 0)
+					{
+						enemy->setState(CharacterState::DeadState);
+					}
+					break;
+				default:
+					break;
 				}
 			}
 #pragma endregion
@@ -1127,11 +1179,24 @@ void Game::checkCollisions()
 			//Slash to Enemy
 			if (CollisionDetection::playerSlashEnemyCollision(m_player, enemy))
 			{
-				enemy->decreaseHealth(100.0f);
-
-				if (enemy->getHealth() < 0)
+				switch (enemy->getType())
 				{
+				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Big:
+					enemy->setState(CharacterState::DeadState);
+					break;
+				case EnemyType::Boss:
+					enemy->decreaseHealth(10.0f);
+
+					if (enemy->getHealth() < 0)
+					{
+						enemy->setState(CharacterState::DeadState);
+					}
+					break;
+				default:
+					break;
 				}
 			}
 #pragma endregion
@@ -1146,20 +1211,37 @@ void Game::checkCollisions()
 					{
 						if (CollisionDetection::bulletEnemyCollision((*it), enemy))
 						{
-							enemy->decreaseHealth((*it)->getDamage());
+							switch (enemy->getType())
+							{
+							case EnemyType::Small:
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Big:
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Boss:
+								enemy->playHitSound();
+								enemy->decreaseHealth((*it)->getDamage());
+
+								enemy->setColour(sf::Color::Red);
+
+								if (enemy->getHealth() < 0.0f)
+								{
+									enemy->setState(CharacterState::DeadState);
+								}
+								break;
+							default:
+								break;
+							}
 
 							m_player.weakRumbleStart();
 							enemyHitRumbleTimer.restart();
 							eIsRumbling = true;
 
-							if (enemy->getHealth() < 0)
-							{
-								enemy->playHitSound();
-								enemy->setState(CharacterState::DeadState);
-
-								delete* it; // Delete the bullet object
-								it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
-							}
+							delete* it; // Delete the bullet object
+							it = weapon->getBullets().erase(it); // Remove the bullet pointer from the vector
 						}
 						else
 						{
@@ -1173,12 +1255,26 @@ void Game::checkCollisions()
 					{
 						if (CollisionDetection::bulletEnemyCollision(bullet, enemy))
 						{
-							enemy->decreaseHealth(bullet->getDamage());
-
-							if (enemy->getHealth() < 0)
+							switch (enemy->getType())
 							{
+							case EnemyType::Small:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Big:
+								enemy->playHitSound();
+								enemy->setState(CharacterState::DeadState);
+								break;
+							case EnemyType::Boss:
+								enemy->playHitSound();
+								enemy->decreaseHealth(bullet->getDamage() / 100.0f);
+
+								if (enemy->getHealth() < 0)
+								{
+									enemy->setState(CharacterState::DeadState);
+								}
+							default:
+								break;
 							}
 						}
 					}
@@ -1187,6 +1283,27 @@ void Game::checkCollisions()
 
 #pragma endregion
 
+#pragma region Player -> Enemy
+			//Player to Enemy
+			if (CollisionDetection::playerEnemyCollision(m_player, enemy))
+			{
+				switch (enemy->getType())
+				{
+				case EnemyType::Small:
+					m_player.decreaseHealth(1.0f);
+					break;
+				case EnemyType::Big:
+					m_player.decreaseHealth(2.0f);
+					break;
+				case EnemyType::Boss:
+					m_player.decreaseHealth(5.0f);
+					break;
+				default:
+					break;
+				}
+
+			}
+#pragma endregion
 		}
 	}
 
@@ -1285,15 +1402,18 @@ void Game::levelUpSpawner()
 {
 	if (m_player.getLevel() > m_currentLevel)
 	{
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 10; i++)
 		{
-			m_enemies.push_back(new Enemy(m_holder["starterAtlas"]));
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 		}
+		for (int i = 0; i < 3; i++)
+		{
+			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Big));
+		}
+		
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;
 		levelUpBGSprite.setPosition(m_playerCamera.getCenter());
-
-		
 
 		createRandomUpgrades();
 		m_cursorPos = 0;

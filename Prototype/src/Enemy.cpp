@@ -4,7 +4,7 @@
 
 std::vector<Enemy*> Enemy::m_allEnemies{};
 
-Enemy::Enemy(sf::Texture& t_texture)
+Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type)
 {
 	m_allEnemies.push_back(this);
 
@@ -15,8 +15,9 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_hitSound.setBuffer(m_hitSoundBuffer);
 	m_hitSound.setVolume(2.0f);
 
-	m_health = 100.0f;
-	m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
+	initialisePosition(t_playerPos);
+
+	m_type = t_type;
 
 	m_enemyState = CharacterState::WalkSideState;
 	m_previousState = CharacterState::None;
@@ -24,12 +25,60 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_deathFrameCounter = 0;
 	m_currentEnemyFrame = 0;
 
-	m_enemyTime = seconds(0.1f);
+	m_enemySprite.setTexture(t_texture);
 
-	m_rectangle.setSize(sf::Vector2f(40.0f, 80.0f));
+	switch (m_type)
+	{
+	case EnemyType::Small:
+		m_maxHealth = 100.0f;
+		m_health = 100.0f;
+		m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
+		m_enemyTime = seconds(0.1f);
+		m_rectangle.setSize(sf::Vector2f(40.0f, 80.0f));
+		m_enemySprite.setTextureRect(IntRect{ 0,192,160,160 });
+		m_enemySprite.setScale(0.5f, 0.5f);
+		break;
+	case EnemyType::Big:
+		m_maxHealth = 100.0f;
+		m_health = 100.0f;
+		m_speed = 0.5f + ((rand() % 10) / 10.0f + 0.1f);
+		m_enemyTime = seconds(0.2f);
+		m_rectangle.setSize(sf::Vector2f(90.0f, 140.0f));
+		m_enemySprite.setTextureRect(IntRect{ 1587, 0, 320, 320 });
+		m_enemySprite.setScale(0.5f, 0.5f);
+		break;
+	case EnemyType::Boss:
+		m_maxHealth = 1000.0f;
+		m_health = 1000.0f;
+		m_speed = 1.5f + ((rand() % 10) / 10.0f + 0.1f);
+		m_enemyTime = seconds(0.2f);
+		m_rectangle.setSize(sf::Vector2f(180.0f, 280.0f));
+		m_enemySprite.setTextureRect(IntRect{ 1587, 0, 320, 320 });
+		m_enemySprite.setScale(1.0f, 1.0f);
+
+		m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
+		m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
+		m_emptyHealthBar.setFillColor(sf::Color::Red);
+		m_emptyHealthBar.setOutlineColor(sf::Color::Black);
+		m_emptyHealthBar.setOutlineThickness(2.0f);
+		m_emptyHealthBar.setPosition(m_position.x, m_position.y - 100.0f);
+
+		m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 50.0f, 6.0f));
+		m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
+		m_currentHealthBar.setFillColor(sf::Color::Green);
+		m_currentHealthBar.setPosition(m_position.x, m_position.y - 100.0f);
+		break;
+	default:
+		break;
+	}
+	
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::Red);
 	m_rectangle.setPosition(m_position);
+	
+	m_enemySprite.setOrigin(m_enemySprite.getTextureRect().width / 2.0f, m_enemySprite.getTextureRect().height / 2.0f);
+	//m_enemySprite.setScale(0.5f, 0.5f);
+	m_enemySprite.setPosition(m_position);
 
 	/*m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 	m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
@@ -38,16 +87,10 @@ Enemy::Enemy(sf::Texture& t_texture)
 	m_emptyHealthBar.setOutlineThickness(2.0f);
 	m_emptyHealthBar.setPosition(m_position.x, m_position.y + 35.0f);
 
-	m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+	m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 100.0f, 6.0f));
 	m_currentHealthBar.setOrigin(m_currentHealthBar.getSize().x / 2.0f, m_currentHealthBar.getSize().y / 2.0f);
 	m_currentHealthBar.setFillColor(sf::Color::Green);
 	m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);*/
-
-	m_enemySprite.setTexture(t_texture);
-	m_enemySprite.setTextureRect(IntRect{ 0,192,160,160 });
-	m_enemySprite.setOrigin(80, 80);
-	m_enemySprite.setScale(0.5f, 0.5f);
-	m_enemySprite.setPosition(m_position);
 }
 
 Enemy::~Enemy()
@@ -56,7 +99,26 @@ Enemy::~Enemy()
 
 void Enemy::update(double dt, Player& t_player)
 {
-	//m_currentHealthBar.setSize(sf::Vector2f(m_health / 2.0f, 6.0f));
+	switch (m_type)
+	{
+	case EnemyType::Big:
+		if (m_damageClock.getElapsedTime().asSeconds() > 0.5f)
+		{
+			m_enemySprite.setColor(sf::Color::White);
+		}
+		break;
+	case EnemyType::Boss:
+		m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 50.0f, 6.0f));
+
+		if (m_damageClock.getElapsedTime().asSeconds() > 0.5f)
+		{
+			m_enemySprite.setColor(sf::Color::White);
+		}
+		break;
+	default:
+		break;
+	}
+	//m_currentHealthBar.setSize(sf::Vector2f(m_health / m_maxHealth * 50.0f, 6.0f));
 
 	if (m_enemyState == CharacterState::WalkSideState)
 	{
@@ -74,13 +136,38 @@ void Enemy::render(sf::RenderWindow& t_window)
 {
 	//t_window.draw(m_rectangle);
 	t_window.draw(m_enemySprite);
+
+	switch (m_type)
+	{
+	case EnemyType::Boss:
+		t_window.draw(m_emptyHealthBar);
+		t_window.draw(m_currentHealthBar);
+		break;
+	default:
+		break;
+	}
 	//t_window.draw(m_emptyHealthBar);
 	//t_window.draw(m_currentHealthBar);
 }
 
 void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 {
-	m_health = 100.0f;
+	switch (m_type)
+	{
+	case EnemyType::Small:
+		m_health = 100.0f;
+		break;
+	case EnemyType::Big:
+		m_health = 100.0f;
+		break;
+	case EnemyType::Boss:
+		m_health = 1000.0f;
+		break;
+	default:
+		break;
+	}
+	
+	
 	m_enemyState = CharacterState::WalkSideState;
 	m_deathFrameCounter = 0;
 
@@ -116,17 +203,56 @@ void Enemy::move(Player& t_player)
 
 	if (m_position.x < playerPos.x)
 	{
-		m_enemySprite.setScale(0.5f, 0.5f);
+		switch (m_type)
+		{
+		case EnemyType::Small:
+			m_enemySprite.setScale(0.5f, 0.5f);
+			break;
+		case EnemyType::Big:
+			m_enemySprite.setScale(0.5f, 0.5f);
+			break;
+		case EnemyType::Boss:
+			m_enemySprite.setScale(1.0f, 1.0f);
+			break;
+		default:
+			break;
+		}
 	}
 	else
 	{
-		m_enemySprite.setScale(-0.5f, 0.5f);
+		switch (m_type)
+		{
+		case EnemyType::Small:
+			m_enemySprite.setScale(-0.5f, 0.5f);
+			break;
+		case EnemyType::Big:
+			m_enemySprite.setScale(-0.5f, 0.5f);
+			break;
+		case EnemyType::Boss:
+			m_enemySprite.setScale(-1.0f, 1.0f);
+			break;
+		default:
+			break;
+		}
 	}
 
 	m_rectangle.setPosition(m_position);
 	m_enemySprite.setPosition(m_position);
-	//m_emptyHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
-	//m_currentHealthBar.setPosition(m_position.x, m_position.y + 50.0f);
+
+	switch (m_type)
+	{
+	case EnemyType::Small:
+		break;
+	case EnemyType::Boss:
+		m_emptyHealthBar.setPosition(m_position.x, m_position.y - 100.0f);
+		m_currentHealthBar.setPosition(m_position.x, m_position.y - 100.0f);
+		break;
+	default:
+		break;
+	}
+
+	//m_emptyHealthBar.setPosition(m_position.x, m_position.y - 100.0f);
+	//m_currentHealthBar.setPosition(m_position.x, m_position.y - 100.0f);
 }
 
 void Enemy::calculatePushFactor()
@@ -149,6 +275,14 @@ void Enemy::calculatePushFactor()
 	m_pushFactor *= 0.06f;
 }
 
+void Enemy::inverseMovement()
+{
+	m_velocity.x *= -1;
+	m_velocity.y *= -1;
+
+	m_position += m_velocity;
+}
+
 void Enemy::setPosition(float t_x, float t_y)
 {
 	m_position = sf::Vector2f(t_x, t_y);
@@ -167,6 +301,11 @@ void Enemy::setState(CharacterState t_state)
 CharacterState Enemy::getState()
 {
 	return m_enemyState;
+}
+
+EnemyType Enemy::getType()
+{
+	return m_type;
 }
 
 sf::RectangleShape Enemy::getRectangle()
@@ -219,36 +358,111 @@ void Enemy::setFrames()
 	m_enemyFrames.clear();
 	m_currentEnemyFrame = 0;
 
-	switch (m_enemyState)
+	switch (m_type)
 	{
-	case CharacterState::IdleState:
+	case EnemyType::Small:
+		switch (m_enemyState)
+		{
+		case CharacterState::WalkSideState:
+			addFrame(IntRect{ 0,192,160,160 });
+			addFrame(IntRect{ 160,192,160,160 });
+			addFrame(IntRect{ 320,192,160,160 });
+			addFrame(IntRect{ 480,192,160,160 });
+			addFrame(IntRect{ 640,192,160,160 });
+			break;
+		case CharacterState::DeadState:
+			addFrame(IntRect{ 3744,0,160,160 });
+			addFrame(IntRect{ 3904,0,160,160 });
+			addFrame(IntRect{ 4064,0,160,160 });
+			addFrame(IntRect{ 4224,0,160,160 });
+			addFrame(IntRect{ 4384,0,160,160 });
+
+			addFrame(IntRect{ 4544,0,160,160 });
+			addFrame(IntRect{ 4704,0,160,160 });
+			addFrame(IntRect{ 4864,0,160,160 });
+			addFrame(IntRect{ 5024,0,160,160 });
+			addFrame(IntRect{ 5184,0,160,160 });
+
+			addFrame(IntRect{ 5344,0,160,160 });
+			addFrame(IntRect{ 5504,0,160,160 });
+			break;
+		default:
+			break;
+		}
 		break;
-	case CharacterState::WalkSideState:
-		addFrame(IntRect{ 0,192,160,160 });
-		addFrame(IntRect{ 160,192,160,160 });
-		addFrame(IntRect{ 320,192,160,160 });
-		addFrame(IntRect{ 480,192,160,160 });
-		addFrame(IntRect{ 640,192,160,160 });
-		break;
-	case CharacterState::DeadState:
-		addFrame(IntRect{ 3744,0,160,160 });
-		addFrame(IntRect{ 3904,0,160,160 });
-		addFrame(IntRect{ 4064,0,160,160 });
-		addFrame(IntRect{ 4224,0,160,160 });
-		addFrame(IntRect{ 4384,0,160,160 });
-		
-		addFrame(IntRect{ 4544,0,160,160 });
-		addFrame(IntRect{ 4704,0,160,160 });
-		addFrame(IntRect{ 4864,0,160,160 });
-		addFrame(IntRect{ 5024,0,160,160 });
-		addFrame(IntRect{ 5184,0,160,160 });
-		
-		addFrame(IntRect{ 5344,0,160,160 });
-		addFrame(IntRect{ 5504,0,160,160 });
+	case EnemyType::Big:
+		switch (m_enemyState)
+		{
+		case CharacterState::WalkSideState:
+			addFrame(IntRect{ 1587,0,320,320 });
+			addFrame(IntRect{ 1907,0,320,320 });
+			addFrame(IntRect{ 2227,0,320,320 });
+			addFrame(IntRect{ 2547,0,320,320 });
+			addFrame(IntRect{ 2867,0,320,320 });
+			addFrame(IntRect{ 3187,0,320,320 });
+			break;
+		case CharacterState::DeadState:
+			addFrame(IntRect{ 0,2496,320,320 });
+			addFrame(IntRect{ 320,2496,320,320 });
+			addFrame(IntRect{ 640,2496,320,320 });
+			addFrame(IntRect{ 960,2496,320,320 });
+			addFrame(IntRect{ 1280,2496,320,320 });
+
+			addFrame(IntRect{ 1600,2496,320,320 });
+			addFrame(IntRect{ 1920,2496,320,320 });
+			addFrame(IntRect{ 2240,2496,320,320 });
+			addFrame(IntRect{ 2560,2496,320,320 });
+			addFrame(IntRect{ 2880,2496,320,320 });
+
+			addFrame(IntRect{ 3200,2496,320,320 });
+			addFrame(IntRect{ 3520,2496,320,320 });
+			addFrame(IntRect{ 3840,2496,320,320 });
+			addFrame(IntRect{ 4160,2496,320,320 });
+			addFrame(IntRect{ 4480,2496,320,320 });
+			addFrame(IntRect{ 4800,2496,320,320 });
+			break;
+		default:
+			break;
+		}
+	case EnemyType::Boss:
+		switch (m_enemyState)
+		{
+		case CharacterState::WalkSideState:
+			addFrame(IntRect{ 1587,0,320,320 });
+			addFrame(IntRect{ 1907,0,320,320 });
+			addFrame(IntRect{ 2227,0,320,320 });
+			addFrame(IntRect{ 2547,0,320,320 });
+			addFrame(IntRect{ 2867,0,320,320 });
+			addFrame(IntRect{ 3187,0,320,320 });
+			break;
+		case CharacterState::DeadState:
+			addFrame(IntRect{ 0,2496,320,320 });
+			addFrame(IntRect{ 320,2496,320,320 });
+			addFrame(IntRect{ 640,2496,320,320 });
+			addFrame(IntRect{ 960,2496,320,320 });
+			addFrame(IntRect{ 1280,2496,320,320 });
+
+			addFrame(IntRect{ 1600,2496,320,320 });
+			addFrame(IntRect{ 1920,2496,320,320 });
+			addFrame(IntRect{ 2240,2496,320,320 });
+			addFrame(IntRect{ 2560,2496,320,320 });
+			addFrame(IntRect{ 2880,2496,320,320 });
+
+			addFrame(IntRect{ 3200,2496,320,320 });
+			addFrame(IntRect{ 3520,2496,320,320 });
+			addFrame(IntRect{ 3840,2496,320,320 });
+			addFrame(IntRect{ 4160,2496,320,320 });
+			addFrame(IntRect{ 4480,2496,320,320 });
+			addFrame(IntRect{ 4800,2496,320,320 });
+			break;
+		default:
+			break;
+		}
 		break;
 	default:
 		break;
 	}
+	
 }
 
 int Enemy::getDeathFrameCounter()
@@ -260,4 +474,10 @@ void Enemy::playHitSound()
 {
 	m_hitSound.stop();
 	m_hitSound.play();
+}
+
+void Enemy::setColour(sf::Color t_colour)
+{
+	m_enemySprite.setColor(t_colour);
+	m_damageClock.restart();
 }

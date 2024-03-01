@@ -26,6 +26,11 @@ Weapon::Weapon(WeaponType t_type)
 		m_fireRate = 3.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
 		break;
+	case WeaponType::Sniper:
+		m_fireRate = 5.0f / m_fireRateModifier;
+		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when sniper sprite is added
+		break;
+
 	default:
 		break;
 	}
@@ -80,6 +85,22 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 				m_firing = false;
 				m_timer.restart();
 			}
+		}
+		break;
+	case WeaponType::Sniper:
+		if (!m_firing)
+		{
+			if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
+			{
+				m_firing = true;
+			}
+		}
+		else if (m_firing)
+		{
+			m_firing = false;
+			m_timer.restart();
+
+			m_bullets.push_back(new Bullet(m_type, m_holder["starterAtlas"], t_playerPos, t_enemies, t_direction));
 		}
 		break;
 	default:
@@ -170,6 +191,7 @@ void Weapon::upgradeWeapon(WeaponType t_type) //probably pass in which weapon ID
 			break;
 		}
 		break;
+	case WeaponType::Sniper:
 		break;
 	}
 	//switch statement here based off the weapon (E.G: more bullets in AR)

@@ -6,6 +6,7 @@ enum class WeaponType
 {
 	Pistol,
 	AssaultRifle,
+	Sniper,
 
 	Count
 };
@@ -48,4 +49,5 @@ private:
 
 	float pistolSpeed;
 	float arSpeed;
+	float sniperSpeed;
 };

@@ -12,10 +12,17 @@ using namespace sf;
 class Player;
 enum class CharacterState;
 
+enum class EnemyType
+{
+	Small,
+	Big,
+	Boss
+};
+
 class Enemy
 {
 public:
-	Enemy(sf::Texture& t_texture);
+	Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type);
 	~Enemy();
 
 	void update(double dt, Player& t_player);
@@ -29,7 +36,10 @@ public:
 	void setState(CharacterState t_state);
 	CharacterState getState();
 
+	EnemyType getType();
+
 	void calculatePushFactor();
+	void inverseMovement();
 
 	void decreaseHealth(float t_damage);
 	float getHealth();
@@ -43,9 +53,14 @@ public:
 
 	void playHitSound();
 
+	void setColour(sf::Color t_colour);
+
 private:
 	static std::vector<Enemy*> m_allEnemies;
 
+	EnemyType m_type;
+
+	float m_maxHealth;
 	float m_health;
 	float m_speed;
 	sf::Vector2f m_position;
@@ -56,8 +71,10 @@ private:
 	sf::Sound m_hitSound;
 
 	sf::RectangleShape m_rectangle;
-	//sf::RectangleShape m_emptyHealthBar;
-	//sf::RectangleShape m_currentHealthBar;
+	sf::RectangleShape m_emptyHealthBar;
+	sf::RectangleShape m_currentHealthBar;
+
+	Clock m_damageClock;
 
 	CharacterState m_enemyState;
 	CharacterState m_previousState;

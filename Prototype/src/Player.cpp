@@ -29,6 +29,12 @@ Player::Player()
 	m_dashSound.setBuffer(m_dashSoundBuffer);
 	m_dashSound.setVolume(3.0f);
 
+	//FONT & TEXT
+	if (!m_font.loadFromFile("BebasNeue.otf"))
+	{
+		std::cout << "Error loading font file";
+	}
+
 	//Base variable initialiser
 	isPlayerAlive = true;
 
@@ -38,7 +44,7 @@ Player::Player()
 	m_level = 1;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
-
+	
 	//Upgrade modifiers
 	m_speedModifier = 1;
 	m_xpModifier = 1;
@@ -65,9 +71,9 @@ Player::Player()
 	{
 		m_haloFrames.push_back(IntRect{ 160 * i,1351,160,64 });
 	}
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_slashFrames.push_back(IntRect{ 1560 + 128 * i, 484, 128, 128 });
+		m_slashFrames.push_back(IntRect{ 1560 + 400 * i, 484, 400, 200 });
 	}
 
 	m_currentPlayerFrame = 0;
@@ -98,10 +104,10 @@ Player::Player()
 	m_dashSprite.setPosition(m_position);
 
 	m_slashSprite.setTexture(playerTextures);
-	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 128, 128 });
-	m_slashSprite.setOrigin(64.0f, 64.0f);
-	m_slashSprite.setScale(2.0f, 2.0f);
-	m_slashSprite.setPosition(m_position);
+	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 400, 200 });
+	m_slashSprite.setOrigin(200.0f, 100.0f);
+	m_slashSprite.setScale(1.0f, 1.0f);
+	m_slashSprite.setPosition(-1000.0f,-1000.0f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -194,6 +200,16 @@ Player::Player()
 	m_dashRect.setOrigin(m_dashRect.getSize().x / 2.0f, m_dashRect.getSize().y / 2.0f);
 	m_dashRect.setFillColor(sf::Color::White);
 	m_dashRect.setPosition(-1000.0f, -1000.0f);
+
+	//XP Bar Text
+	m_xpBarText.setFont(m_font);
+	m_xpBarText.setCharacterSize(18.0f);
+	m_xpBarText.setFillColor(sf::Color::White);
+	m_xpBarText.setOutlineColor(sf::Color::Black);
+	m_xpBarText.setOutlineThickness(2.0f);
+	m_xpBarText.setString(std::to_string(static_cast<int>(m_xp)) + " / " + std::to_string(static_cast<int>(m_xpRequired)));
+	m_xpBarText.setOrigin(m_xpBarText.getGlobalBounds().width / 2.0f, m_xpBarText.getGlobalBounds().height / 2.0f);
+	m_xpBarText.setPosition(800.0f, 40.0f);
 #pragma endregion
 
 	score = 0;
@@ -240,6 +256,8 @@ void Player::initialise()
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
 
+	m_afterImages.clear();
+
 	m_dashCooldownClock.restart();
 	//Time m_dashCooldownTime; couldn't find initialiser
 	
@@ -281,7 +299,7 @@ void Player::initialise()
 	m_dashRectBounds.setPosition(m_dashRect.getPosition());
 
 	m_dashSprite.setPosition(m_position);
-	m_slashSprite.setPosition(m_position);
+	m_slashSprite.setPosition(-1000.0f, -1000.0f);
 	m_slashCircle.setPosition(-1000.0f, -1000.0f);
 
 	//Dash Bar sprite setup
@@ -402,6 +420,7 @@ void Player::renderHUD(sf::RenderWindow& t_window)
 	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
 	t_window.draw(m_xpBarSprite);
+	t_window.draw(m_xpBarText);
 
 	if (m_level > 1)
 	{
@@ -457,6 +476,7 @@ void Player::handleKeyInput()
 			m_playerState = CharacterState::WalkSideState;
 			m_playerSprite.setScale(-0.5f, 0.5f);
 			m_dashSprite.setScale(-0.5f, 0.5f);
+			m_slashSprite.setScale(-1.0f, 1.0f);
 			m_movementVector.x -= m_speed;
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || xAxis > JOYSTICK_THRESHOLD)
@@ -465,6 +485,7 @@ void Player::handleKeyInput()
 			m_playerState = CharacterState::WalkSideState;
 			m_playerSprite.setScale(0.5f, 0.5f);
 			m_dashSprite.setScale(0.5f, 0.5f);
+			m_slashSprite.setScale(1.0f, 1.0f);
 			m_movementVector.x += m_speed;
 		}
 	}
@@ -661,6 +682,7 @@ void Player::setPosition(sf::View& t_view)
 	m_xpBar.setPosition(xpBarPos);
 	m_emptyXPBar.setPosition(xpBarPos);
 	m_xpBarSprite.setPosition(xpBarPos);
+	m_xpBarText.setPosition(xpBarPos.x, xpBarPos.y - 2.0f);
 
 	m_dashBarLeftSprite.setPosition(dashBarLeftPos);
 	m_emptyDashBarLeft.setPosition(dashBarLeftPos);
@@ -681,6 +703,11 @@ void Player::setPosition(sf::View& t_view)
 				m_slashSprite.setPosition(m_position);
 				m_slashCircle.setPosition(m_position);
 			}
+		}
+		else
+		{
+			m_slashSprite.setPosition(sf::Vector2f(-1000.0f,-1000.0f));
+			m_slashCircle.setPosition(sf::Vector2f(-1000.0f, -1000.0f));
 		}
 	}
 }
@@ -842,9 +869,9 @@ void Player::pushBack()
 	m_position = m_previousPosition;
 }
 
-void Player::decreaseHealth()
+void Player::decreaseHealth(float t_damage)
 {
-	m_health -= 1.0f * m_armorModifier;
+	m_health -= t_damage * m_armorModifier;
 }
 
 void Player::increaseHealth()
@@ -933,6 +960,10 @@ void Player::checkXP()
 
 		upgradeDash();
 	}
+
+	m_xpBarText.setString(std::to_string(static_cast<int>(m_xp)) + " / " + std::to_string(static_cast<int>(m_xpRequired)));
+	m_xpBarText.setOrigin(m_xpBarText.getGlobalBounds().width / 2.0f, m_xpBarText.getGlobalBounds().height / 2.0f);
+
 	m_xpBar.setSize(sf::Vector2f(m_xp / m_xpRequired * 1000.0f, 20.0f));
 }
 

@@ -865,6 +865,14 @@ void Game::checkCollisions()
 	{
 		if (enemy->getState() != CharacterState::DeadState)
 		{
+			for (auto obstacle : m_obstacles)
+			{
+				if (CollisionDetection::enemyObstacleCollision(enemy, obstacle))
+				{
+					enemy->inverseMovement();
+				}
+			}
+			
 #pragma region Dash -> Enemy
 			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))

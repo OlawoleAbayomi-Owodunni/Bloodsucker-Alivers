@@ -275,6 +275,14 @@ void Enemy::calculatePushFactor()
 	m_pushFactor *= 0.06f;
 }
 
+void Enemy::inverseMovement()
+{
+	m_velocity.x *= -1;
+	m_velocity.y *= -1;
+
+	m_position += m_velocity;
+}
+
 void Enemy::setPosition(float t_x, float t_y)
 {
 	m_position = sf::Vector2f(t_x, t_y);

@@ -98,3 +98,16 @@ bool CollisionDetection::playerObstacleCollision(Player& t_player, Obstacle* t_o
 
 	return false;
 }
+
+bool CollisionDetection::enemyObstacleCollision(Enemy* t_enemy, Obstacle* t_obstacle)
+{
+	sf::FloatRect enemy = t_enemy->getRectangle().getGlobalBounds();
+	sf::FloatRect obstacle = t_obstacle->getRectangle().getGlobalBounds();
+
+	if (enemy.intersects(obstacle))
+	{
+		return true;
+	}
+
+	return false;
+}

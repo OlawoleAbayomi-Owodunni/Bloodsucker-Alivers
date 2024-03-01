@@ -39,6 +39,7 @@ public:
 	EnemyType getType();
 
 	void calculatePushFactor();
+	void inverseMovement();
 
 	void decreaseHealth(float t_damage);
 	float getHealth();

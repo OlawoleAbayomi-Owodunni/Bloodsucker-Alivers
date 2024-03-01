@@ -37,7 +37,10 @@ Player::Player()
 
 	//Base variable initialiser
 	isPlayerAlive = true;
-
+	isPistolEquipped = true;
+	isAREquipped = false;
+	isSniperEquipped = false;
+	isRPGEquipped = false;
 	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
@@ -230,6 +233,11 @@ Player::~Player()
 void Player::initialise()
 {
 	isPlayerAlive = true;
+	isPistolEquipped = true;
+	isAREquipped = false;
+	isSniperEquipped = false;
+	isRPGEquipped = false;
+
 	m_maxHealth = 200.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
@@ -620,7 +628,7 @@ sf::RectangleShape Player::getRectangle()
 	return m_rectangle;
 }
 
-std::vector<Weapon*> Player::getWeapon()
+std::vector<Weapon*> Player::getWeapons()
 {
 	return m_weapons;
 }
@@ -827,6 +835,7 @@ void Player::giveWeapon(WeaponType t_type)
 		for (auto weapon : m_weapons)
 		{
 			if (weapon->getType() == t_type) {
+				weapon->equipWeapon();
 				weaponEquipped = true;
 			}
 		}
@@ -840,10 +849,10 @@ void Player::giveWeapon(WeaponType t_type)
 		}
 		break;
 	case WeaponType::AssaultRifle:
-
 		for (auto weapon : m_weapons)
 		{
 			if (weapon->getType() == t_type) {
+				weapon->equipWeapon();
 				weaponEquipped = true;
 			}
 		}

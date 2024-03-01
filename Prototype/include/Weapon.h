@@ -15,7 +15,10 @@ public:
 	WeaponType getType();
 	int getWeaponLevel();
 
+	void equipWeapon();
+	bool isWeaponEquipped();
 	void upgradeWeapon(WeaponType t_type);
+	
 
 private:
 	sf::Clock m_timer;
@@ -35,4 +38,6 @@ private:
 	Sprite m_weaponSprite;
 
 	int m_weaponLvl;
+
+	bool isGunEquipped;
 };

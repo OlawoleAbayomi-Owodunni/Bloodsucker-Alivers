@@ -150,6 +150,16 @@ int Weapon::getWeaponLevel()
 }
 
 
+void Weapon::equipWeapon()
+{
+	isGunEquipped = true;
+}
+
+bool Weapon::isWeaponEquipped()
+{
+	return isGunEquipped;
+}
+
 void Weapon::upgradeWeapon(WeaponType t_type) //probably pass in which weapon ID is coming from the player and based off that modify that guns properties in here
 {
 	m_weaponLvl++;

@@ -1361,7 +1361,7 @@ void Game::checkCollisions()
 
 #pragma region Bullet -> Enemy
 			//Bullet to Enemy
-			for (auto weapon : m_player.getWeapon())
+			for (auto weapon : m_player.getWeapons())
 			{
 				if (weapon->getType() == WeaponType::Pistol || weapon->getType() == WeaponType::AssaultRifle) // If bullet is meant to delete when collided with enemy
 				{
@@ -1564,13 +1564,13 @@ void Game::createRandomUpgrades()
 {
 	m_upgradeButtons.clear();
 
-	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 6) + static_cast<int>(ButtonType::UpgradeHealth));
-	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 6) + static_cast<int>(ButtonType::UpgradeHealth));
+	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
+	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
 	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 6) + static_cast<int>(ButtonType::UpgradeHealth)); }
-	ButtonType randomUpgradeButton3 = static_cast<ButtonType>((rand() % 6) + static_cast<int>(ButtonType::UpgradeHealth));
+	ButtonType randomUpgradeButton3 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
 	while (randomUpgradeButton3 == randomUpgradeButton1 || randomUpgradeButton3 == randomUpgradeButton2)
 	{
-		randomUpgradeButton3 = static_cast<ButtonType>((rand() % 6) + static_cast<int>(ButtonType::UpgradeHealth));
+		randomUpgradeButton3 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
 	}
 
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180), Vector2f(0.75f, 0.75f)));
@@ -1623,7 +1623,56 @@ void Game::createRandomWeapons()
 
 	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
 	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
+
 	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol)); }
+	
+	bool isEquipped1 = false;
+	bool isEquipped2 = false;
+	WeaponType btnWpnTyp1=WeaponType::Count;
+	WeaponType btnWpnTyp2=WeaponType::Count;
+	switch(randomUpgradeButton1){
+	case (0 + static_cast<int>(ButtonType::GetPistol)):
+			btnWpnTyp1 = WeaponType::Pistol;
+			break;
+		case (1 + static_cast<int>(ButtonType::GetPistol)):
+			btnWpnTyp1 = WeaponType::AssaultRifle;
+			break;
+	}
+	switch (randomUpgradeButton2) {
+	case (0 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp2 = WeaponType::Pistol;
+		break;
+	case (1 + static_cast<int>(ButtonType::GetPistol)): //remember that this calculation is to get the position of get pistol and get ar bt types
+		btnWpnTyp2 = WeaponType::AssaultRifle;
+		break;
+	}
+	for (auto weapon : m_player.getWeapons()) {
+		if (btnWpnTyp1 == weapon->getType()) {
+			isEquipped1 = true;
+		}
+		if (btnWpnTyp2 == weapon->getType()) {
+			isEquipped2 = true;
+		}
+	}
+	if (isEquipped1) {
+		if (btnWpnTyp1 == WeaponType::Pistol){
+			randomUpgradeButton1 = ButtonType::UpgradePistol;
+		}
+		if (btnWpnTyp1 == WeaponType::AssaultRifle) {
+			randomUpgradeButton1 = ButtonType::UpgradeAR;
+		}
+	}
+	if (isEquipped2) {
+		if (btnWpnTyp2 == WeaponType::Pistol) {
+			randomUpgradeButton2 = ButtonType::UpgradePistol;
+		}
+		if (btnWpnTyp2 == WeaponType::AssaultRifle) {
+			randomUpgradeButton2 = ButtonType::UpgradeAR;
+		}
+	}
+
+
+
 
 	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150), Vector2f(0.75f, 0.75f)));
 	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150), Vector2f(0.75f, 0.75f)));

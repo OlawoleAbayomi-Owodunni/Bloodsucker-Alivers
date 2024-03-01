@@ -1243,9 +1243,33 @@ void Game::checkCollisions()
 				{
 				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
+					switch (enemy->getType()) {
+					case EnemyType::Small:
+						smallEK++;
+						break;
+					case EnemyType::Big:
+						bigEK++;
+						break;
+					case EnemyType::Boss:
+						bossEK++;
+						break;
+					}
+					totalEK++;
 					break;
 				case EnemyType::Big:
 					enemy->setState(CharacterState::DeadState);
+					switch (enemy->getType()) {
+					case EnemyType::Small:
+						smallEK++;
+						break;
+					case EnemyType::Big:
+						bigEK++;
+						break;
+					case EnemyType::Boss:
+						bossEK++;
+						break;
+					}
+					totalEK++;
 					break;
 				case EnemyType::Boss:
 					enemy->decreaseHealth(5.0f);
@@ -1281,9 +1305,33 @@ void Game::checkCollisions()
 				{
 				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
+					switch (enemy->getType()) {
+					case EnemyType::Small:
+						smallEK++;
+						break;
+					case EnemyType::Big:
+						bigEK++;
+						break;
+					case EnemyType::Boss:
+						bossEK++;
+						break;
+					}
+					totalEK++;
 					break;
 				case EnemyType::Big:
 					enemy->setState(CharacterState::DeadState);
+					switch (enemy->getType()) {
+					case EnemyType::Small:
+						smallEK++;
+						break;
+					case EnemyType::Big:
+						bigEK++;
+						break;
+					case EnemyType::Boss:
+						bossEK++;
+						break;
+					}
+					totalEK++;
 					break;
 				case EnemyType::Boss:
 					enemy->decreaseHealth(10.0f);
@@ -1364,6 +1412,18 @@ void Game::checkCollisions()
 								if (enemy->getHealth() < 0.0f)
 								{
 									enemy->setState(CharacterState::DeadState);
+									switch (enemy->getType()) {
+									case EnemyType::Small:
+										smallEK++;
+										break;
+									case EnemyType::Big:
+										bigEK++;
+										break;
+									case EnemyType::Boss:
+										bossEK++;
+										break;
+									}
+									totalEK++;
 								}
 								break;
 							default:

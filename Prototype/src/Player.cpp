@@ -247,6 +247,8 @@ void Player::initialise()
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
 
+	m_afterImages.clear();
+
 	m_dashCooldownClock.restart();
 	//Time m_dashCooldownTime; couldn't find initialiser
 	

@@ -120,6 +120,12 @@ protected:
 	sf::SoundBuffer m_pickupSoundBuffer;
 	sf::Sound m_pickupSound;
 
+	sf::SoundBuffer m_menuMusicBuffer;
+	sf::Sound m_menuMusic;
+
+	sf::SoundBuffer m_gameplayMusicBuffer;
+	sf::Sound m_gameplayMusic;
+
 	int m_currentLevel;
 	Clock m_bossTimer;
 	bool m_bossSpawned;

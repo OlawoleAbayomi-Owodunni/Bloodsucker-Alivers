@@ -47,6 +47,24 @@ void Game::init()
 	}
 	m_pickupSound.setBuffer(m_pickupSoundBuffer);
 	m_pickupSound.setVolume(15.0f);
+
+	if (!m_menuMusicBuffer.loadFromFile("resources/sounds/menu_music.wav"))
+	{
+		std::cout << "error loading menu music";
+	}
+	m_menuMusic.setBuffer(m_menuMusicBuffer);
+	m_menuMusic.setLoop(true);
+	m_menuMusic.setVolume(1.0f);
+
+	if (!m_gameplayMusicBuffer.loadFromFile("resources/sounds/gameplay_music.wav"))
+	{
+		std::cout << "error loading gameplay music";
+	}
+	m_gameplayMusic.setBuffer(m_gameplayMusicBuffer);
+	m_gameplayMusic.setLoop(true);
+	m_gameplayMusic.setVolume(2.0f);
+
+	m_menuMusic.play();
 #pragma endregion
 
 #pragma region ENEMIES & OBSTACLEES INITIALISER
@@ -241,6 +259,9 @@ void Game::processGameEvents(sf::Event& event)
 				{
 				case ButtonType::Play:
 					m_currentGamemode = Gamemode::Gameplay;
+					m_menuMusic.stop();
+					m_gameplayMusic.play();
+
 					break;
 					//CASE FOR TUTORIAL AND CASE FOR CREDITS
 				case ButtonType::Exit:
@@ -285,6 +306,9 @@ void Game::processGameEvents(sf::Event& event)
 					{
 					case ButtonType::Play:
 						m_currentGamemode = Gamemode::Gameplay;
+						m_menuMusic.stop();
+						m_gameplayMusic.play();
+
 						m_player.rumbleStop();
 						startGame();
 						break;
@@ -326,6 +350,9 @@ void Game::processGameEvents(sf::Event& event)
 					break;
 				case ButtonType::ToMenu:
 					m_currentGamemode = Gamemode::Menu;
+					m_menuMusic.play();
+					m_gameplayMusic.stop();
+
 					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 					break;
@@ -373,6 +400,9 @@ void Game::processGameEvents(sf::Event& event)
 						break;
 					case ButtonType::ToMenu:
 						m_currentGamemode = Gamemode::Menu;
+						m_menuMusic.play();
+						m_gameplayMusic.stop();
+
 						m_cursorPos = 0;
 						m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 						m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();

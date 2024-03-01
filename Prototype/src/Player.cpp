@@ -234,7 +234,7 @@ void Player::initialise()
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
-	m_xp = 8;
+	m_xp = 0;
 	m_xpRequired = 10.0f;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);

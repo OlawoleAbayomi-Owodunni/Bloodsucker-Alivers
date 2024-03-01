@@ -95,6 +95,12 @@ Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type)
 
 Enemy::~Enemy()
 {
+	// Find the position of the current enemy in the vector
+	auto it = std::find(m_allEnemies.begin(), m_allEnemies.end(), this);
+	if (it != m_allEnemies.end()) {
+		// Remove the enemy from the vector
+		m_allEnemies.erase(it);
+	}
 }
 
 void Enemy::update(double dt, Player& t_player)

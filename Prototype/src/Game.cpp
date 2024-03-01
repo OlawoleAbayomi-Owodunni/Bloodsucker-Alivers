@@ -32,6 +32,7 @@ void Game::init()
 	hasGameOverTimerStarted = false;
 	firstStart = true;
 	inMenu = false;
+	m_bossSpawned = false;
 
 #pragma region THOR
 	//THOR
@@ -346,16 +347,54 @@ void Game::startGame()
 
 	////VECTOR INTIALISATION
 	//ENEMY
-	m_enemies.clear();
+	
+	//m_enemies.clear();
+	for (auto it = m_enemies.begin(); it != m_enemies.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_enemies.erase(it); // Remove the pointer from the vector
+	}
+
 	for (int i = 0; i < 10; i++) {
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
 	
-	m_xpOrbs.clear();
-	m_pickups.clear();
+	//m_xpOrbs.clear();
+	for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_xpOrbs.erase(it); // Remove the pointer from the vector
+	}
+
+
+	//m_pickups.clear();
+	for (auto it = m_pickups.begin(); it != m_pickups.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_pickups.erase(it); // Remove the pointer from the vector
+	}
+
 
 	//OBSTACLES
-	m_obstacles.clear();
+	//m_obstacles.clear();
+	for (auto it = m_obstacles.begin(); it != m_obstacles.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_obstacles.erase(it); // Remove the pointer from the vector
+	}
+
 	for (int i = 0; i < 3; i++)
 	{
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));

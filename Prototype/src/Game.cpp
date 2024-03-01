@@ -1291,7 +1291,19 @@ void Game::checkCollisions()
 
 					if (enemy->getHealth() < 0)
 					{
+						switch (enemy->getType()) {
+						case EnemyType::Small:
+							smallEK++;
+							break;
+						case EnemyType::Big:
+							bigEK++;
+							break;
+						case EnemyType::Boss:
+							bossEK++;
+							break;
+						}
 						enemy->setState(CharacterState::DeadState);
+						totalEK++;
 					}
 					break;
 				default:
@@ -1317,7 +1329,19 @@ void Game::checkCollisions()
 
 					if (enemy->getHealth() < 0)
 					{
+						switch (enemy->getType()) {
+						case EnemyType::Small:
+							smallEK++;
+							break;
+						case EnemyType::Big:
+							bigEK++;
+							break;
+						case EnemyType::Boss:
+							bossEK++;
 						enemy->setState(CharacterState::DeadState);
+							break;
+						}
+						totalEK++;
 					}
 					break;
 				default:
@@ -1341,10 +1365,34 @@ void Game::checkCollisions()
 							case EnemyType::Small:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
+								switch (enemy->getType()) {
+								case EnemyType::Small:
+									smallEK++;
+									break;
+								case EnemyType::Big:
+									bigEK++;
+									break;
+								case EnemyType::Boss:
+									bossEK++;
+									break;
+								}
+								totalEK++;
 								break;
 							case EnemyType::Big:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
+								switch (enemy->getType()) {
+								case EnemyType::Small:
+									smallEK++;
+									break;
+								case EnemyType::Big:
+									bigEK++;
+									break;
+								case EnemyType::Boss:
+									bossEK++;
+									break;
+								}
+								totalEK++;
 								break;
 							case EnemyType::Boss:
 								enemy->playHitSound();

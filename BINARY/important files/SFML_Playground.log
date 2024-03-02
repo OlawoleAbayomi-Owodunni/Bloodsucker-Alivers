@@ -1,0 +1,96 @@
+﻿  Bullet.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Bullet.cpp(204,26): warning C4018: '<': signed/unsigned mismatch
+  Button.cpp
+  CollisionDetection.cpp
+  Enemy.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Enemy.cpp(180,13): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Enemy.cpp(181,13): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Enemy.cpp(186,24): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Enemy.cpp(187,24): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Enemy.cpp(361,31): warning C4018: '<': signed/unsigned mismatch
+  Game.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(10,77): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(10,55): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(11,71): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(11,49): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(13,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(447,48): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(999,86): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Game.cpp(1060,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  main.cpp
+  Obstacle.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Obstacle.cpp(11,31): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Obstacle.cpp(12,31): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Obstacle.cpp(23,34): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Obstacle.cpp(24,34): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  Pickup.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Pickup.cpp(42,26): warning C4018: '<': signed/unsigned mismatch
+  Player.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(207,31): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(401,65): warning C4244: 'argument': conversion from 'const float' to 'sf::Uint8', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(561,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(12,32): warning C4244: '=': conversion from 'float' to 'WORD', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(13,39): warning C4244: '=': conversion from 'float' to 'WORD', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(14,37): warning C4244: '=': conversion from 'float' to 'WORD', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(767,25): warning C4305: '-=': truncation from 'double' to 'float'
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(782,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(790,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(923,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(999,33): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(1010,33): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(1024,30): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Player.cpp(1045,34): warning C4018: '<': signed/unsigned mismatch
+  Weapon.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\Weapon.cpp(10,29): warning C4305: 'argument': truncation from 'double' to 'float'
+  XPOrb.cpp
+C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\src\XPOrb.cpp(69,26): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  SFML_Playground.vcxproj -> C:\Users\Ninja\Desktop\College\Year 2\Games Fleadh\Bloodsucker-Alivers\CODE\Prototype\Debug\Prototype.exe

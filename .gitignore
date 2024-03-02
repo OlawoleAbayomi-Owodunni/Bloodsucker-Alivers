@@ -47,11 +47,8 @@ artifacts/
 *_i.c
 *_p.c
 *_i.h
-*.ilk
 *.meta
-*.obj
 *.pch
-*.pdb
 *.pgc
 *.pgd
 *.rsp
@@ -61,7 +58,6 @@ artifacts/
 *.tlh
 *.tmp
 *.tmp_proj
-*.log
 *.vspscc
 *.vssscc
 .builds

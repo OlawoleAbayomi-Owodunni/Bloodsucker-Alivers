@@ -29,6 +29,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 	pistolSpeed = 10.0f;
 	arSpeed = 7.5f;
 	sniperSpeed = 20.0f;
+	rpgSpeed = 3.0f;
 
 	float distance;
 	float targetDistance;
@@ -39,7 +40,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 	{
 #pragma region Pistol
 	case WeaponType::Pistol:
-		m_damage = 32.0f;	// default 12
+		m_damage = 12.0f;	// default 12
 		
 		for (int i = 0; i < 16; i++)
 		{
@@ -105,8 +106,9 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 			break;
 		}
 		break;
+
 	case WeaponType::Sniper:
-		m_damage = 10.0f;	// default 12
+		m_damage = 10.0f;	// default 10
 
 		for (int i = 0; i < 16; i++)
 		{
@@ -139,6 +141,42 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		targetDisplacement = targetDisplacement / targetDistance;
 		m_velocity = targetDisplacement * sniperSpeed;
+		break;
+
+	case WeaponType::RPG:
+		m_damage = 50.0f;	// default 50
+
+		for (int i = 0; i < 16; i++)
+		{
+			m_frames.push_back(IntRect{ 1034 + 32 * i,658,32,32 });
+		}
+
+		m_position = t_playerPos;
+
+		for (auto enemy : t_enemies)
+		{
+			displacement.x = enemy->getPosition().x - t_playerPos.x;
+			displacement.y = enemy->getPosition().y - t_playerPos.y;
+
+			distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+			if (enemy == t_enemies.at(0))
+			{
+				targetDistance = distance;
+				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+			}
+
+			if (distance < targetDistance)
+			{
+				targetDistance = distance;
+				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+			}
+		}
+
+		targetDisplacement = targetDisplacement / targetDistance;
+		m_velocity = targetDisplacement * rpgSpeed;
 		break;
 
 #pragma endregion

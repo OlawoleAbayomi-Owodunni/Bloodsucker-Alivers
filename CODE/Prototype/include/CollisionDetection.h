@@ -21,4 +21,5 @@ public:
 	bool static playerSlashEnemyCollision(Player& t_player, Enemy* t_enemy);
 	bool static playerObstacleCollision(Player& t_player, Obstacle* t_obstacle);
 	bool static enemyObstacleCollision(Enemy* t_enemy, Obstacle* t_obstacle);
+	bool static enemyExplosionCollision(Enemy* t_enemy, Explosion t_explosion);
 };

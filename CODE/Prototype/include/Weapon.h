@@ -2,6 +2,20 @@
 #include <SFML/Graphics.hpp>
 #include "Bullet.h"
 
+struct Explosion
+{
+	sf::CircleShape radius;
+	sf::Sprite sprite;
+	sf::Vector2f position;
+
+	std::vector<sf::IntRect> frames;
+	int currentFrame;
+	Time time;
+	Clock clock;
+
+	bool animationOver;
+};
+
 class Weapon
 {
 public:
@@ -19,6 +33,8 @@ public:
 	bool isWeaponEquipped();
 	void upgradeWeapon(WeaponType t_type);
 
+	void animateExplosion();
+	Explosion& getExplosion();
 
 private:
 	sf::Clock m_timer;
@@ -30,8 +46,11 @@ private:
 	bool m_firing;
 	float m_fireRate;
 	float m_fireRateModifier;
+	
 	int m_arBulletCounter;
 	int m_maxArBullets;
+
+	Explosion m_explosion;
 
 	Texture m_starterAtlas;
 	Sprite m_weaponSprite;

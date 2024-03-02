@@ -26,8 +26,36 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
 		break;
 	case WeaponType::Sniper:
-		m_fireRate = 5.0f / m_fireRateModifier;
+		m_fireRate = 4.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when sniper sprite is added
+		break;
+	case WeaponType::RPG:
+		m_fireRate = 6.0f / m_fireRateModifier;
+		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when rpg sprite is added
+
+		m_explosion.position = sf::Vector2f(-1000.0f, -1000.0f);
+		
+		m_explosion.radius.setRadius(100.0f);
+		m_explosion.radius.setOrigin(m_explosion.radius.getRadius(), m_explosion.radius.getRadius());
+		m_explosion.radius.setFillColor(sf::Color::White);
+		m_explosion.radius.setPosition(m_explosion.position);
+
+		m_explosion.sprite.setTexture(m_starterAtlas);
+		m_explosion.sprite.setTextureRect(IntRect{ 0, 2864, 500, 500 });
+		m_explosion.sprite.setOrigin(250.0f, 250.0f);
+		m_explosion.sprite.setScale(0.5f, 0.5f);
+		m_explosion.sprite.setPosition(m_explosion.position);
+
+		for (int i = 0; i < 10; i++)
+		{
+			m_explosion.frames.push_back(IntRect{ 500 * i, 2864, 500, 500 });
+		}
+
+		m_explosion.currentFrame = 0;
+		m_explosion.time = seconds(0.15f);
+
+		m_explosion.animationOver = false;
+
 		break;
 	default:
 		break;
@@ -104,6 +132,31 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
 		}
 		break;
+	case WeaponType::RPG:
+		if (!m_firing)
+		{
+			if (m_timer.getElapsedTime().asSeconds() > (m_fireRate / m_fireRateModifier))
+			{
+				m_firing = true;
+			}
+		}
+		else if (m_firing)
+		{
+			m_firing = false;
+			m_timer.restart();
+
+			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
+		}
+
+		if (m_explosion.currentFrame > 2)
+		{
+			m_explosion.position = sf::Vector2f(-1000.0f, -1000.0f);
+			m_explosion.radius.setPosition(m_explosion.position);
+			//m_explosion.sprite.setPosition(m_explosion.position);
+		}
+
+		animateExplosion();
+		break;
 	default:
 		break;
 	}
@@ -117,8 +170,8 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 		if ((*it)->getPosition().x < 0 || (*it)->getPosition().x > 3200 ||
 			(*it)->getPosition().y < 0 || (*it)->getPosition().y > 1800)
 		{
-			delete* it; // Delete the orb object
-			it = m_bullets.erase(it); // Remove the orb pointer from the vector
+			delete* it; // Delete the bullet object
+			it = m_bullets.erase(it); // Remove the bullet pointer from the vector
 		}
 		else
 		{
@@ -132,6 +185,15 @@ void Weapon::render(sf::RenderWindow& t_window)
 	for (auto bullet : m_bullets)
 	{
 		bullet->render(t_window);
+	}
+
+	if (m_type == WeaponType::RPG)
+	{
+		//t_window.draw(m_explosion.radius);
+		if (!m_explosion.animationOver)
+		{
+			t_window.draw(m_explosion.sprite);
+		}
 	}
 }
 
@@ -206,4 +268,27 @@ void Weapon::upgradeWeapon(WeaponType t_type) //probably pass in which weapon ID
 	}
 	//switch statement here based off the weapon (E.G: more bullets in AR)
 
+}
+
+void Weapon::animateExplosion()
+{
+	if (m_explosion.clock.getElapsedTime() > m_explosion.time)
+	{
+		if (m_explosion.currentFrame + 1 < m_explosion.frames.size())
+		{
+			m_explosion.currentFrame++;
+		}
+		else
+		{
+			m_explosion.animationOver = true;
+		}
+		m_explosion.clock.restart();
+	}
+
+	m_explosion.sprite.setTextureRect(m_explosion.frames[m_explosion.currentFrame]);
+}
+
+Explosion& Weapon::getExplosion()
+{
+	return m_explosion;
 }

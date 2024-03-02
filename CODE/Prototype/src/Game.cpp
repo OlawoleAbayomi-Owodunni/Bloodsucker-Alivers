@@ -1087,6 +1087,9 @@ void Game::update(double dt)
 
 		//cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
 
+		levelUpSpawner();
+		checkCollisions();
+
 		m_player.update(dt, m_playerCamera, m_enemies);
 
 		for (auto enemy : m_enemies)
@@ -1123,9 +1126,8 @@ void Game::update(double dt)
 
 		//std::cout << m_enemies.size() << std::endl;
 
-		levelUpSpawner();
-
-		checkCollisions();
+		//levelUpSpawner();
+		//checkCollisions();
 
 		//Rumble timer logic
 		if (orbRumbleTimer.getElapsedTime().asSeconds() > 0.1f && oIsRumbling) {
@@ -1449,7 +1451,7 @@ void Game::checkCollisions()
 			//Bullet to Enemy
 			for (auto weapon : m_player.getWeapons())
 			{
-				if (weapon->getType() == WeaponType::Pistol || weapon->getType() == WeaponType::AssaultRifle) // If bullet is meant to delete when collided with enemy
+				if (weapon->getType() == WeaponType::Pistol || weapon->getType() == WeaponType::AssaultRifle || weapon->getType() == WeaponType::RPG) // If bullet is meant to delete when collided with enemy
 				{
 					for (auto it = weapon->getBullets().begin(); it != weapon->getBullets().end();) // this line is the issue. it needs to be permanent. it gets destroyed so no work
 					{
@@ -1516,6 +1518,16 @@ void Game::checkCollisions()
 								break;
 							}
 
+							if (weapon->getType() == WeaponType::RPG)
+							{
+								weapon->getExplosion().currentFrame = 0;
+								weapon->getExplosion().animationOver = false;
+
+								weapon->getExplosion().position = (*it)->getPosition();
+								weapon->getExplosion().radius.setPosition(weapon->getExplosion().position);
+								weapon->getExplosion().sprite.setPosition(weapon->getExplosion().position.x, weapon->getExplosion().position.y - 40.0f);
+							}
+
 							m_player.weakRumbleStart();
 							enemyHitRumbleTimer.restart();
 							eIsRumbling = true;
@@ -1558,6 +1570,33 @@ void Game::checkCollisions()
 							default:
 								break;
 							}
+						}
+					}
+				}
+				
+				if (weapon->getType() == WeaponType::RPG)
+				{
+					if (CollisionDetection::enemyExplosionCollision(enemy, weapon->getExplosion()))
+					{
+						switch (enemy->getType())
+						{
+						case EnemyType::Small:
+							enemy->setState(CharacterState::DeadState);
+							break;
+						case EnemyType::Big:
+							enemy->setState(CharacterState::DeadState);
+							break;
+						case EnemyType::Boss:
+							enemy->decreaseHealth(20.0f);
+
+							enemy->setColour(sf::Color::Red);
+
+							if (enemy->getHealth() < 0)
+							{
+								enemy->setState(CharacterState::DeadState);
+							}
+						default:
+							break;
 						}
 					}
 				}

@@ -277,7 +277,7 @@ void Player::initialise()
 		it = m_weapons.erase(it); // Remove the pointer from the vector
 	}
 
-	m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
+	m_weapons.push_back(new Weapon(WeaponType::RPG, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 
 	m_currentPlayerFrame = 0;
 	m_currentHaloFrame = 0;

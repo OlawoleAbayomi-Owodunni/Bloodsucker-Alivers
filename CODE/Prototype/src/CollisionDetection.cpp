@@ -111,3 +111,16 @@ bool CollisionDetection::enemyObstacleCollision(Enemy* t_enemy, Obstacle* t_obst
 
 	return false;
 }
+
+bool CollisionDetection::enemyExplosionCollision(Enemy* t_enemy, Explosion t_explosion)
+{
+	sf::FloatRect enemy = t_enemy->getRectangle().getGlobalBounds();
+	sf::FloatRect explosion = t_explosion.radius.getGlobalBounds();
+
+	if (enemy.intersects(explosion))
+	{
+		return true;
+	}
+
+	return false;
+}

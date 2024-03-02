@@ -7,6 +7,7 @@ enum class WeaponType
 	Pistol,
 	AssaultRifle,
 	Sniper,
+	RPG,
 
 	Count
 };
@@ -50,4 +51,5 @@ private:
 	float pistolSpeed;
 	float arSpeed;
 	float sniperSpeed;
+	float rpgSpeed;
 };

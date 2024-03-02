@@ -900,7 +900,7 @@ void Player::increaseHealth()
 {
 	if (m_health < m_maxHealth)
 	{
-		m_health += 25.0f;
+		m_health += m_maxHealth / 8.0f;
 	}
 }
 

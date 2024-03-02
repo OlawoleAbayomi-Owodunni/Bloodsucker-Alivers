@@ -19,26 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Button.h" />
     <ClInclude Include="include\Bullet.h" />
+    <ClInclude Include="include\Button.h" />
     <ClInclude Include="include\CollisionDetection.h" />
     <ClInclude Include="include\Enemy.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\Obstacle.h" />
     <ClInclude Include="include\Pickup.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\ScreenSize.h" />
     <ClInclude Include="include\Weapon.h" />
     <ClInclude Include="include\XPOrb.h" />
-    <ClInclude Include="Obstacle.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Button.cpp" />
-    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="src\Bullet.cpp" />
+    <ClCompile Include="src\Button.cpp" />
     <ClCompile Include="src\CollisionDetection.cpp" />
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Obstacle.cpp" />
     <ClCompile Include="src\Pickup.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Weapon.cpp" />

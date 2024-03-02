@@ -112,7 +112,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		for (int i = 0; i < 16; i++)
 		{
-			m_frames.push_back(IntRect{ 1034 + 32 * i,658,32,32 });
+			m_frames.push_back(IntRect{ 512 + 32 * i,706,32,32 });
 		}
 
 		m_position = t_playerPos;
@@ -148,7 +148,7 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		for (int i = 0; i < 16; i++)
 		{
-			m_frames.push_back(IntRect{ 1034 + 32 * i,658,32,32 });
+			m_frames.push_back(IntRect{ 32 * i,704,32,32 });
 		}
 
 		m_position = t_playerPos;

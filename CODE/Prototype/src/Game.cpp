@@ -94,7 +94,7 @@ void Game::init()
 
 #pragma region OTHERS (Font, Rumble, Background, score)
 	//FONT
-	if (!m_arialFont.loadFromFile("BebasNeue.otf"))
+	if (!m_arialFont.loadFromFile("resources/BebasNeue.otf"))
 	{
 		std::cout << "Error loading font file";
 	}

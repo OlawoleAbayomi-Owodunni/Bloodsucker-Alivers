@@ -28,7 +28,7 @@ Player::Player()
 	m_dashSound.setVolume(3.0f);
 
 	//FONT & TEXT
-	if (!m_font.loadFromFile("BebasNeue.otf"))
+	if (!m_font.loadFromFile("resources/BebasNeue.otf"))
 	{
 		std::cout << "Error loading font file";
 	}

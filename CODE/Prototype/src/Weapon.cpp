@@ -1,10 +1,8 @@
 #include "Weapon.h"
 #include <iostream>
 
-Weapon::Weapon(WeaponType t_type)
+Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 {
-	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
-	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
 
 	m_type = t_type;
 	m_firing = false;
@@ -13,9 +11,9 @@ Weapon::Weapon(WeaponType t_type)
 	m_arBulletCounter = 0;
 	m_maxArBullets = 3;
 
-	m_weaponSprite.setTexture(m_weaponTexture);
-	m_weaponSprite.setOrigin(16, 16);
-	m_weaponSprite.setScale(5.0f, 5.0f);
+	m_starterAtlas = t_texture;
+
+	m_weaponSprite.setTexture(m_starterAtlas);
 
 	switch (m_type)
 	{
@@ -31,10 +29,12 @@ Weapon::Weapon(WeaponType t_type)
 		m_fireRate = 5.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when sniper sprite is added
 		break;
-
 	default:
 		break;
 	}
+
+	m_weaponSprite.setOrigin(64, 16);
+	m_weaponSprite.setScale(5.0f, 5.0f);
 
 	m_weaponLvl = 1;
 }
@@ -60,7 +60,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			m_firing = false;
 			m_timer.restart();
 
-			m_bullets.push_back(new Bullet(m_type, m_holder["starterAtlas"], t_playerPos, t_enemies, t_direction));
+			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
 		}
 		break;
 	case WeaponType::AssaultRifle:
@@ -76,7 +76,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			if (m_arTimer.getElapsedTime() > m_arCooldown)
 			{
 				m_arTimer.restart();
-				m_bullets.push_back(new Bullet(m_type, m_holder["starterAtlas"], t_playerPos, t_enemies, t_direction));
+				m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
 				m_arBulletCounter++;
 			}
 
@@ -101,7 +101,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			m_firing = false;
 			m_timer.restart();
 
-			m_bullets.push_back(new Bullet(m_type, m_holder["starterAtlas"], t_playerPos, t_enemies, t_direction));
+			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
 		}
 		break;
 	default:

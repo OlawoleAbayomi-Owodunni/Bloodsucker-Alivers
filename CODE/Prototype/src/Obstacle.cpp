@@ -1,21 +1,29 @@
 #include "Obstacle.h"
 
-//std::vector<Obstacle*> Obstacle::m_allObstacles{};
+std::vector<Obstacle*> Obstacle::m_allObstacles{};
 
 Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 {
-	//m_allObstacles.push_back(this);
+	m_allObstacles.push_back(this);
 
 	m_type = t_type;
 
 	m_position.x = rand() % 3200 + 1;
 	m_position.y = rand() % 1800 + 1;
-
-	while (m_position.x > 500.0f && m_position.x < 1100.0f &&
-		m_position.y > 150.0f && m_position.y < 750.0f)
+	
+	for (Obstacle const* other : m_allObstacles)
 	{
-		m_position.x = rand() % 3200 + 1;
-		m_position.y = rand() % 1800 + 1;
+		if (this != other)
+		{
+			while (m_position.x > 500.0f && m_position.x < 1100.0f &&
+				m_position.y > 150.0f && m_position.y < 750.0f ||
+				m_position.x > other->m_position.x - 200.0f && m_position.x < other->m_position.x + 200.0f &&
+				m_position.y > other->m_position.y - 200.0f && m_position.y < other->m_position.y + 200.0f)
+			{
+				m_position.x = rand() % 3200 + 1;
+				m_position.y = rand() % 1800 + 1;
+			}
+		}
 	}
 	
 	m_topSprite.setTexture(t_texture);
@@ -74,6 +82,12 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 
 Obstacle::~Obstacle()
 {
+	// Find the position of the current enemy in the vector
+	auto it = std::find(m_allObstacles.begin(), m_allObstacles.end(), this);
+	if (it != m_allObstacles.end()) {
+		// Remove the enemy from the vector
+		m_allObstacles.erase(it);
+	}
 }
 
 void Obstacle::update(double dt)

@@ -30,7 +30,7 @@ public:
 	RectangleShape getRectangle();
 
 private:
-	//static std::vector<Obstacle*> m_allObstacles;
+	static std::vector<Obstacle*> m_allObstacles;
 
 	ObstacleType m_type;
 

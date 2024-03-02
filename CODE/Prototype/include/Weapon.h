@@ -5,7 +5,7 @@
 class Weapon
 {
 public:
-	Weapon(WeaponType t_type);
+	Weapon(WeaponType t_type, sf::Texture& t_texture);
 	~Weapon();
 
 	void update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction);
@@ -33,9 +33,7 @@ private:
 	int m_arBulletCounter;
 	int m_maxArBullets;
 
-	thor::ResourceHolder<sf::Texture, std::string> m_holder;
-
-	Texture m_weaponTexture;
+	Texture m_starterAtlas;
 	Sprite m_weaponSprite;
 
 	int m_weaponLvl;

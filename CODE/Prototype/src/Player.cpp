@@ -18,8 +18,6 @@ Player::Player()
 {
 	//THOR
 	m_holder.acquire("starterAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/StarterAtlas.png"));
-	m_holder.acquire("mapSprite", thor::Resources::fromFile<sf::Texture>("resources/sprites/Map.png"));
-	m_holder.acquire("playerAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/differentCharacterangle.png"));
 
 	//SOUND
 	if (!m_dashSoundBuffer.loadFromFile("resources/sounds/dash.wav"))
@@ -53,7 +51,7 @@ Player::Player()
 	m_xpModifier = 1;
 	m_armorModifier = 1;
 
-	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+	m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 
 	//FSM setup
 	m_direction = Direction::East;
@@ -269,8 +267,17 @@ void Player::initialise()
 	m_dashCooldownClock.restart();
 	//Time m_dashCooldownTime; couldn't find initialiser
 
-	m_weapons.clear();
-	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+	//m_weapons.clear();
+	for (auto it = m_weapons.begin(); it != m_weapons.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_weapons.erase(it); // Remove the pointer from the vector
+	}
+
+	m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 
 	m_currentPlayerFrame = 0;
 	m_currentHaloFrame = 0;
@@ -844,7 +851,7 @@ void Player::giveWeapon(WeaponType t_type)
 			cout << "You already have that weapon equipped.\n";
 		}
 		else {
-			m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
+			m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 			cout << "Pistol added to arsenal.\n";
 		}
 		break;
@@ -861,7 +868,7 @@ void Player::giveWeapon(WeaponType t_type)
 			cout << "You already have that weapon equipped.\n";
 		}
 		else {
-			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle)); // all we need to do to player to add a new weapon
+			m_weapons.push_back(new Weapon(WeaponType::AssaultRifle, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 			cout << "Assault Rifle added to arsenal.\n";
 		}
 		break;

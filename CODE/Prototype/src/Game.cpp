@@ -1356,6 +1356,8 @@ void Game::checkCollisions()
 				case EnemyType::Boss:
 					enemy->decreaseHealth(5.0f);
 
+					enemy->setColour(sf::Color::Red);
+
 					if (enemy->getHealth() < 0)
 					{
 						switch (enemy->getType()) {
@@ -1417,6 +1419,8 @@ void Game::checkCollisions()
 					break;
 				case EnemyType::Boss:
 					enemy->decreaseHealth(10.0f);
+
+					enemy->setColour(sf::Color::Red);
 
 					if (enemy->getHealth() < 0)
 					{
@@ -1544,6 +1548,8 @@ void Game::checkCollisions()
 							case EnemyType::Boss:
 								enemy->playHitSound();
 								enemy->decreaseHealth(bullet->getDamage() / 100.0f);
+								
+								enemy->setColour(sf::Color::Red);
 
 								if (enemy->getHealth() < 0)
 								{
@@ -1578,6 +1584,7 @@ void Game::checkCollisions()
 					break;
 				}
 
+				m_player.setDamageIndicator(sf::Color::Red);
 			}
 #pragma endregion
 		}

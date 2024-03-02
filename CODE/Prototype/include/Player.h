@@ -95,6 +95,9 @@ public:
 	std::vector<Weapon*> getWeapons();
 	bool& getRumbleState();
 	bool& getAliveState();
+
+	void setDamageIndicator(sf::Color t_colour);
+
 private:
 	const float AFTERIMAGE_COUNT{ 16.0f };
 
@@ -119,6 +122,7 @@ private:
 	float m_armorModifier;
 
 	Direction m_direction;
+	Clock m_damageClock;
 
 	float m_dashDistance;
 	bool m_canDash;

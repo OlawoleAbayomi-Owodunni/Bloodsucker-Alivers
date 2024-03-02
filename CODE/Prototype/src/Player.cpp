@@ -373,6 +373,11 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 		m_dashRectBounds.setPosition(m_dashRect.getPosition());
 		m_dashRectBounds.setSize(sf::Vector2f(m_dashRect.getGlobalBounds().width, m_dashRect.getGlobalBounds().height));
 
+		if (m_damageClock.getElapsedTime().asSeconds() > 0.1f)
+		{
+			m_playerSprite.setColor(sf::Color::White);
+		}
+
 		setHealth();
 		setPosition(t_view);
 
@@ -1168,4 +1173,10 @@ void Player::setFrames()
 void Player::playSound(sf::Sound& t_sound)
 {
 	t_sound.play();
+}
+
+void Player::setDamageIndicator(sf::Color t_colour)
+{
+	m_playerSprite.setColor(t_colour);
+	m_damageClock.restart();
 }

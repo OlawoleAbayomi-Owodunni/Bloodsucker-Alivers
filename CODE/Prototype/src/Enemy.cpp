@@ -172,10 +172,6 @@ void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 	default:
 		break;
 	}
-	
-	
-	m_enemyState = CharacterState::WalkSideState;
-	m_deathFrameCounter = 0;
 
 	float xPos = rand() % 3200 + 1;
 	float yPos = rand() % 1800 + 1;
@@ -188,6 +184,11 @@ void Enemy::initialisePosition(sf::Vector2f t_playerPos)
 	}
 	
 	m_position = sf::Vector2f(xPos, yPos);
+	m_rectangle.setPosition(m_position);
+	m_enemySprite.setPosition(m_position);
+
+	m_enemyState = CharacterState::WalkSideState;
+	m_deathFrameCounter = 0;
 }
 
 void Enemy::move(Player& t_player)

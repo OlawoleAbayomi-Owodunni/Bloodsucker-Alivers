@@ -47,7 +47,7 @@ Player::Player()
 	m_level = 1;
 	m_xp = 0;
 	m_xpRequired = 10.0f;
-	
+
 	//Upgrade modifiers
 	m_speedModifier = 1;
 	m_xpModifier = 1;
@@ -110,7 +110,7 @@ Player::Player()
 	m_slashSprite.setTextureRect(IntRect{ 1560, 484, 400, 200 });
 	m_slashSprite.setOrigin(200.0f, 100.0f);
 	m_slashSprite.setScale(1.0f, 1.0f);
-	m_slashSprite.setPosition(-1000.0f,-1000.0f);
+	m_slashSprite.setPosition(-1000.0f, -1000.0f);
 
 	m_rectangle.setSize(sf::Vector2f(48.0f, 60.0f));
 	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
@@ -120,7 +120,7 @@ Player::Player()
 	m_slashCircle.setRadius(130.0f);
 	m_slashCircle.setOrigin(130.0f, 130.0f);
 	m_slashCircle.setFillColor(sf::Color::Red);
-	m_slashCircle.setPosition(-1000.0f,-1000.0f);
+	m_slashCircle.setPosition(-1000.0f, -1000.0f);
 
 	//XP Bar sprite setup
 	m_xpBarSprite.setTexture(playerTextures);
@@ -238,7 +238,7 @@ void Player::initialise()
 	isSniperEquipped = false;
 	isRPGEquipped = false;
 
-	m_maxHealth = 200.0f;
+	m_maxHealth = 500.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
@@ -268,7 +268,7 @@ void Player::initialise()
 
 	m_dashCooldownClock.restart();
 	//Time m_dashCooldownTime; couldn't find initialiser
-	
+
 	m_weapons.clear();
 	m_weapons.push_back(new Weapon(WeaponType::Pistol)); // all we need to do to player to add a new weapon
 
@@ -534,22 +534,22 @@ void Player::handleKeyInput()
 			m_dashRect.setPosition(-1000.0f,-1000.0f);
 		}*/
 
-			if (m_movementVector.x != 0.0f || m_movementVector.y != 0.0f)
+		if (m_movementVector.x != 0.0f || m_movementVector.y != 0.0f)
+		{
+			if (m_currentDashCharges > 0 && m_canDash)
 			{
-				if (m_currentDashCharges > 0 && m_canDash)
-				{
-					dash();
-					m_dashCooldownClock.restart();
-					strongRumbleStart();
-					dashRumbleTimer.restart();
-					isDashRumbling = true;
-				}
+				dash();
+				m_dashCooldownClock.restart();
+				strongRumbleStart();
+				dashRumbleTimer.restart();
+				isDashRumbling = true;
 			}
-			else if (!m_canDash && m_movementVector.x == 0.0f && m_movementVector.y == 0.0f)
-			{
-				m_canDash = true;
-				m_dashRect.setPosition(-1000.0f, -1000.0f);
-			}
+		}
+		else if (!m_canDash && m_movementVector.x == 0.0f && m_movementVector.y == 0.0f)
+		{
+			m_canDash = true;
+			m_dashRect.setPosition(-1000.0f, -1000.0f);
+		}
 
 		for (int i = 0; i < m_afterImages.size(); i++)
 		{
@@ -714,7 +714,7 @@ void Player::setPosition(sf::View& t_view)
 		}
 		else
 		{
-			m_slashSprite.setPosition(sf::Vector2f(-1000.0f,-1000.0f));
+			m_slashSprite.setPosition(sf::Vector2f(-1000.0f, -1000.0f));
 			m_slashCircle.setPosition(sf::Vector2f(-1000.0f, -1000.0f));
 		}
 	}
@@ -839,7 +839,7 @@ void Player::giveWeapon(WeaponType t_type)
 				weaponEquipped = true;
 			}
 		}
-		
+
 		if (weaponEquipped) {
 			cout << "You already have that weapon equipped.\n";
 		}
@@ -894,44 +894,44 @@ void Player::increaseHealth()
 
 void Player::dash()
 {
-		m_canDash = false;
-		m_dashStateClock.restart();
+	m_canDash = false;
+	m_dashStateClock.restart();
 
-		m_dashSound.stop();
-		m_dashSound.play();
+	m_dashSound.stop();
+	m_dashSound.play();
 
-		sf::Vector2f heading = m_movementVector * m_dashDistance;
+	sf::Vector2f heading = m_movementVector * m_dashDistance;
 
-		for (unsigned int i = 0; i < AFTERIMAGE_COUNT; i++)
-		{
-			AfterImageData data{
-				m_position + (m_movementVector * (m_dashDistance * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
-				static_cast<float>(i) / AFTERIMAGE_COUNT, m_dashSprite
-			};
+	for (unsigned int i = 0; i < AFTERIMAGE_COUNT; i++)
+	{
+		AfterImageData data{
+			m_position + (m_movementVector * (m_dashDistance * (static_cast<float>(i) / AFTERIMAGE_COUNT))),
+			static_cast<float>(i) / AFTERIMAGE_COUNT, m_dashSprite
+		};
 
-			m_afterImages.push_back(data);
-		}
+		m_afterImages.push_back(data);
+	}
 
-		float distance = std::sqrtf(heading.x * heading.x + heading.y * heading.y);
-		float dashAngle = atan2(heading.y, heading.x) * (180.0f / 3.14159);
+	float distance = std::sqrtf(heading.x * heading.x + heading.y * heading.y);
+	float dashAngle = atan2(heading.y, heading.x) * (180.0f / 3.14159);
 
-		if (abs(static_cast<int>(dashAngle)) % 90 == 0)
-		{
-			distance += 200.0f;
-			m_dashRect.setSize(sf::Vector2f(distance, 120.0f));
-		}
-		else
-		{
-			m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
-		}
+	if (abs(static_cast<int>(dashAngle)) % 90 == 0)
+	{
+		distance += 200.0f;
+		m_dashRect.setSize(sf::Vector2f(distance, 120.0f));
+	}
+	else
+	{
+		m_dashRect.setSize(sf::Vector2f(distance, 10.0f));
+	}
 
-		m_dashRect.setOrigin(distance / 2.0f, m_dashRect.getSize().y / 2.0f);
-		m_dashRect.setRotation(dashAngle);
-		m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
+	m_dashRect.setOrigin(distance / 2.0f, m_dashRect.getSize().y / 2.0f);
+	m_dashRect.setRotation(dashAngle);
+	m_dashRect.setPosition(m_position.x + heading.x / 2.0f, m_position.y + heading.y / 2.0f);
 
-		m_position += heading;
-		m_currentDashCharges--;
-		
+	m_position += heading;
+	m_currentDashCharges--;
+
 }
 
 void Player::updateDashbar()
@@ -1005,7 +1005,7 @@ void Player::animate()
 				m_currentPlayerFrame++;
 			}
 		}
-		
+
 		m_playerClock.restart();
 	}
 

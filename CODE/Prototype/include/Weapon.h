@@ -18,7 +18,7 @@ public:
 	void equipWeapon();
 	bool isWeaponEquipped();
 	void upgradeWeapon(WeaponType t_type);
-	
+
 
 private:
 	sf::Clock m_timer;
@@ -31,6 +31,7 @@ private:
 	float m_fireRate;
 	float m_fireRateModifier;
 	int m_arBulletCounter;
+	int m_maxArBullets;
 
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 

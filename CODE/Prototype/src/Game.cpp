@@ -158,16 +158,17 @@ void Game::init()
 	levelUpBGSprite.setPosition(m_playerCamera.getCenter());
 	//no need to setup buttons in constructor since they are randomised everytime
 
-	dashInfoImgBGSprite.setTexture(UITexture);
-	dashInfoImgBGSprite.setTextureRect(IntRect({ 1000, 0, 250, 250 }));
-	dashInfoImgBGSprite.setOrigin(125.0f, 125.0f);
-	dashInfoImgBGSprite.setPosition(m_playerCamera.getCenter());
+	InfoImgBGSprite.setTexture(UITexture);
+	InfoImgBGSprite.setTextureRect(IntRect({ 1000, 0, 250, 250 }));
+	InfoImgBGSprite.setOrigin(125.0f, 125.0f);
+	InfoImgBGSprite.setPosition(m_playerCamera.getCenter());
 
-	dashInfoTxtBGSprite.setTexture(UITexture);
-	dashInfoTxtBGSprite.setTextureRect(IntRect({ 1250, 0, 250, 250 }));
-	dashInfoTxtBGSprite.setOrigin(125.0f, 125.0f);
-	dashInfoTxtBGSprite.setPosition(m_playerCamera.getCenter());
+	InfoTxtBGSprite.setTexture(UITexture);
+	InfoTxtBGSprite.setTextureRect(IntRect({ 1250, 0, 250, 250 }));
+	InfoTxtBGSprite.setOrigin(125.0f, 125.0f);
+	InfoTxtBGSprite.setPosition(m_playerCamera.getCenter());
 
+#pragma region dash
 	dashInfoImgSprite.setTexture(m_holder["starterAtlas"]);
 	dashInfoImgSprite.setTextureRect(IntRect({ 0, 1778, 200, 160 }));
 	dashInfoImgSprite.setOrigin(100.0f, 80.0f);
@@ -185,6 +186,27 @@ void Game::init()
 	dashDescriptionText.setOutlineColor(sf::Color::Black);
 	dashDescriptionText.setOutlineThickness(2.0f);
 	dashDescriptionText.setFillColor(sf::Color::White);
+
+#pragma endregion
+
+	gunInfoImgSprite.setTexture(m_holder["starterAtlas"]);
+	gunInfoImgSprite.setTextureRect({ 0,0,128,32 }); // pistol by default
+	gunInfoImgSprite.setOrigin({ 128 / 2.0f,16.0f });
+
+	gunLvlInfoTxt.setFont(m_arialFont);
+	gunLvlInfoTxt.setStyle(sf::Text::Bold);
+	gunLvlInfoTxt.setCharacterSize(40U);
+	gunLvlInfoTxt.setOutlineColor(sf::Color::Black);
+	gunLvlInfoTxt.setOutlineThickness(3U);
+	gunLvlInfoTxt.setFillColor(sf::Color::White);
+
+	gunDescriptionText.setFont(m_arialFont);
+	gunDescriptionText.setStyle(sf::Text::Bold);
+	gunDescriptionText.setCharacterSize(25U);
+	gunDescriptionText.setOutlineColor(sf::Color::Black);
+	gunDescriptionText.setOutlineThickness(2.0f);
+	gunDescriptionText.setFillColor(sf::Color::White);
+
 #pragma endregion
 
 #pragma region game over menu
@@ -202,7 +224,7 @@ void Game::init()
 	m_scoreSprite.setTextureRect(IntRect{ 0, 1503, 550, 150 });
 	m_scoreSprite.setOrigin(550.0f / 2.0f, 150.0f / 2);
 	m_scoreSprite.setScale(1.0f, 1.0f);
-	m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250); 
+	m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
 
 	m_scoreVarBGSprite.setTexture(UITexture);
 	m_scoreVarBGSprite.setTextureRect(IntRect{ 1250, 0, 250, 250 });
@@ -347,7 +369,7 @@ void Game::startGame()
 
 	////VECTOR INTIALISATION
 	//ENEMY
-	
+
 	//m_enemies.clear();
 	for (auto it = m_enemies.begin(); it != m_enemies.end();)
 	{
@@ -361,7 +383,7 @@ void Game::startGame()
 	for (int i = 0; i < 10; i++) {
 		m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));
 	}
-	
+
 	//m_xpOrbs.clear();
 	for (auto it = m_xpOrbs.begin(); it != m_xpOrbs.end();)
 	{
@@ -409,7 +431,7 @@ void Game::startGame()
 	enemyHitRumbleTimer.restart();
 
 	oIsRumbling = false;
-	pIsRumbling = false; 
+	pIsRumbling = false;
 	eIsRumbling = false;
 
 	m_cursorPos = 0;
@@ -506,19 +528,19 @@ void Game::processGameEvents(sf::Event& event)
 						m_cursorPos--;
 				}
 
-			if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) { 
-				m_cursorPos = 0; 
+				if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) {
+					m_cursorPos = 0;
+					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+				}
+				if (m_cursorPos < 0) {
+					m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1;
+					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+				}
+
 				m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
-			}
-			if (m_cursorPos < 0) { 
-				m_cursorPos = static_cast<int>(m_menuButtons.size()) - 1; 
-				m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
-			}			
-			
-			m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
-			m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
 			}
 
 			//Button pressed
@@ -551,7 +573,7 @@ void Game::processGameEvents(sf::Event& event)
 							break;
 						}
 					}
-				}	
+				}
 				else {
 					if (event.joystickButton.button == 1) {
 						inMenu = false;
@@ -613,19 +635,19 @@ void Game::processGameEvents(sf::Event& event)
 						m_cursorPos++;
 				}
 
-			if (m_cursorPos > (static_cast<int>(m_pauseButtons.size()) - 1)) {
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
-			}
-			if (m_cursorPos < 0) {
-				m_cursorPos = static_cast<int>(m_pauseButtons.size()) - 1;
-				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
-			}
+				if (m_cursorPos > (static_cast<int>(m_pauseButtons.size()) - 1)) {
+					m_cursorPos = 0;
+					m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				}
+				if (m_cursorPos < 0) {
+					m_cursorPos = static_cast<int>(m_pauseButtons.size()) - 1;
+					m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				}
 
-			m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-			m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
 			}
 
 			//Button pressed
@@ -716,19 +738,19 @@ void Game::processGameEvents(sf::Event& event)
 						m_cursorPos--;
 				}
 
-			if (m_cursorPos > (static_cast<int>(m_upgradeButtons.size()) - 1)) {
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
-			}
-			if (m_cursorPos < 0) {
-				m_cursorPos = static_cast<int>(m_upgradeButtons.size()) - 1;
-				m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
-			}
+				if (m_cursorPos > (static_cast<int>(m_upgradeButtons.size()) - 1)) {
+					m_cursorPos = 0;
+					m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+				}
+				if (m_cursorPos < 0) {
+					m_cursorPos = static_cast<int>(m_upgradeButtons.size()) - 1;
+					m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+				}
 
-			m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
-			m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();		
+				m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
 			}
 
 			//Button pressed
@@ -748,18 +770,18 @@ void Game::processGameEvents(sf::Event& event)
 					case ButtonType::UpgradeArmor:
 						m_player.upgradePlayer(PlayerUpgrade::Armor);
 						break;
-					case ButtonType::UpgradePistol:
-						m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
-						break;
-					case ButtonType::UpgradeAR:
-						m_player.upgradeGun(WeaponType::AssaultRifle);
-						break;
 					}
-					createRandomWeapons();
-					m_currentGamemode = Gamemode::CarePackage; 
+					m_currentGamemode = Gamemode::CarePackage;
+
+					gunInfoImgSprite.setPosition(InfoImgBGSprite.getPosition());
+					gunLvlInfoTxt.setPosition(InfoTxtBGSprite.getPosition().x, InfoTxtBGSprite.getPosition().y - 50);
+					gunDescriptionText.setPosition(gunLvlInfoTxt.getPosition().x, gunLvlInfoTxt.getPosition().y + 60);
+
 					m_cursorPos = 0;
+					createRandomWeapons();
 					m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
 					m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+
 					m_player.rumbleStop();
 				}
 			}
@@ -809,19 +831,21 @@ void Game::processGameEvents(sf::Event& event)
 						m_cursorPos++;
 				}
 
-			if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-			}
-			if (m_cursorPos < 0) {
-				m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1;
-				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-			}
+				if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
+					m_cursorPos = 0;
+					m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+				}
+				if (m_cursorPos < 0) {
+					m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1;
+					m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+					m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+				}
 
-			m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-			m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+
+				setGunInfo();
 			}
 
 			//Button pressed
@@ -834,6 +858,12 @@ void Game::processGameEvents(sf::Event& event)
 						break;
 					case ButtonType::GetRifle:
 						m_player.giveWeapon(WeaponType::AssaultRifle);
+						break;
+					case ButtonType::UpgradePistol:
+						m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
+						break;
+					case ButtonType::UpgradeAR:
+						m_player.upgradeGun(WeaponType::AssaultRifle);
 						break;
 					}
 					m_currentGamemode = Gamemode::Gameplay;
@@ -955,7 +985,8 @@ void Game::update(double dt)
 #pragma region Gameplay Gamemode logic
 	if (m_currentGamemode == Gamemode::Gameplay) //switching between screens
 	{
-		if (!m_player.getAliveState() && !hasGameOverTimerStarted){
+#pragma region Gameover logic
+		if (!m_player.getAliveState() && !hasGameOverTimerStarted) {
 			m_gameOverTimer.restart();
 			hasGameOverTimerStarted = true;
 		}
@@ -966,6 +997,9 @@ void Game::update(double dt)
 			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
 			score = (((1 * smallEK) + (1.5 * normalEK) + (5 * bigEK) + (200 * bossEK)) / 100) * timeSurvived;
+
+
+
 
 #pragma region Menu UI setup
 #pragma region Sprites
@@ -1017,8 +1051,9 @@ void Game::update(double dt)
 
 
 		}
-		
+#pragma endregion		
 
+#pragma region camera movement
 		sf::Vector2f targetPosition = m_player.getPosition();
 		sf::Vector2f interpolatedPosition = m_playerCamera.getCenter();
 
@@ -1047,6 +1082,8 @@ void Game::update(double dt)
 
 		m_playerCamera.setCenter(interpolatedPosition);
 		m_window.setView(m_playerCamera);
+
+#pragma endregion
 
 		//cout << m_view.getCenter().x << "	" << m_view.getCenter().y << "\n";
 
@@ -1096,7 +1133,7 @@ void Game::update(double dt)
 		}
 		if (pickupRumbleTimer.getElapsedTime().asSeconds() > 0.01f && pIsRumbling) {
 			pIsRumbling = false;
-		}	
+		}
 		if (enemyHitRumbleTimer.getElapsedTime().asSeconds() > 0.05f && eIsRumbling) {
 			eIsRumbling = false;
 		}
@@ -1123,7 +1160,7 @@ void Game::update(double dt)
 void Game::render()
 {
 	m_window.clear(sf::Color(0, 0, 0, 0));
-	
+
 #pragma region GAMEPLAY
 	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause ||
 		m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage ||
@@ -1161,7 +1198,7 @@ void Game::render()
 		m_player.renderHUD(m_window);
 
 #pragma endregion
-		 
+
 #pragma region pause menu
 		//Render pause menu
 		if (m_currentGamemode == Gamemode::Pause)
@@ -1176,6 +1213,7 @@ void Game::render()
 #pragma endregion
 
 #pragma region Level up and acquisition menu
+
 		//Render level up menu
 		if (m_currentGamemode == Gamemode::Upgrade)
 		{
@@ -1184,9 +1222,8 @@ void Game::render()
 			{
 				buttons->render(m_window);
 			}
-
-			m_window.draw(dashInfoImgBGSprite);
-			m_window.draw(dashInfoTxtBGSprite);
+			m_window.draw(InfoImgBGSprite);
+			m_window.draw(InfoTxtBGSprite);
 			m_window.draw(dashInfoImgSprite);
 			m_window.draw(dashInfoTxt);
 			m_window.draw(dashDescriptionText);
@@ -1201,6 +1238,12 @@ void Game::render()
 			{
 				buttons->render(m_window);
 			}
+			m_window.draw(InfoImgBGSprite);
+			m_window.draw(InfoTxtBGSprite);
+			m_window.draw(gunInfoImgSprite);
+			m_window.draw(gunLvlInfoTxt);
+			m_window.draw(gunDescriptionText);
+
 			m_window.draw(m_cursorSprite);
 		}
 #pragma endregion
@@ -1273,7 +1316,7 @@ void Game::checkCollisions()
 					enemy->adjustMovement();
 				}
 			}
-			
+
 #pragma region Dash -> Enemy
 			//Dash to Enemy
 			if (CollisionDetection::playerDashEnemyCollision(m_player, enemy))
@@ -1386,7 +1429,7 @@ void Game::checkCollisions()
 							break;
 						case EnemyType::Boss:
 							bossEK++;
-						enemy->setState(CharacterState::DeadState);
+							enemy->setState(CharacterState::DeadState);
 							break;
 						}
 						totalEK++;
@@ -1664,18 +1707,18 @@ void Game::createRandomWeapons()
 	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
 
 	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol)); }
-	
+
 	bool isEquipped1 = false;
 	bool isEquipped2 = false;
-	WeaponType btnWpnTyp1=WeaponType::Count;
-	WeaponType btnWpnTyp2=WeaponType::Count;
-	switch(randomUpgradeButton1){
+	WeaponType btnWpnTyp1 = WeaponType::Count;
+	WeaponType btnWpnTyp2 = WeaponType::Count;
+	switch (randomUpgradeButton1) {
 	case (0 + static_cast<int>(ButtonType::GetPistol)):
-			btnWpnTyp1 = WeaponType::Pistol;
-			break;
-		case (1 + static_cast<int>(ButtonType::GetPistol)):
-			btnWpnTyp1 = WeaponType::AssaultRifle;
-			break;
+		btnWpnTyp1 = WeaponType::Pistol;
+		break;
+	case (1 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp1 = WeaponType::AssaultRifle;
+		break;
 	}
 	switch (randomUpgradeButton2) {
 	case (0 + static_cast<int>(ButtonType::GetPistol)):
@@ -1694,7 +1737,7 @@ void Game::createRandomWeapons()
 		}
 	}
 	if (isEquipped1) {
-		if (btnWpnTyp1 == WeaponType::Pistol){
+		if (btnWpnTyp1 == WeaponType::Pistol) {
 			randomUpgradeButton1 = ButtonType::UpgradePistol;
 		}
 		if (btnWpnTyp1 == WeaponType::AssaultRifle) {
@@ -1710,11 +1753,98 @@ void Game::createRandomWeapons()
 		}
 	}
 
-
-
-
 	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150), Vector2f(0.75f, 0.75f)));
 	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150), Vector2f(0.75f, 0.75f)));
+
+	setGunInfo();
+}
+
+void Game::setGunInfo()
+{
+	m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+	m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+
+	string heading;
+	String description;
+	description = "Testing, Testing, 1, 2\nnew line for look";
+	int gunLevel = 1;
+	WeaponType tempWpnType;
+
+
+	switch (m_cursorButtonType) {
+	case ButtonType::UpgradePistol:
+		tempWpnType = WeaponType::Pistol;
+		for (auto gun : m_player.getWeapons())
+		{
+			if (gun->getType() == tempWpnType) {
+				gunLevel = gun->getWeaponLevel();
+			}
+		}
+		break;
+	case ButtonType::UpgradeAR:
+		tempWpnType = WeaponType::AssaultRifle;
+		for (auto gun : m_player.getWeapons())
+		{
+			if (gun->getType() == tempWpnType) {
+				gunLevel = gun->getWeaponLevel();
+			}
+		}
+		break;
+	}
+
+
+	switch (m_cursorButtonType) {
+	case ButtonType::GetPistol:
+		heading = "Get Pistol";
+		description = "Fires one bullet at\nclosest enemy";
+		gunInfoImgSprite.setTextureRect({ 0,0,128,32 });
+		break;
+	case ButtonType::GetRifle:
+		heading = "Get Assault Rifle";
+		description = "Fires burst in the\nfaced direction";
+		gunInfoImgSprite.setTextureRect({ 0,32,128,32 });
+		break;
+
+	case ButtonType::UpgradePistol:
+		heading = "PISTOL LVL " + to_string(gunLevel + 1);
+		gunInfoImgSprite.setTextureRect({ 0,0,128,32 });
+		switch (gunLevel) {
+		case 1:
+			description = "Increase Fire Rate";
+			break;
+		case 2:
+			description = "Increase Fire Rate";
+			break;
+		default:
+			description = "GUN FULLY UPGRADED";
+			break;
+		}
+		break;
+	case ButtonType::UpgradeAR:
+		heading = "RIFLE LVL " + to_string(gunLevel + 1);
+		gunInfoImgSprite.setTextureRect({ 0,32,128,32 });
+		switch (gunLevel) {
+		case 1:
+			description = "Increase mag size +1";
+			break;
+		case 2:
+			description = "Increase Fire Rate\nIncrease mag size +2";
+			break;
+		default:
+			description = "GUN FULLY UPGRADED";
+			break;
+		}
+		break;
+	}
+
+	gunInfoImgSprite.setScale(2.0f, 2.0f);
+
+	gunLvlInfoTxt.setString(heading);//has to be weaopn level which should be gotten from for loop above
+	gunLvlInfoTxt.setOrigin(gunLvlInfoTxt.getGlobalBounds().width / 2.0f, gunLvlInfoTxt.getGlobalBounds().height / 2.0f);
+	gunDescriptionText.setString(description);
+	gunDescriptionText.setOrigin(gunDescriptionText.getGlobalBounds().width / 2.0f, gunDescriptionText.getGlobalBounds().height / 2.0f);
+	gunDescriptionText.setPosition(gunLvlInfoTxt.getPosition().x, gunLvlInfoTxt.getPosition().y + 60);
+
 }
 
 #pragma endregion
@@ -1731,15 +1861,15 @@ void Game::levelUpSpawner()
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Big));
 		}
-		
+
 		m_currentLevel++;
 		m_currentGamemode = Gamemode::Upgrade;
 		levelUpBGSprite.setPosition(m_playerCamera.getCenter());
 
-		dashInfoImgBGSprite.setPosition(levelUpBGSprite.getPosition().x + 200, levelUpBGSprite.getPosition().y - 100);
-		dashInfoTxtBGSprite.setPosition(dashInfoImgBGSprite.getPosition().x, (dashInfoImgBGSprite.getPosition().y + 250) + 10);
-		dashInfoImgSprite.setPosition(dashInfoImgBGSprite.getPosition());
-		dashInfoTxt.setPosition(dashInfoTxtBGSprite.getPosition().x, dashInfoTxtBGSprite.getPosition().y - 50);
+		InfoImgBGSprite.setPosition(levelUpBGSprite.getPosition().x + 200, levelUpBGSprite.getPosition().y - 100);
+		InfoTxtBGSprite.setPosition(InfoImgBGSprite.getPosition().x, (InfoImgBGSprite.getPosition().y + 250) + 10);
+		dashInfoImgSprite.setPosition(InfoImgBGSprite.getPosition());
+		dashInfoTxt.setPosition(InfoTxtBGSprite.getPosition().x, InfoTxtBGSprite.getPosition().y - 50);
 
 		createRandomUpgrades();
 		m_cursorPos = 0;

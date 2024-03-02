@@ -47,7 +47,7 @@ public:
 
 protected:
 	void init();
-	
+
 	void update(double dt);
 
 	void render();
@@ -62,6 +62,7 @@ protected:
 	void createRandomUpgrades();
 	void setDashInfo();
 	void createRandomWeapons();
+	void setGunInfo();
 
 	void dropLoot(Enemy* t_enemy);
 
@@ -100,7 +101,7 @@ protected:
 	thor::ResourceHolder<sf::Texture, std::string> m_holder;
 
 	Sprite bgSprite;
-	
+
 	Clock orbRumbleTimer;
 	Clock pickupRumbleTimer;
 	Clock enemyHitRumbleTimer;
@@ -110,7 +111,7 @@ protected:
 #ifdef TEST_FPS
 	sf::Text x_updateFPS;					// text used to display updates per second.
 	sf::Text x_drawFPS;						// text used to display draw calls per second.
-	sf::Time x_secondTime {sf::Time::Zero};	// counter used to establish when a second has passed.
+	sf::Time x_secondTime{ sf::Time::Zero };	// counter used to establish when a second has passed.
 	int x_updateFrameCount{ 0 };			// updates per second counter.
 	int x_drawFrameCount{ 0 };				// draws per second counter.
 #endif // TEST_FPS
@@ -126,13 +127,16 @@ protected:
 	vector<Button*> m_upgradeButtons;
 	vector<Button*> m_weaponButtons;
 
-	Sprite dashInfoImgBGSprite;
-	Sprite dashInfoTxtBGSprite;
+	Sprite InfoImgBGSprite;
+	Sprite InfoTxtBGSprite;
 	Sprite dashInfoImgSprite;
 	Text dashInfoTxt;
 	Text dashDescriptionText;
 	vector<IntRect> dashInfoFrames;
 
+	Sprite gunInfoImgSprite;
+	Text gunLvlInfoTxt;
+	Text gunDescriptionText;
 
 	Sprite gameOverBGSprite;
 	vector<Button*> m_gameoverButtons;
@@ -141,7 +145,7 @@ protected:
 	//Text for all the things to add
 
 	Sprite m_cursorSprite;
-	int m_cursorPos; 
+	int m_cursorPos;
 	ButtonType m_cursorButtonType;
 
 	bool inMenu;

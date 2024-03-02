@@ -11,6 +11,7 @@ Weapon::Weapon(WeaponType t_type)
 	m_fireRateModifier = 1;
 	m_arCooldown = seconds(0.15);
 	m_arBulletCounter = 0;
+	m_maxArBullets = 3;
 
 	m_weaponSprite.setTexture(m_weaponTexture);
 	m_weaponSprite.setOrigin(16, 16);
@@ -43,7 +44,7 @@ Weapon::~Weapon()
 }
 
 void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction)
-{	
+{
 	switch (m_type)
 	{
 	case WeaponType::Pistol:
@@ -79,7 +80,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 				m_arBulletCounter++;
 			}
 
-			if (m_arBulletCounter == 3)
+			if (m_arBulletCounter == m_maxArBullets)
 			{
 				m_arBulletCounter = 0;
 				m_firing = false;
@@ -106,7 +107,7 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 	default:
 		break;
 	}
-	
+
 	//std::cout << m_timer.getElapsedTime().asSeconds() << std::endl;
 
 	for (auto it = m_bullets.begin(); it != m_bullets.end();)
@@ -187,15 +188,14 @@ void Weapon::upgradeWeapon(WeaponType t_type) //probably pass in which weapon ID
 		{
 		case 1:
 			m_fireRateModifier = 1.0f;
-			m_arBulletCounter++;
+
 			break;
 		case 2:
-			m_fireRateModifier = 1.5f;
-			m_arBulletCounter += 2;
+			m_maxArBullets++;
 			break;
 		case 3:
 			m_fireRateModifier = 2.0f;
-			m_arBulletCounter *= 2;
+			m_maxArBullets += 2;
 			break;
 		default:
 			break;

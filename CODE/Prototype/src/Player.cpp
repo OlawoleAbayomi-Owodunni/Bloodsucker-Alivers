@@ -74,9 +74,9 @@ Player::Player()
 	{
 		m_haloFrames.push_back(IntRect{ 160 * i,1351,160,64 });
 	}
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 7; i++)
 	{
-		m_slashFrames.push_back(IntRect{ 1560 + 400 * i, 484, 400, 200 });
+		m_slashFrames.push_back(IntRect{ 1712 + 400 * i, 464, 400, 200 });
 	}
 
 	m_currentPlayerFrame = 0;
@@ -85,7 +85,7 @@ Player::Player()
 
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
-	m_slashTime = seconds(0.1f);
+	m_slashTime = seconds(0.05f);
 
 	m_dashStateTime = seconds(1.0f);
 	m_dashCooldownTime = seconds(4.0f);
@@ -249,9 +249,10 @@ void Player::initialise()
 	m_previousPosition = m_position;
 	m_movementVector = sf::Vector2f(0.0f, 0.0f);
 
-	m_speedModifier = 1;
-	m_xpModifier = 1;
-	m_armorModifier = 1;
+	m_speedModifier = 1.0f;
+	m_xpModifier = 1.0f;
+	m_armorModifier = 1.0f;
+	m_magnetModifier = 1.0f;
 
 	m_direction = Direction::East;
 	m_canDash = false;
@@ -259,7 +260,7 @@ void Player::initialise()
 	m_maxDashCharges = 0;
 	m_currentDashCharges = 0;
 	m_dashDistance = 150.0f;
-	m_dashHasAOE = false;
+	m_dashHasAOE = true;
 
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
@@ -287,7 +288,7 @@ void Player::initialise()
 
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
-	m_slashTime = seconds(0.1f);
+	m_slashTime = seconds(0.05f);
 
 	m_dashStateTime = seconds(1.0f);
 	m_dashCooldownTime = seconds(4.0f);

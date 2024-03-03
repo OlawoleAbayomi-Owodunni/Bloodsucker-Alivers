@@ -139,7 +139,7 @@ void Obstacle::update(double dt)
 
 void Obstacle::renderBottom(sf::RenderWindow& t_window)
 {
-	t_window.draw(m_rectangle);
+	//t_window.draw(m_rectangle);
 	t_window.draw(m_bottomSprite);
 }
 

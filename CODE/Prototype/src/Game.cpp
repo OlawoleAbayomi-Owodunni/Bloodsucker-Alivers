@@ -149,6 +149,10 @@ void Game::init()
 	m_vignetteSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	m_vignetteSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	m_vignetteSprite.setPosition(m_playerCamera.getCenter());
+	m_hudSprite.setTexture(m_holder["screenVignette"]);
+	m_hudSprite.setTextureRect(IntRect{ 0,0,1600,80 });
+	m_hudSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
+	m_hudSprite.setPosition(m_playerCamera.getCenter());
 
 	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(550, 320), Vector2f(1.0f, 1.0f)));
@@ -1056,6 +1060,7 @@ void Game::update(double dt)
 		break;
 	case Gamemode::Gameplay:
 		m_window.setView(m_playerCamera);
+		m_hudSprite.setPosition(m_playerCamera.getCenter());
 	}
 
 #pragma region Gameplay Gamemode logic
@@ -1273,6 +1278,9 @@ void Game::render()
 		{
 			obstacle->renderTop(m_window);
 		}
+		if (m_currentGamemode == Gamemode::Gameplay) {
+			m_window.draw(m_hudSprite);
+		}
 
 		m_player.renderHUD(m_window);
 
@@ -1283,6 +1291,7 @@ void Game::render()
 			m_currentGamemode == Gamemode::GameOver) {
 		m_window.draw(m_vignetteSprite);
 		}
+
 
 #pragma region pause menu
 		//Render pause menu

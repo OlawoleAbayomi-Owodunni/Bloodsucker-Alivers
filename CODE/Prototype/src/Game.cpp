@@ -43,7 +43,7 @@ void Game::init()
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
 	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
 	m_holder.acquire("tutorialMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/InformationScreen.png"));
-	//m_holder.acquire("creditsMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/credits.png"));
+	m_holder.acquire("creditsMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/credits.png"));
 	m_holder.acquire("screenVignette", thor::Resources::fromFile<sf::Texture>("resources/sprites/bigblackbox.png"));
 #pragma endregion
 

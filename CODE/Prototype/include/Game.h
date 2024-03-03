@@ -175,6 +175,8 @@ protected:
 	int totalEK;
 	int updateCount;
 	int timeSurvived;
+	int timeSurvivedSeconds;
+	int timeSurvivedMinutes;
 	int highScore;
 
 	Text m_scoreText;
@@ -186,4 +188,6 @@ protected:
 	Text m_playerLevelText;
 	Text m_timeSurvivedText;
 	Text m_statsText;
+	Text m_inGameTimerText;
+	Text m_currentLevelText;
 };

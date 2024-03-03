@@ -134,7 +134,9 @@ void Game::init()
 	bigEK = 0;
 	bossEK = 0;
 	updateCount = 0;
-	timeSurvived = -2;
+	timeSurvived = 0;
+	timeSurvivedSeconds = 0;
+	timeSurvivedMinutes = 0;
 #pragma endregion
 
 #pragma region MENU INITIALISERS
@@ -355,9 +357,19 @@ void Game::init()
 	m_timeSurvivedText.setOutlineColor(sf::Color::Black);
 	m_timeSurvivedText.setFillColor(sf::Color::White);
 	m_timeSurvivedText.setOutlineThickness(2.0f);
-	m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvived) + " seconds");
+	m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
 	m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
 	m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 250);
+
+	m_inGameTimerText.setFont(m_arialFont);
+	m_inGameTimerText.setStyle(sf::Text::Bold);
+	m_inGameTimerText.setCharacterSize(36U);
+	m_inGameTimerText.setOutlineColor(sf::Color::Black);
+	m_inGameTimerText.setFillColor(sf::Color::White);
+	m_inGameTimerText.setOutlineThickness(2.0f);
+	m_inGameTimerText.setString(to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
+	m_inGameTimerText.setOrigin(0.0f, m_inGameTimerText.getGlobalBounds().height / 2.0f);
+	m_inGameTimerText.setPosition(0.0f,0.0f);
 
 	m_scoreText.setFont(m_arialFont);
 	m_scoreText.setStyle(sf::Text::Bold);
@@ -368,6 +380,15 @@ void Game::init()
 	m_scoreText.setString(to_string(score));
 	m_scoreText.setOrigin(m_scoreText.getGlobalBounds().width / 2.0f, m_scoreText.getGlobalBounds().height / 2.0f);
 	m_scoreText.setPosition(m_scoreSprite.getPosition().x + 150, m_scoreSprite.getPosition().y);
+
+	m_currentLevelText.setFont(m_arialFont);
+	m_currentLevelText.setCharacterSize(18.0f);
+	m_currentLevelText.setOutlineColor(sf::Color::Black);
+	m_currentLevelText.setFillColor(sf::Color::White);
+	m_currentLevelText.setOutlineThickness(2.0f);
+	m_currentLevelText.setString("Level: " + to_string(m_currentLevel));
+	m_currentLevelText.setOrigin(m_currentLevelText.getGlobalBounds().width / 2.0f, m_currentLevelText.getGlobalBounds().height / 2.0f);
+	m_currentLevelText.setPosition(0.0f, 0.0f);
 
 #pragma endregion
 
@@ -408,8 +429,9 @@ void Game::startGame()
 	bigEK = 0;
 	bossEK = 0;
 	updateCount = 0;
-	timeSurvived = -2;
-
+	timeSurvived = 0;
+	timeSurvivedSeconds = 0;
+	timeSurvivedMinutes = 0;
 
 	////VECTOR INTIALISATION
 	//ENEMY
@@ -995,7 +1017,7 @@ void Game::update(double dt)
 			m_playerLevelText.setOrigin(0.0f, m_playerLevelText.getGlobalBounds().height / 2.0f);
 			m_playerLevelText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 220);
 
-			m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvived) + " seconds");
+			m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
 			m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
 			m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 250);
 
@@ -1108,9 +1130,32 @@ void Game::update(double dt)
 		//time in game
 		if (updateCount > 60) {
 			timeSurvived++;
+			timeSurvivedSeconds++;
 			updateCount = 0;
 		}
 		updateCount++;
+
+		if (timeSurvivedSeconds > 59)
+		{
+			timeSurvivedMinutes++;
+			timeSurvivedSeconds = 0;
+		}
+
+		if (timeSurvivedSeconds < 10)
+		{
+			m_inGameTimerText.setString(to_string(timeSurvivedMinutes) + ":0" + to_string(timeSurvivedSeconds));
+		}
+		else
+		{
+			m_inGameTimerText.setString(to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
+		}
+		
+		m_inGameTimerText.setOrigin(0.0f, m_inGameTimerText.getGlobalBounds().height / 2.0f);
+		m_inGameTimerText.setPosition(m_playerCamera.getCenter().x + 625.0f, m_playerCamera.getCenter().y - 415.0f);
+
+		m_currentLevelText.setString("Level: " + to_string(m_currentLevel));
+		m_currentLevelText.setOrigin(0.0f, m_currentLevelText.getGlobalBounds().height / 2.0f);
+		m_currentLevelText.setPosition(m_playerCamera.getCenter().x - 450.0f, m_playerCamera.getCenter().y - 412.0f);
 	}
 
 #pragma endregion
@@ -1168,11 +1213,14 @@ void Game::render()
 		{
 			obstacle->renderTop(m_window);
 		}
+
 		if (m_currentGamemode == Gamemode::Gameplay) {
 			m_window.draw(m_hudSprite);
+			m_window.draw(m_inGameTimerText);
 		}
 
 		m_player.renderHUD(m_window);
+		m_window.draw(m_currentLevelText);
 
 #pragma endregion
 

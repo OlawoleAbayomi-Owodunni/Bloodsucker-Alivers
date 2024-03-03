@@ -260,7 +260,7 @@ void Player::initialise()
 	m_maxDashCharges = 0;
 	m_currentDashCharges = 0;
 	m_dashDistance = 150.0f;
-	m_dashHasAOE = true;
+	m_dashHasAOE = false;
 
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;

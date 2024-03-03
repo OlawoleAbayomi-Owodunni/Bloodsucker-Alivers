@@ -161,6 +161,23 @@ void Game::init()
 	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 440), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 560), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 680), Vector2f(1.0f, 1.0f)));
+
+	m_highscoreSprite.setTexture(UITexture);
+	m_highscoreSprite.setTextureRect(IntRect{ 89, 2366, 627, 118 });
+	m_highscoreSprite.setOrigin(627.0f / 2.0f, 118.0f / 2.0f);
+	m_highscoreSprite.setScale(0.75f, 0.75f);
+	m_highscoreSprite.setPosition(m_menuCamera.getCenter().x + 250, 190);
+
+	m_highscoreText.setFont(m_arialFont);
+	m_highscoreText.setStyle(sf::Text::Bold);
+	m_highscoreText.setCharacterSize(30U);
+	m_highscoreText.setOutlineColor(sf::Color::Black);
+	m_highscoreText.setFillColor(sf::Color::White);
+	m_highscoreText.setOutlineThickness(2.0f);
+	m_highscoreText.setString(to_string(highScore));
+	m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
+	m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
+
 #pragma endregion
 
 #pragma region pause menu
@@ -511,39 +528,6 @@ void Game::processGameEvents(sf::Event& event)
 		{
 #pragma region Menu input handling
 		case Gamemode::Menu:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-
-			case sf::Keyboard::Escape:
-				m_window.close();
-
-			case sf::Keyboard::Up:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Down:
-				m_cursorPos++;
-				break;
-
-			case sf::Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::Play:
-					m_currentGamemode = Gamemode::Gameplay;
-					m_menuMusic.stop();
-					m_gameplayMusic.play();
-
-					break;
-					//CASE FOR TUTORIAL AND CASE FOR CREDITS
-				case ButtonType::Exit:
-					m_window.close();
-					break;
-				}
-
-			}
-
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
@@ -628,42 +612,6 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Pause input handling
 		case Gamemode::Pause:
-#pragma region Keyboard Input
-
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Escape:
-				m_currentGamemode = Gamemode::Gameplay;
-				break;
-
-			case sf::Keyboard::Left:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Right:
-				m_cursorPos++;
-				break;
-
-			case Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::Resume:
-					m_currentGamemode = Gamemode::Gameplay;
-					break;
-				case ButtonType::ToMenu:
-					m_currentGamemode = Gamemode::Menu;
-					m_menuMusic.play();
-					m_gameplayMusic.stop();
-
-					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
-					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
-					break;
-				}
-				break;
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
@@ -733,50 +681,6 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Upgrade input handling
 		case Gamemode::Upgrade:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Up:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Down:
-				m_cursorPos++;
-				break;
-
-			case Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::UpgradeHealth:
-					m_player.upgradePlayer(PlayerUpgrade::Health);
-					break;
-				case ButtonType::UpgradeSpeed:
-					m_player.upgradePlayer(PlayerUpgrade::Speed);
-					break;
-				case ButtonType::UpgradeXP:
-					m_player.upgradePlayer(PlayerUpgrade::XP);
-					break;
-				case ButtonType::UpgradeArmor:
-					m_player.upgradePlayer(PlayerUpgrade::Armor);
-					break;
-				case ButtonType::UpgradePistol:
-					m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
-					break;
-				case ButtonType::UpgradeAR:
-					m_player.upgradeGun(WeaponType::AssaultRifle);
-					break;
-				}
-				createRandomWeapons();
-				m_currentGamemode = Gamemode::CarePackage;
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-				m_player.rumbleStop();
-				break;
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
@@ -854,33 +758,6 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Care Package input handling
 		case Gamemode::CarePackage:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Up:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Down:
-				m_cursorPos++;
-				break;
-
-			case Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::GetPistol:
-					m_player.giveWeapon(WeaponType::Pistol);
-					break;
-				case ButtonType::GetRifle:
-					m_player.giveWeapon(WeaponType::AssaultRifle);
-					break;
-				}
-				m_currentGamemode = Gamemode::Gameplay;
-				break;
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
@@ -960,24 +837,6 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Gameplay input handling
 		case Gamemode::Gameplay:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Escape:
-				m_currentGamemode = Gamemode::Pause;
-				pauseBgSprite.setPosition(m_playerCamera.getCenter());
-				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
-				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
-				break;
-
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller Input
 			if (event.joystickButton.button == 7) {
 				m_currentGamemode = Gamemode::Pause;
@@ -1089,11 +948,17 @@ void Game::update(double dt)
 			isGameOver = false;
 			//switch to game over game mode here
 			m_currentGamemode = Gamemode::GameOver;
+			m_cursorPos = 0;
 			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
 			score = (((1 * smallEK) + (1.5 * normalEK) + (5 * bigEK) + (200 * bossEK)) / 100) * timeSurvived;
 
-
+			if (score > highScore) {
+				highScore = score;
+				m_highscoreText.setString(to_string(highScore));
+				m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
+				m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
+			}
 
 
 #pragma region Menu UI setup
@@ -1188,6 +1053,7 @@ void Game::update(double dt)
 
 		m_player.update(dt, m_playerCamera, m_enemies);
 
+#pragma region iterators
 		for (auto enemy : m_enemies)
 		{
 			enemy->update(dt, m_player);
@@ -1213,6 +1079,9 @@ void Game::update(double dt)
 		{
 			pickup->update(dt);
 		}
+
+#pragma endregion
+
 
 		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 120.0f)
 		{
@@ -1400,6 +1269,8 @@ void Game::render()
 			for (auto buttons : m_menuButtons) {
 				buttons->render(m_window);
 			}
+			m_window.draw(m_highscoreSprite);
+			m_window.draw(m_highscoreText);
 			m_window.draw(m_cursorSprite);
 		}
 

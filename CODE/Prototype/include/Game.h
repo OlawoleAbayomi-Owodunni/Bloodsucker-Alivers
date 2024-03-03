@@ -145,6 +145,9 @@ protected:
 	vector<Button*> m_gameoverButtons;
 	Sprite m_scoreVarBGSprite;
 	Sprite m_scoreSprite;
+	Sprite m_highscoreSprite;
+	Text m_highscoreText;
+	Text m_scoreRank;
 
 	SoundBuffer m_menuScrollBuffer;
 	Sound m_menuScrollSound;
@@ -172,6 +175,7 @@ protected:
 	int totalEK;
 	int updateCount;
 	int timeSurvived;
+	int highScore;
 
 	Text m_scoreText;
 	Text m_smallEKText;

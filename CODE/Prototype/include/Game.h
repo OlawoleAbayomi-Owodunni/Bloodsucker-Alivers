@@ -120,6 +120,8 @@ protected:
 	Sprite menuBgSprite;
 	vector<Button*> m_menuButtons;
 
+	Sprite m_vignetteSprite;
+
 	Sprite pauseBgSprite;
 	vector<Button*> m_pauseButtons;
 

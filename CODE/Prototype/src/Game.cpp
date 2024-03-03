@@ -42,6 +42,7 @@ void Game::init()
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
 	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
 	m_holder.acquire("tutorialMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/InformationScreen.png"));
+	m_holder.acquire("screenVignette", thor::Resources::fromFile<sf::Texture>("resources/sprites/bigblackbox.png"));
 #pragma endregion
 
 #pragma region SOUND
@@ -143,6 +144,11 @@ void Game::init()
 	menuBgSprite.setTextureRect(IntRect{ 0,0,1600,900 });
 	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	menuBgSprite.setPosition(m_menuCamera.getCenter());
+
+	m_vignetteSprite.setTexture(m_holder["screenVignette"]);
+	m_vignetteSprite.setTextureRect(IntRect{ 0,0,1600,900 });
+	m_vignetteSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
+	m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 
 	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(550, 320), Vector2f(1.0f, 1.0f)));
@@ -958,6 +964,7 @@ void Game::processGameEvents(sf::Event& event)
 			if (event.joystickButton.button == 7) {
 				m_currentGamemode = Gamemode::Pause;
 				pauseBgSprite.setPosition(m_playerCamera.getCenter());
+				m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
 				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
 				m_cursorPos = 0;
@@ -1075,6 +1082,7 @@ void Game::update(double dt)
 			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
 			m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
 			gameOverBGSprite.setPosition(m_playerCamera.getCenter());
+			m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 			m_gameoverButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 275, m_playerCamera.getCenter().y + 365));
 			m_gameoverButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 275, m_playerCamera.getCenter().y + 365));
 #pragma endregion
@@ -1269,6 +1277,12 @@ void Game::render()
 		m_player.renderHUD(m_window);
 
 #pragma endregion
+
+		if (m_currentGamemode == Gamemode::Pause ||
+			m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage ||
+			m_currentGamemode == Gamemode::GameOver) {
+		m_window.draw(m_vignetteSprite);
+		}
 
 #pragma region pause menu
 		//Render pause menu
@@ -1990,6 +2004,8 @@ void Game::levelUpSpawner()
 		m_cursorPos = 0;
 		m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
 		m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+
+		m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 	}
 }
 

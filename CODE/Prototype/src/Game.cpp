@@ -70,6 +70,21 @@ void Game::init()
 	m_gameplayMusic.setVolume(2.0f);
 
 	m_menuMusic.play();
+
+	if (!m_menuSelectBuffer.loadFromFile("resources/sounds/button_select.wav"))
+	{
+		std::cout << "error loading select sound";
+	}
+	m_menuSelectSound.setBuffer(m_menuSelectBuffer);
+	m_menuSelectSound.setVolume(3.0f);
+
+	if (!m_menuScrollBuffer.loadFromFile("resources/sounds/button_scroll.wav"))
+	{
+		std::cout << "error loading scroll sound";
+	}
+	m_menuScrollSound.setBuffer(m_menuScrollBuffer);
+	m_menuScrollSound.setVolume(1.5f);
+
 #pragma endregion
 
 #pragma region ENEMIES & OBSTACLEES INITIALISER
@@ -523,9 +538,17 @@ void Game::processGameEvents(sf::Event& event)
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
 					if (event.joystickMove.position == -100) // Up
+					{ 
 						m_cursorPos++;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 					else if (event.joystickMove.position == 100) // Down
+					{
 						m_cursorPos--;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 				}
 
 				if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) {
@@ -572,6 +595,8 @@ void Game::processGameEvents(sf::Event& event)
 							m_window.close();
 							break;
 						}
+						m_menuSelectSound.stop();
+						m_menuSelectSound.play();
 					}
 				}
 				else {
@@ -630,9 +655,17 @@ void Game::processGameEvents(sf::Event& event)
 				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
 				{
 					if (event.joystickMove.position == -100) // Left
+					{
 						m_cursorPos--;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 					else if (event.joystickMove.position == 100) // Right
+					{
 						m_cursorPos++;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}	
 				}
 
 				if (m_cursorPos > (static_cast<int>(m_pauseButtons.size()) - 1)) {
@@ -670,6 +703,8 @@ void Game::processGameEvents(sf::Event& event)
 						m_player.rumbleStop();
 						break;
 					}
+					m_menuSelectSound.stop();
+					m_menuSelectSound.play();
 				}
 				if (event.joystickButton.button == 7) {
 					m_currentGamemode = Gamemode::Gameplay;
@@ -733,9 +768,17 @@ void Game::processGameEvents(sf::Event& event)
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
 					if (event.joystickMove.position == -100) // Up
+					{
 						m_cursorPos++;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}	
 					else if (event.joystickMove.position == 100) // Down
+					{
 						m_cursorPos--;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 				}
 
 				if (m_cursorPos > (static_cast<int>(m_upgradeButtons.size()) - 1)) {
@@ -771,6 +814,9 @@ void Game::processGameEvents(sf::Event& event)
 						m_player.upgradePlayer(PlayerUpgrade::Armor);
 						break;
 					}
+					m_menuSelectSound.stop();
+					m_menuSelectSound.play();
+
 					m_currentGamemode = Gamemode::CarePackage;
 
 					gunInfoImgSprite.setPosition(InfoImgBGSprite.getPosition());
@@ -826,9 +872,17 @@ void Game::processGameEvents(sf::Event& event)
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
 					if (event.joystickMove.position == -100) // Up
+					{
 						m_cursorPos--;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 					else if (event.joystickMove.position == 100) // Down
+					{
 						m_cursorPos++;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 				}
 
 				if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
@@ -867,6 +921,8 @@ void Game::processGameEvents(sf::Event& event)
 						break;
 					}
 					m_currentGamemode = Gamemode::Gameplay;
+					m_menuSelectSound.stop();
+					m_menuSelectSound.play();
 				}
 			}
 #pragma endregion
@@ -919,9 +975,17 @@ void Game::processGameEvents(sf::Event& event)
 				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
 				{
 					if (event.joystickMove.position == -100) // Left
+					{
 						m_cursorPos--;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 					else if (event.joystickMove.position == 100) // Right
+					{
 						m_cursorPos++;
+						m_menuScrollSound.stop();
+						m_menuScrollSound.play();
+					}
 				}
 
 				if (m_cursorPos > (static_cast<int>(m_gameoverButtons.size()) - 1)) {
@@ -960,6 +1024,8 @@ void Game::processGameEvents(sf::Event& event)
 						m_player.rumbleStop();
 						break;
 					}
+					m_menuSelectSound.stop();
+					m_menuSelectSound.play();
 				}
 				break;
 			}
@@ -1185,12 +1251,12 @@ void Game::render()
 			orb->render(m_window);
 		}
 
-		m_player.renderPlayer(m_window);
-
 		for (auto enemy : m_enemies)
 		{
 			enemy->render(m_window);
 		}
+
+		m_player.renderPlayer(m_window);
 
 		for (auto obstacle : m_obstacles)
 		{

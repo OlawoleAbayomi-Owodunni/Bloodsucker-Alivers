@@ -20,18 +20,46 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 	case WeaponType::Pistol:
 		m_fireRate = 2.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
+
+		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/pistol_shoot.wav"))
+		{
+			std::cout << "error loading pistl shooting sound";
+		}
+		m_shootingSound.setBuffer(m_shootingSoundBuffer);
+		m_shootingSound.setVolume(2.0f);
 		break;
 	case WeaponType::AssaultRifle:
 		m_fireRate = 3.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
+
+		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/ar_shoot.wav"))
+		{
+			std::cout << "error loading ar shooting sound";
+		}
+		m_shootingSound.setBuffer(m_shootingSoundBuffer);
+		m_shootingSound.setVolume(1.5f);
 		break;
 	case WeaponType::Sniper:
 		m_fireRate = 4.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when sniper sprite is added
+
+		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/sniper_shoot.wav"))
+		{
+			std::cout << "error loading sniper shooting sound";
+		}
+		m_shootingSound.setBuffer(m_shootingSoundBuffer);
+		m_shootingSound.setVolume(5.0f);
 		break;
 	case WeaponType::RPG:
 		m_fireRate = 6.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when rpg sprite is added
+
+		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/rpg_shoot.wav"))
+		{
+			std::cout << "error loading rpg shooting sound";
+		}
+		m_shootingSound.setBuffer(m_shootingSoundBuffer);
+		m_shootingSound.setVolume(10.0f);
 
 		m_explosion.position = sf::Vector2f(-1000.0f, -1000.0f);
 		
@@ -89,6 +117,9 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			m_timer.restart();
 
 			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
+			
+			m_shootingSound.stop();
+			m_shootingSound.play();
 		}
 		break;
 	case WeaponType::AssaultRifle:
@@ -106,6 +137,9 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 				m_arTimer.restart();
 				m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
 				m_arBulletCounter++;
+				
+				m_shootingSound.stop();
+				m_shootingSound.play();
 			}
 
 			if (m_arBulletCounter == m_maxArBullets)
@@ -130,6 +164,9 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			m_timer.restart();
 
 			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
+			
+			m_shootingSound.stop();
+			m_shootingSound.play();
 		}
 		break;
 	case WeaponType::RPG:
@@ -146,6 +183,8 @@ void Weapon::update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_e
 			m_timer.restart();
 
 			m_bullets.push_back(new Bullet(m_type, m_starterAtlas, t_playerPos, t_enemies, t_direction));
+			m_shootingSound.stop();
+			m_shootingSound.play();
 		}
 
 		if (m_explosion.currentFrame > 2)

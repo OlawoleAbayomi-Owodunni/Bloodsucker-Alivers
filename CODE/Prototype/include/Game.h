@@ -142,6 +142,12 @@ protected:
 	vector<Button*> m_gameoverButtons;
 	Sprite m_scoreVarBGSprite;
 	Sprite m_scoreSprite;
+
+	SoundBuffer m_menuScrollBuffer;
+	Sound m_menuScrollSound;
+
+	SoundBuffer m_menuSelectBuffer;
+	Sound m_menuSelectSound;
 	//Text for all the things to add
 
 	Sprite m_cursorSprite;

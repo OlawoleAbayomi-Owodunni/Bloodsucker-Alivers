@@ -52,6 +52,9 @@ private:
 
 	Explosion m_explosion;
 
+	SoundBuffer m_shootingSoundBuffer;
+	Sound m_shootingSound;
+
 	Texture m_starterAtlas;
 	Sprite m_weaponSprite;
 

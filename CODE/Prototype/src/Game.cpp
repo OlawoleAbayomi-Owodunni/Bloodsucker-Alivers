@@ -589,7 +589,10 @@ void Game::processGameEvents(sf::Event& event)
 							inMenu = true;
 							menuBgSprite.setTexture(m_holder["tutorialMenu"]);
 							break;
-							//CASE FOR TUTORIAL AND CASE FOR CREDITS
+						case ButtonType::Credits:
+							inMenu = true;
+							menuBgSprite.setTexture(m_holder["tutorialMenu"]); // PLEASE REMEBER TO CHANGE THE HOLDER TO CRREDITS WHEN BG IS READY
+							break;
 						case ButtonType::Exit:
 							m_player.rumbleStop();
 							m_window.close();

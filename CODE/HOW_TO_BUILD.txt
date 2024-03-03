@@ -1,7 +1,8 @@
 Windows:
 - run the .sln file in the Prototype folder
+- switch build mode to release
 - Build the project using Visual Studio (ctrl + B)
-- ensure resources folder and .otf (font file) are in the debug directory
+- ensure resources folder and .otf (font file) are in the release directory
 
 LinuX:
 - Going to keep it straight with you. I have no idea...

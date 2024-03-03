@@ -878,7 +878,42 @@ void Player::giveWeapon(WeaponType t_type)
 			cout << "Assault Rifle added to arsenal.\n";
 		}
 		break;
+	case WeaponType::Sniper:
+		for (auto weapon : m_weapons)
+		{
+			if (weapon->getType() == t_type) {
+				weapon->equipWeapon();
+				weaponEquipped = true;
+			}
+		}
+
+		if (weaponEquipped) {
+			cout << "You already have that weapon equipped.\n";
+		}
+		else {
+			m_weapons.push_back(new Weapon(WeaponType::Sniper, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
+			cout << "Sniper added to arsenal.\n";
+		}
+		break;
+	case WeaponType::RPG:
+		for (auto weapon : m_weapons)
+		{
+			if (weapon->getType() == t_type) {
+				weapon->equipWeapon();
+				weaponEquipped = true;
+			}
+		}
+
+		if (weaponEquipped) {
+			cout << "You already have that weapon equipped.\n";
+		}
+		else {
+			m_weapons.push_back(new Weapon(WeaponType::RPG, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
+			cout << "RPG added to arsenal.\n";
+		}
+		break;
 	default:
+		cout << "ERROR RUNNING TRYING TO ADD WEEAPON. WEAPON TYPE DOES NOT EXIST IN CONTEXT!\n";
 		break;
 	}
 }

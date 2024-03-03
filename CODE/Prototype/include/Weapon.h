@@ -51,6 +51,8 @@ private:
 	int m_maxArBullets;
 
 	Explosion m_explosion;
+	float m_dmgRadius;
+	float m_dmgRadiusModifier;
 
 	SoundBuffer m_shootingSoundBuffer;
 	Sound m_shootingSound;
@@ -61,4 +63,5 @@ private:
 	int m_weaponLvl;
 
 	bool isGunEquipped;
+	bool isFullyUpgraded;
 };

@@ -33,6 +33,7 @@ void Game::init()
 	firstStart = true;
 	inMenu = false;
 	m_bossSpawned = false;
+	highScore = 0;
 
 #pragma region THOR
 	//THOR
@@ -42,6 +43,8 @@ void Game::init()
 	m_holder.acquire("UIAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/UI_Atlas.png"));
 	m_holder.acquire("obstacleAtlas", thor::Resources::fromFile<sf::Texture>("resources/sprites/ObstacleAtlas.png"));
 	m_holder.acquire("tutorialMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/InformationScreen.png"));
+	//m_holder.acquire("creditsMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/credits.png"));
+	m_holder.acquire("screenVignette", thor::Resources::fromFile<sf::Texture>("resources/sprites/bigblackbox.png"));
 #pragma endregion
 
 #pragma region SOUND
@@ -144,11 +147,37 @@ void Game::init()
 	menuBgSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
 	menuBgSprite.setPosition(m_menuCamera.getCenter());
 
+	m_vignetteSprite.setTexture(m_holder["screenVignette"]);
+	m_vignetteSprite.setTextureRect(IntRect{ 0,0,1600,900 });
+	m_vignetteSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
+	m_vignetteSprite.setPosition(m_playerCamera.getCenter());
+	m_hudSprite.setTexture(m_holder["screenVignette"]);
+	m_hudSprite.setTextureRect(IntRect{ 0,0,1600,80 });
+	m_hudSprite.setOrigin(1600.0f / 2.0f, 900.0f / 2.0f);
+	m_hudSprite.setPosition(m_playerCamera.getCenter());
+
 	m_menuButtons.push_back(new Button(ButtonType::Play, UITexture, m_arialFont, Vector2f(550, 200), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Resume, UITexture, m_arialFont, Vector2f(550, 320), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 440), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 560), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 680), Vector2f(1.0f, 1.0f)));
+
+	m_highscoreSprite.setTexture(UITexture);
+	m_highscoreSprite.setTextureRect(IntRect{ 89, 2366, 627, 118 });
+	m_highscoreSprite.setOrigin(627.0f / 2.0f, 118.0f / 2.0f);
+	m_highscoreSprite.setScale(0.75f, 0.75f);
+	m_highscoreSprite.setPosition(m_menuCamera.getCenter().x + 250, 190);
+
+	m_highscoreText.setFont(m_arialFont);
+	m_highscoreText.setStyle(sf::Text::Bold);
+	m_highscoreText.setCharacterSize(30U);
+	m_highscoreText.setOutlineColor(sf::Color::Black);
+	m_highscoreText.setFillColor(sf::Color::White);
+	m_highscoreText.setOutlineThickness(2.0f);
+	m_highscoreText.setString(to_string(highScore));
+	m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
+	m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
+
 #pragma endregion
 
 #pragma region pause menu
@@ -499,51 +528,18 @@ void Game::processGameEvents(sf::Event& event)
 		{
 #pragma region Menu input handling
 		case Gamemode::Menu:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-
-			case sf::Keyboard::Escape:
-				m_window.close();
-
-			case sf::Keyboard::Up:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Down:
-				m_cursorPos++;
-				break;
-
-			case sf::Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::Play:
-					m_currentGamemode = Gamemode::Gameplay;
-					m_menuMusic.stop();
-					m_gameplayMusic.play();
-
-					break;
-					//CASE FOR TUTORIAL AND CASE FOR CREDITS
-				case ButtonType::Exit:
-					m_window.close();
-					break;
-				}
-
-			}
-
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
-					if (event.joystickMove.position == -100) // Up
+					if (event.joystickMove.position == -100) // Down
 					{ 
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
-					else if (event.joystickMove.position == 100) // Down
+					else if (event.joystickMove.position == 100) // Up
 					{
 						m_cursorPos--;
 						m_menuScrollSound.stop();
@@ -591,7 +587,7 @@ void Game::processGameEvents(sf::Event& event)
 							break;
 						case ButtonType::Credits:
 							inMenu = true;
-							menuBgSprite.setTexture(m_holder["tutorialMenu"]); // PLEASE REMEBER TO CHANGE THE HOLDER TO CRREDITS WHEN BG IS READY
+							menuBgSprite.setTexture(m_holder["creditsMenu"]); // PLEASE REMEBER TO CHANGE THE HOLDER TO CRREDITS WHEN BG IS READY
 							break;
 						case ButtonType::Exit:
 							m_player.rumbleStop();
@@ -616,42 +612,6 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Pause input handling
 		case Gamemode::Pause:
-#pragma region Keyboard Input
-
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Escape:
-				m_currentGamemode = Gamemode::Gameplay;
-				break;
-
-			case sf::Keyboard::Left:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Right:
-				m_cursorPos++;
-				break;
-
-			case Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::Resume:
-					m_currentGamemode = Gamemode::Gameplay;
-					break;
-				case ButtonType::ToMenu:
-					m_currentGamemode = Gamemode::Menu;
-					m_menuMusic.play();
-					m_gameplayMusic.stop();
-
-					m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
-					m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
-					break;
-				}
-				break;
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
@@ -721,62 +681,18 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Upgrade input handling
 		case Gamemode::Upgrade:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Up:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Down:
-				m_cursorPos++;
-				break;
-
-			case Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::UpgradeHealth:
-					m_player.upgradePlayer(PlayerUpgrade::Health);
-					break;
-				case ButtonType::UpgradeSpeed:
-					m_player.upgradePlayer(PlayerUpgrade::Speed);
-					break;
-				case ButtonType::UpgradeXP:
-					m_player.upgradePlayer(PlayerUpgrade::XP);
-					break;
-				case ButtonType::UpgradeArmor:
-					m_player.upgradePlayer(PlayerUpgrade::Armor);
-					break;
-				case ButtonType::UpgradePistol:
-					m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
-					break;
-				case ButtonType::UpgradeAR:
-					m_player.upgradeGun(WeaponType::AssaultRifle);
-					break;
-				}
-				createRandomWeapons();
-				m_currentGamemode = Gamemode::CarePackage;
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-				m_player.rumbleStop();
-				break;
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
-					if (event.joystickMove.position == -100) // Up
+					if (event.joystickMove.position == -100) // Down
 					{
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}	
-					else if (event.joystickMove.position == 100) // Down
+					else if (event.joystickMove.position == 100) // Up
 					{
 						m_cursorPos--;
 						m_menuScrollSound.stop();
@@ -842,47 +758,20 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Care Package input handling
 		case Gamemode::CarePackage:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Up:
-				m_cursorPos--;
-				break;
-			case sf::Keyboard::Down:
-				m_cursorPos++;
-				break;
-
-			case Keyboard::Enter:
-				switch (m_cursorButtonType)
-				{
-				case ButtonType::GetPistol:
-					m_player.giveWeapon(WeaponType::Pistol);
-					break;
-				case ButtonType::GetRifle:
-					m_player.giveWeapon(WeaponType::AssaultRifle);
-					break;
-				}
-				m_currentGamemode = Gamemode::Gameplay;
-				break;
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller input
 			//D-Pad pressed
 			if (Event::JoystickMoved == event.type) {
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
-					if (event.joystickMove.position == -100) // Up
+					if (event.joystickMove.position == -100) // Down
 					{
-						m_cursorPos--;
+						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
-					else if (event.joystickMove.position == 100) // Down
+					else if (event.joystickMove.position == 100) // Up
 					{
-						m_cursorPos++;
+						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
@@ -916,11 +805,23 @@ void Game::processGameEvents(sf::Event& event)
 					case ButtonType::GetRifle:
 						m_player.giveWeapon(WeaponType::AssaultRifle);
 						break;
+					case ButtonType::GetSniper:
+						m_player.giveWeapon(WeaponType::Sniper);
+						break;
+					case ButtonType::GetRPG:
+						m_player.giveWeapon(WeaponType::RPG);
+						break;
 					case ButtonType::UpgradePistol:
 						m_player.upgradeGun(WeaponType::Pistol); // go back to player and refreactor to allow for pistol and ar
 						break;
 					case ButtonType::UpgradeAR:
 						m_player.upgradeGun(WeaponType::AssaultRifle);
+						break;
+					case ButtonType::UpgradeSniper:
+						m_player.upgradeGun(WeaponType::Sniper); // go back to player and refreactor to allow for pistol and ar
+						break;
+					case ButtonType::UpgradeRPG:
+						m_player.upgradeGun(WeaponType::RPG);
 						break;
 					}
 					m_currentGamemode = Gamemode::Gameplay;
@@ -936,28 +837,11 @@ void Game::processGameEvents(sf::Event& event)
 
 #pragma region Gameplay input handling
 		case Gamemode::Gameplay:
-#pragma region Keyboard Input
-			switch (event.key.code)
-			{
-			case sf::Keyboard::Escape:
-				m_currentGamemode = Gamemode::Pause;
-				pauseBgSprite.setPosition(m_playerCamera.getCenter());
-				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
-				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
-				m_cursorPos = 0;
-				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
-				break;
-
-			default:
-				break;
-			}
-#pragma endregion
-
 #pragma region Controller Input
 			if (event.joystickButton.button == 7) {
 				m_currentGamemode = Gamemode::Pause;
 				pauseBgSprite.setPosition(m_playerCamera.getCenter());
+				m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 				m_pauseButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 250, m_playerCamera.getCenter().y));
 				m_pauseButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 250, m_playerCamera.getCenter().y));
 				m_cursorPos = 0;
@@ -1049,6 +933,7 @@ void Game::update(double dt)
 		break;
 	case Gamemode::Gameplay:
 		m_window.setView(m_playerCamera);
+		m_hudSprite.setPosition(m_playerCamera.getCenter());
 	}
 
 #pragma region Gameplay Gamemode logic
@@ -1063,11 +948,17 @@ void Game::update(double dt)
 			isGameOver = false;
 			//switch to game over game mode here
 			m_currentGamemode = Gamemode::GameOver;
+			m_cursorPos = 0;
 			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
 			score = (((1 * smallEK) + (1.5 * normalEK) + (5 * bigEK) + (200 * bossEK)) / 100) * timeSurvived;
 
-
+			if (score > highScore) {
+				highScore = score;
+				m_highscoreText.setString(to_string(highScore));
+				m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
+				m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
+			}
 
 
 #pragma region Menu UI setup
@@ -1075,6 +966,7 @@ void Game::update(double dt)
 			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
 			m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
 			gameOverBGSprite.setPosition(m_playerCamera.getCenter());
+			m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 			m_gameoverButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 275, m_playerCamera.getCenter().y + 365));
 			m_gameoverButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 275, m_playerCamera.getCenter().y + 365));
 #pragma endregion
@@ -1161,6 +1053,7 @@ void Game::update(double dt)
 
 		m_player.update(dt, m_playerCamera, m_enemies);
 
+#pragma region iterators
 		for (auto enemy : m_enemies)
 		{
 			enemy->update(dt, m_player);
@@ -1186,6 +1079,9 @@ void Game::update(double dt)
 		{
 			pickup->update(dt);
 		}
+
+#pragma endregion
+
 
 		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 120.0f)
 		{
@@ -1265,10 +1161,20 @@ void Game::render()
 		{
 			obstacle->renderTop(m_window);
 		}
+		if (m_currentGamemode == Gamemode::Gameplay) {
+			m_window.draw(m_hudSprite);
+		}
 
 		m_player.renderHUD(m_window);
 
 #pragma endregion
+
+		if (m_currentGamemode == Gamemode::Pause ||
+			m_currentGamemode == Gamemode::Upgrade || m_currentGamemode == Gamemode::CarePackage ||
+			m_currentGamemode == Gamemode::GameOver) {
+		m_window.draw(m_vignetteSprite);
+		}
+
 
 #pragma region pause menu
 		//Render pause menu
@@ -1363,6 +1269,8 @@ void Game::render()
 			for (auto buttons : m_menuButtons) {
 				buttons->render(m_window);
 			}
+			m_window.draw(m_highscoreSprite);
+			m_window.draw(m_highscoreText);
 			m_window.draw(m_cursorSprite);
 		}
 
@@ -1619,14 +1527,17 @@ void Game::checkCollisions()
 							switch (enemy->getType())
 							{
 							case EnemyType::Small:
+								smallEK++;
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
 								break;
 							case EnemyType::Big:
+								bigEK++;
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
 								break;
 							case EnemyType::Boss:
+								bossEK++;
 								enemy->playHitSound();
 								enemy->decreaseHealth(bullet->getDamage() / 100.0f);
 								
@@ -1818,21 +1729,35 @@ void Game::createRandomWeapons()
 {
 	m_weaponButtons.clear();
 
-	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
-	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol));
+	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol));
+	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol));
+	ButtonType randomUpgradeButton3 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol));
 
-	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 2) + static_cast<int>(ButtonType::GetPistol)); }
+	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol)); }
+	while (randomUpgradeButton3 == randomUpgradeButton1 || randomUpgradeButton3 == randomUpgradeButton2)
+	{
+		randomUpgradeButton3 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol));
+	}
+
 
 	bool isEquipped1 = false;
 	bool isEquipped2 = false;
+	bool isEquipped3 = false;
 	WeaponType btnWpnTyp1 = WeaponType::Count;
 	WeaponType btnWpnTyp2 = WeaponType::Count;
+	WeaponType btnWpnTyp3 = WeaponType::Count;
 	switch (randomUpgradeButton1) {
 	case (0 + static_cast<int>(ButtonType::GetPistol)):
 		btnWpnTyp1 = WeaponType::Pistol;
 		break;
 	case (1 + static_cast<int>(ButtonType::GetPistol)):
 		btnWpnTyp1 = WeaponType::AssaultRifle;
+		break;
+	case (2 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp1 = WeaponType::Sniper;
+		break;
+	case (3 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp1 = WeaponType::RPG;
 		break;
 	}
 	switch (randomUpgradeButton2) {
@@ -1842,6 +1767,26 @@ void Game::createRandomWeapons()
 	case (1 + static_cast<int>(ButtonType::GetPistol)): //remember that this calculation is to get the position of get pistol and get ar bt types
 		btnWpnTyp2 = WeaponType::AssaultRifle;
 		break;
+	case (2 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp2 = WeaponType::Sniper;
+		break;
+	case (3 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp2 = WeaponType::RPG;
+		break;
+	}
+	switch (randomUpgradeButton3) {
+	case (0 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp3 = WeaponType::Pistol;
+		break;
+	case (1 + static_cast<int>(ButtonType::GetPistol)): //remember that this calculation is to get the position of get pistol and get ar bt types
+		btnWpnTyp3 = WeaponType::AssaultRifle;
+		break;
+	case (2 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp3 = WeaponType::Sniper;
+		break;
+	case (3 + static_cast<int>(ButtonType::GetPistol)):
+		btnWpnTyp3 = WeaponType::RPG;
+		break;
 	}
 	for (auto weapon : m_player.getWeapons()) {
 		if (btnWpnTyp1 == weapon->getType()) {
@@ -1849,6 +1794,9 @@ void Game::createRandomWeapons()
 		}
 		if (btnWpnTyp2 == weapon->getType()) {
 			isEquipped2 = true;
+		}
+		if (btnWpnTyp3 == weapon->getType()) {
+			isEquipped3 = true;
 		}
 	}
 	if (isEquipped1) {
@@ -1858,6 +1806,12 @@ void Game::createRandomWeapons()
 		if (btnWpnTyp1 == WeaponType::AssaultRifle) {
 			randomUpgradeButton1 = ButtonType::UpgradeAR;
 		}
+		if (btnWpnTyp1 == WeaponType::Sniper) {
+			randomUpgradeButton1 = ButtonType::UpgradeSniper;
+		}
+		if (btnWpnTyp1 == WeaponType::RPG) {
+			randomUpgradeButton1 = ButtonType::UpgradeRPG;
+		}
 	}
 	if (isEquipped2) {
 		if (btnWpnTyp2 == WeaponType::Pistol) {
@@ -1866,10 +1820,32 @@ void Game::createRandomWeapons()
 		if (btnWpnTyp2 == WeaponType::AssaultRifle) {
 			randomUpgradeButton2 = ButtonType::UpgradeAR;
 		}
+		if (btnWpnTyp2 == WeaponType::Sniper) {
+			randomUpgradeButton2 = ButtonType::UpgradeSniper;
+		}
+		if (btnWpnTyp2 == WeaponType::RPG) {
+			randomUpgradeButton2 = ButtonType::UpgradeRPG;
+		}
+	}
+	if (isEquipped3) {
+		if (btnWpnTyp3 == WeaponType::Pistol) {
+			randomUpgradeButton3 = ButtonType::UpgradePistol;
+		}
+		if (btnWpnTyp3 == WeaponType::AssaultRifle) {
+			randomUpgradeButton3 = ButtonType::UpgradeAR;
+		}
+		if (btnWpnTyp3 == WeaponType::Sniper) {
+			randomUpgradeButton3 = ButtonType::UpgradeSniper;
+		}
+		if (btnWpnTyp3 == WeaponType::RPG) {
+			randomUpgradeButton3 = ButtonType::UpgradeRPG;
+		}
 	}
 
-	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 150), Vector2f(0.75f, 0.75f)));
-	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 150), Vector2f(0.75f, 0.75f)));
+	m_weaponButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180), Vector2f(0.75f, 0.75f)));
+	m_weaponButtons.push_back(new Button(randomUpgradeButton2, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y), Vector2f(0.75f, 0.75f)));
+	m_weaponButtons.push_back(new Button(randomUpgradeButton3, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y + 180), Vector2f(0.75f, 0.75f)));
+
 
 	setGunInfo();
 }
@@ -1905,6 +1881,24 @@ void Game::setGunInfo()
 			}
 		}
 		break;
+	case ButtonType::UpgradeSniper:
+		tempWpnType = WeaponType::Sniper;
+		for (auto gun : m_player.getWeapons())
+		{
+			if (gun->getType() == tempWpnType) {
+				gunLevel = gun->getWeaponLevel();
+			}
+		}
+		break;
+	case ButtonType::UpgradeRPG:
+		tempWpnType = WeaponType::RPG;
+		for (auto gun : m_player.getWeapons())
+		{
+			if (gun->getType() == tempWpnType) {
+				gunLevel = gun->getWeaponLevel();
+			}
+		}
+		break;
 	}
 
 
@@ -1913,21 +1907,42 @@ void Game::setGunInfo()
 		heading = "Get Pistol";
 		description = "Fires one bullet at\nclosest enemy";
 		gunInfoImgSprite.setTextureRect({ 0,0,128,32 });
+		gunInfoImgSprite.setScale(1.8f, 1.8f);
 		break;
 	case ButtonType::GetRifle:
-		heading = "Get Assault Rifle";
+		heading = "Get AR";
 		description = "Fires burst in the\nfaced direction";
 		gunInfoImgSprite.setTextureRect({ 0,32,128,32 });
+		gunInfoImgSprite.setScale(1.8f, 1.8f);
+		break;
+	case ButtonType::GetSniper:
+		heading = "Get Sniper";
+		description = "Fires one bullet at\nfurthest enemy";
+		gunInfoImgSprite.setTextureRect({ 1584, 784, 256, 64 });
+		gunInfoImgSprite.setScale(0.8f, 0.8f);
+		break;
+	case ButtonType::GetRPG:
+		heading = "Get RPG";
+		description = "Fires a rocket in\na random direction";
+		gunInfoImgSprite.setTextureRect({ 1648, 994, 256, 64 });
+		gunInfoImgSprite.setScale(0.8f, 0.8f);
 		break;
 
 	case ButtonType::UpgradePistol:
 		heading = "PISTOL LVL " + to_string(gunLevel + 1);
 		gunInfoImgSprite.setTextureRect({ 0,0,128,32 });
+		gunInfoImgSprite.setScale(1.8f, 1.8f);
 		switch (gunLevel) {
 		case 1:
 			description = "Increase Fire Rate";
 			break;
 		case 2:
+			description = "Increase Fire Rate";
+			break;
+		case 3:
+			description = "Increase Fire Rate";
+			break;
+		case 4:
 			description = "Increase Fire Rate";
 			break;
 		default:
@@ -1938,12 +1953,63 @@ void Game::setGunInfo()
 	case ButtonType::UpgradeAR:
 		heading = "RIFLE LVL " + to_string(gunLevel + 1);
 		gunInfoImgSprite.setTextureRect({ 0,32,128,32 });
+		gunInfoImgSprite.setScale(1.8f, 1.8f);
 		switch (gunLevel) {
 		case 1:
 			description = "Increase mag size +1";
 			break;
 		case 2:
-			description = "Increase Fire Rate\nIncrease mag size +2";
+			description = "Increase Fire Rate";
+			break;
+		case 3:
+			description = "Increase mag size +1";
+			break;
+		case 4:
+			description = "Increase Fire Rate\nIncrease mag size +3";
+			break;
+		default:
+			description = "GUN FULLY UPGRADED";
+			break;
+		}
+		break;
+	case ButtonType::UpgradeSniper:
+		heading = "SNIPER LVL " + to_string(gunLevel + 1);
+		gunInfoImgSprite.setTextureRect({ 1584, 784, 256, 64 });
+		gunInfoImgSprite.setScale(0.8f, 0.8f);
+		switch (gunLevel) {
+		case 1:
+			description = "Increase Fire Rate";
+			break;
+		case 2:
+			description = "Increase Fire Rate";
+			break;
+		case 3:
+			description = "Increase Fire Rate";
+			break;
+		case 4:
+			description = "Increase Fire Rate";
+			break;
+		default:
+			description = "GUN FULLY UPGRADED";
+			break;
+		}
+		break;
+	case ButtonType::UpgradeRPG:
+		heading = "RPG LVL " + to_string(gunLevel + 1);
+		gunInfoImgSprite.setTextureRect({ 1648, 994, 256, 64 });
+		gunInfoImgSprite.setScale(0.8f, 0.8f);
+		switch (gunLevel) {
+		case 1:
+			description = "Increase Fire Rate";
+			break;
+		case 2:
+			description = "Increase Power";
+			break;
+		case 3:
+			description = "Increase Fire Rate\nIncrease Power";
+			break;
+		case 4:
+			description = "Increase Power\nIncrease Fire Rate";
 			break;
 		default:
 			description = "GUN FULLY UPGRADED";
@@ -1951,8 +2017,7 @@ void Game::setGunInfo()
 		}
 		break;
 	}
-
-	gunInfoImgSprite.setScale(2.0f, 2.0f);
+	gunInfoImgSprite.setOrigin(gunInfoImgSprite.getTextureRect().width / 2.0f, gunInfoImgSprite.getTextureRect().height / 2.0f);
 
 	gunLvlInfoTxt.setString(heading);//has to be weaopn level which should be gotten from for loop above
 	gunLvlInfoTxt.setOrigin(gunLvlInfoTxt.getGlobalBounds().width / 2.0f, gunLvlInfoTxt.getGlobalBounds().height / 2.0f);
@@ -1990,6 +2055,8 @@ void Game::levelUpSpawner()
 		m_cursorPos = 0;
 		m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
 		m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+
+		m_vignetteSprite.setPosition(m_playerCamera.getCenter());
 	}
 }
 

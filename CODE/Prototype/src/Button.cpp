@@ -112,8 +112,23 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("Assault\nRifle");
+		m_text.setString("Assault Rifle");
 		break;
+	case ButtonType::GetSniper:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("Sniper");
+		break;
+	case ButtonType::GetRPG:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("RPG");
+		break;
+
 
 	case ButtonType::UpgradePistol:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
@@ -128,6 +143,20 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("RIFLE UPGRADE +");
+		break;
+	case ButtonType::UpgradeSniper:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("SNIPER UPGRADE +");
+		break;
+	case ButtonType::UpgradeRPG:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("RPG UPGRADE +");
 		break;
 
 #pragma endregion

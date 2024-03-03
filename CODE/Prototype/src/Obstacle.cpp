@@ -17,8 +17,8 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 		{
 			while (m_position.x > 500.0f && m_position.x < 1100.0f &&
 				m_position.y > 150.0f && m_position.y < 750.0f ||
-				m_position.x > other->m_position.x - 200.0f && m_position.x < other->m_position.x + 200.0f &&
-				m_position.y > other->m_position.y - 200.0f && m_position.y < other->m_position.y + 200.0f)
+				m_position.x > other->m_position.x - 400.0f && m_position.x < other->m_position.x + 400.0f &&
+				m_position.y > other->m_position.y - 400.0f && m_position.y < other->m_position.y + 400.0f)
 			{
 				m_position.x = rand() % 3200 + 1;
 				m_position.y = rand() % 1800 + 1;
@@ -143,4 +143,9 @@ void Obstacle::renderTop(sf::RenderWindow& t_window)
 RectangleShape Obstacle::getRectangle()
 {
 	return m_rectangle;
+}
+
+Vector2f Obstacle::getPosition()
+{
+	return m_position;
 }

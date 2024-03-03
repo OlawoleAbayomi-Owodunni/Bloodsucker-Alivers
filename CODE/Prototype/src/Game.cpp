@@ -1384,7 +1384,7 @@ void Game::checkCollisions()
 			{
 				if (CollisionDetection::enemyObstacleCollision(enemy, obstacle))
 				{
-					enemy->adjustMovement();
+					enemy->adjustMovement(obstacle);
 				}
 			}
 

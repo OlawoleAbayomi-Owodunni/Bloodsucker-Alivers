@@ -28,6 +28,7 @@ public:
 	void renderTop(sf::RenderWindow& t_window);
 
 	RectangleShape getRectangle();
+	Vector2f getPosition();
 
 private:
 	static std::vector<Obstacle*> m_allObstacles;

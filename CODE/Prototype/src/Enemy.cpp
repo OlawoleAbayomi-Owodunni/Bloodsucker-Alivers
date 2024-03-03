@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Player.h"
+#include "Obstacle.h"
 #include <iostream>
 
 std::vector<Enemy*> Enemy::m_allEnemies{};
@@ -285,34 +286,21 @@ void Enemy::calculatePushFactor()
 	m_pushFactor *= 0.06f;
 }
 
-void Enemy::adjustMovement()
+void Enemy::adjustMovement(Obstacle* t_obstacle)
 {
-	if (abs(m_velocity.x) > abs(m_velocity.y))
-	{
-		if (m_velocity.y > 0)
-		{
-			m_velocity.y -= 3.0f;
-		}
-		else
-		{
-			m_velocity.y += 3.0f;
-		}
-		
-		m_velocity.x = 0.0f;
-	}
-	else if (abs(m_velocity.x) < abs(m_velocity.y))
-	{
-		if (m_velocity.x > 0)
-		{
-			m_velocity.x -= 3.0f;
-		}
-		else
-		{
-			m_velocity.x += 3.0f;
-		}
+	sf::Vector2f obstaclePos = t_obstacle->getPosition();
+	sf::Vector2f displacement;
+	float distance;
 
-		m_velocity.y = 0.0f;
-	}
+	displacement.x = obstaclePos.x - m_position.x;
+	displacement.y = obstaclePos.y - m_position.y;
+
+	distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+	m_velocity = (displacement / distance) * m_speed;
+	
+	m_velocity.x *= -1;
+	m_velocity.y *= -1;
 
 	m_position += m_velocity;
 }

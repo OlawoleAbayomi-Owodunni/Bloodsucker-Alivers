@@ -10,6 +10,7 @@ using namespace std;
 using namespace sf;
 
 class Player;
+class Obstacle;
 enum class CharacterState;
 
 enum class EnemyType
@@ -39,7 +40,7 @@ public:
 	EnemyType getType();
 
 	void calculatePushFactor();
-	void adjustMovement();
+	void adjustMovement(Obstacle* t_obstacle);
 
 	void decreaseHealth(float t_damage);
 	float getHealth();

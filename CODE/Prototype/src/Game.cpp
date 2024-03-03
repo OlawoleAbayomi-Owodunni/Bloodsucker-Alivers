@@ -103,10 +103,10 @@ void Game::init()
 	//OBSTACLES
 	for (int i = 0; i < 3; i++)
 	{
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree, m_player.getPosition()));
 	}
 #pragma endregion
 
@@ -463,11 +463,11 @@ void Game::startGame()
 
 	for (int i = 0; i < 3; i++)
 	{
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree));
-		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Building));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock1, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock2, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Rock3, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree, m_player.getPosition()));
+		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Building, m_player.getPosition()));
 	}
 
 	orbRumbleTimer.restart();

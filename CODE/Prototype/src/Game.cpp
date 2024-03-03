@@ -1185,12 +1185,12 @@ void Game::render()
 			orb->render(m_window);
 		}
 
+		m_player.renderPlayer(m_window);
+
 		for (auto enemy : m_enemies)
 		{
 			enemy->render(m_window);
 		}
-
-		m_player.renderPlayer(m_window);
 
 		for (auto obstacle : m_obstacles)
 		{

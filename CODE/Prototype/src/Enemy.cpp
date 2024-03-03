@@ -34,27 +34,30 @@ Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type)
 		m_health = 100.0f;
 		m_speed = 1.0f + ((rand() % 10) / 10.0f + 0.1f);
 		m_enemyTime = seconds(0.1f);
-		m_rectangle.setSize(sf::Vector2f(40.0f, 80.0f));
+		m_rectangle.setSize(sf::Vector2f(40.0f, 50.0f));
 		m_enemySprite.setTextureRect(IntRect{ 0,192,160,160 });
 		m_enemySprite.setScale(0.5f, 0.5f);
+		m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y - 40.0f);
 		break;
 	case EnemyType::Big:
 		m_maxHealth = 100.0f;
 		m_health = 100.0f;
 		m_speed = 0.5f + ((rand() % 10) / 10.0f + 0.1f);
 		m_enemyTime = seconds(0.2f);
-		m_rectangle.setSize(sf::Vector2f(90.0f, 140.0f));
+		m_rectangle.setSize(sf::Vector2f(90.0f, 90.0f));
 		m_enemySprite.setTextureRect(IntRect{ 1587, 0, 320, 320 });
 		m_enemySprite.setScale(0.5f, 0.5f);
+		m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y - 80.0f);
 		break;
 	case EnemyType::Boss:
 		m_maxHealth = 1000.0f;
 		m_health = 1000.0f;
 		m_speed = 1.5f + ((rand() % 10) / 10.0f + 0.1f);
 		m_enemyTime = seconds(0.2f);
-		m_rectangle.setSize(sf::Vector2f(180.0f, 280.0f));
+		m_rectangle.setSize(sf::Vector2f(180.0f, 170.0f));
 		m_enemySprite.setTextureRect(IntRect{ 1587, 0, 320, 320 });
 		m_enemySprite.setScale(1.0f, 1.0f);
+		m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y - 160.0f);
 
 		m_emptyHealthBar.setSize(sf::Vector2f(50.0f, 6.0f));
 		m_emptyHealthBar.setOrigin(m_emptyHealthBar.getSize().x / 2.0f, m_emptyHealthBar.getSize().y / 2.0f);
@@ -72,7 +75,6 @@ Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type)
 		break;
 	}
 	
-	m_rectangle.setOrigin(m_rectangle.getSize().x / 2.0f, m_rectangle.getSize().y / 2.0f);
 	m_rectangle.setFillColor(sf::Color::Red);
 	m_rectangle.setPosition(m_position);
 	

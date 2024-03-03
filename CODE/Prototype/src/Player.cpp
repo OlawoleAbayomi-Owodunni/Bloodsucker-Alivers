@@ -236,7 +236,7 @@ void Player::initialise()
 	isSniperEquipped = false;
 	isRPGEquipped = false;
 
-	m_maxHealth = 500.0f;
+	m_maxHealth = 400.0f;
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
@@ -277,7 +277,7 @@ void Player::initialise()
 		it = m_weapons.erase(it); // Remove the pointer from the vector
 	}
 
-	m_weapons.push_back(new Weapon(WeaponType::RPG, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
+	m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 
 	m_currentPlayerFrame = 0;
 	m_currentHaloFrame = 0;
@@ -417,8 +417,6 @@ void Player::renderPlayer(sf::RenderWindow& t_window)
 	t_window.draw(m_haloSprite);
 
 	//t_window.draw(m_rectangle);
-	t_window.draw(m_emptyHealthBar);
-	t_window.draw(m_currentHealthBar);
 
 	t_window.draw(m_playerSprite);
 
@@ -437,6 +435,9 @@ void Player::renderPlayer(sf::RenderWindow& t_window)
 
 void Player::renderHUD(sf::RenderWindow& t_window)
 {
+	t_window.draw(m_emptyHealthBar);
+	t_window.draw(m_currentHealthBar);
+
 	t_window.draw(m_emptyXPBar);
 	t_window.draw(m_xpBar);
 	t_window.draw(m_xpBarSprite);

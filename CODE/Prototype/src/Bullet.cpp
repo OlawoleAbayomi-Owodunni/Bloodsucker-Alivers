@@ -153,30 +153,39 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		m_position = t_playerPos;
 
-		for (auto enemy : t_enemies)
-		{
-			displacement.x = enemy->getPosition().x - t_playerPos.x;
-			displacement.y = enemy->getPosition().y - t_playerPos.y;
+		//for (auto enemy : t_enemies)
+		//{
+		//	displacement.x = enemy->getPosition().x - t_playerPos.x;
+		//	displacement.y = enemy->getPosition().y - t_playerPos.y;
 
-			distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+		//	distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
 
-			if (enemy == t_enemies.at(0))
-			{
-				targetDistance = distance;
-				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
-			}
+		//	if (enemy == t_enemies.at(0))
+		//	{
+		//		targetDistance = distance;
+		//		targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+		//		targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+		//	}
 
-			if (distance < targetDistance)
-			{
-				targetDistance = distance;
-				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
-			}
-		}
+		//	if (distance < targetDistance)
+		//	{
+		//		targetDistance = distance;
+		//		targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+		//		targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+		//	}
+		//}
+		//targetDisplacement = targetDisplacement / targetDistance;
+		//m_velocity = targetDisplacement * rpgSpeed;
+		
+		//go to a random position
+		displacement.x = (rand() % 1600) - t_playerPos.x;
+		displacement.y = (rand() % 900) - t_playerPos.y;
 
-		targetDisplacement = targetDisplacement / targetDistance;
-		m_velocity = targetDisplacement * rpgSpeed;
+		distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+		displacement /= distance;
+
+		m_velocity = displacement * rpgSpeed;
 		break;
 
 #pragma endregion

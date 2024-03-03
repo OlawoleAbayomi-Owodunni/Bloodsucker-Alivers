@@ -530,20 +530,24 @@ void Game::processGameEvents(sf::Event& event)
 		case Gamemode::Menu:
 #pragma region Controller input
 			//D-Pad pressed
-			if (Event::JoystickMoved == event.type) {
+			if (Event::JoystickMoved == event.type) 
+			{
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
-					if (event.joystickMove.position == -100) // Down
-					{ 
-						m_cursorPos++;
-						m_menuScrollSound.stop();
-						m_menuScrollSound.play();
-					}
-					else if (event.joystickMove.position == 100) // Up
+					if (!inMenu)
 					{
-						m_cursorPos--;
-						m_menuScrollSound.stop();
-						m_menuScrollSound.play();
+						if (event.joystickMove.position == -100) // Down
+						{
+							m_cursorPos++;
+							m_menuScrollSound.stop();
+							m_menuScrollSound.play();
+						}
+						else if (event.joystickMove.position == 100) // Up
+						{
+							m_cursorPos--;
+							m_menuScrollSound.stop();
+							m_menuScrollSound.play();
+						}
 					}
 				}
 
@@ -731,6 +735,9 @@ void Game::processGameEvents(sf::Event& event)
 						break;
 					case ButtonType::UpgradeArmor:
 						m_player.upgradePlayer(PlayerUpgrade::Armor);
+						break;
+					case ButtonType::UpgradeMagnet:
+						m_player.upgradePlayer(PlayerUpgrade::Magnet);
 						break;
 					}
 					m_menuSelectSound.stop();
@@ -926,16 +933,6 @@ void Game::processGameEvents(sf::Event& event)
 
 void Game::update(double dt)
 {
-	//switching camera modes
-	switch (m_currentGamemode) {
-	case Gamemode::Menu:
-		m_window.setView(m_menuCamera);
-		break;
-	case Gamemode::Gameplay:
-		m_window.setView(m_playerCamera);
-		m_hudSprite.setPosition(m_playerCamera.getCenter());
-	}
-
 #pragma region Gameplay Gamemode logic
 	if (m_currentGamemode == Gamemode::Gameplay) //switching between screens
 	{
@@ -1117,6 +1114,16 @@ void Game::update(double dt)
 	}
 
 #pragma endregion
+
+	//switching camera modes
+	switch (m_currentGamemode) {
+	case Gamemode::Menu:
+		m_window.setView(m_menuCamera);
+		break;
+	case Gamemode::Gameplay:
+		m_window.setView(m_playerCamera);
+		m_hudSprite.setPosition(m_playerCamera.getCenter());
+	}
 
 	if (m_currentGamemode == Gamemode::Upgrade) //setup upgrade screen here
 	{
@@ -1670,15 +1677,23 @@ void Game::checkCollisions()
 #pragma region Button Functions
 void Game::createRandomUpgrades()
 {
-	m_upgradeButtons.clear();
+	//m_upgradeButtons.clear();
+	for (auto it = m_upgradeButtons.begin(); it != m_upgradeButtons.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_upgradeButtons.erase(it); // Remove the pointer from the vector
+	}
 
-	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
-	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
-	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth)); }
-	ButtonType randomUpgradeButton3 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
+	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 5) + static_cast<int>(ButtonType::UpgradeHealth));
+	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 5) + static_cast<int>(ButtonType::UpgradeHealth));
+	while (randomUpgradeButton1 == randomUpgradeButton2) { randomUpgradeButton2 = static_cast<ButtonType>((rand() % 5) + static_cast<int>(ButtonType::UpgradeHealth)); }
+	ButtonType randomUpgradeButton3 = static_cast<ButtonType>((rand() % 5) + static_cast<int>(ButtonType::UpgradeHealth));
 	while (randomUpgradeButton3 == randomUpgradeButton1 || randomUpgradeButton3 == randomUpgradeButton2)
 	{
-		randomUpgradeButton3 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::UpgradeHealth));
+		randomUpgradeButton3 = static_cast<ButtonType>((rand() % 5) + static_cast<int>(ButtonType::UpgradeHealth));
 	}
 
 	m_upgradeButtons.push_back(new Button(randomUpgradeButton1, m_holder["UIAtlas"], m_arialFont, Vector2f(m_playerCamera.getCenter().x - 175, m_playerCamera.getCenter().y - 180), Vector2f(0.75f, 0.75f)));
@@ -1727,7 +1742,15 @@ void Game::setDashInfo()
 
 void Game::createRandomWeapons()
 {
-	m_weaponButtons.clear();
+	//m_weaponButtons.clear();
+	for (auto it = m_weaponButtons.begin(); it != m_weaponButtons.end();)
+	{
+		if (*it)
+		{
+			delete* it; // Delete the object
+		}
+		it = m_weaponButtons.erase(it); // Remove the pointer from the vector
+	}
 
 	ButtonType randomUpgradeButton1 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol));
 	ButtonType randomUpgradeButton2 = static_cast<ButtonType>((rand() % 4) + static_cast<int>(ButtonType::GetPistol));

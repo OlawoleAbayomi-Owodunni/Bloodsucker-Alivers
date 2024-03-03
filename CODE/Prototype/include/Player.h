@@ -26,6 +26,7 @@ enum class PlayerUpgrade
 	XP,
 	Armor,
 	Weapon,
+	Magnet,
 
 	Count
 };
@@ -68,6 +69,8 @@ public:
 	void setHealth();
 	void decreaseHealth(float t_damage);
 	void increaseHealth();
+
+	float getMagnetDistance();
 
 	void dash();
 	void updateDashbar();
@@ -117,9 +120,12 @@ private:
 	float m_xpRequired;
 	sf::Text m_xpBarText;
 
+	float m_magnetDistance;
+
 	float m_speedModifier;
 	float m_xpModifier;
 	float m_armorModifier;
+	float m_magnetModifier;
 
 	Direction m_direction;
 	Clock m_damageClock;

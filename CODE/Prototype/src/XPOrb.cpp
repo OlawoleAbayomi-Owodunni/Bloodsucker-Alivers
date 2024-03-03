@@ -31,6 +31,8 @@ XPOrb::~XPOrb()
 
 void XPOrb::update(double dt, Player& t_player)
 {
+	float magnetDistance = t_player.getMagnetDistance();
+
 	sf::Vector2f playerPos = t_player.getPosition();
 	sf::Vector2f displacement;
 	float distance;
@@ -40,17 +42,22 @@ void XPOrb::update(double dt, Player& t_player)
 
 	distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
 
-	if (distance < 150.0f)
+	if (distance < magnetDistance + magnetDistance / 2.0f)
 	{
-		float scale = distance / 100.0f;
+		float scale = distance / magnetDistance;
+		//scale = 1.0f + abs(scale - 1.0f);
 		scale = 1 + (0.5f - (scale - 1));
 
-		if (distance < 100.0f)
+		if (distance < magnetDistance)
 		{
-			scale = distance / 100.0f;
+			scale = distance / magnetDistance;
+			if (scale < 0.5f)
+			{
+				scale = 0.5f;
+			}
 
 			m_movementVector = displacement / distance;
-			m_position += m_movementVector * 4.0f;
+			m_position += m_movementVector * magnetDistance / 100.0f * 3.0f;
 		}
 
 		m_sprite.setScale(scale, scale);

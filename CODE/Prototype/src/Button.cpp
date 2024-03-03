@@ -74,28 +74,35 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("INCREASE HEALTH");
+		m_text.setString("MAX HEALTH +25%");
 		break;
 	case ButtonType::UpgradeSpeed:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("INCREASE SPEED");
+		m_text.setString("SPEED +25%");
 		break;
 	case ButtonType::UpgradeXP:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("XP X2");
+		m_text.setString("XP +25%");
 		break;
 	case ButtonType::UpgradeArmor:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
 		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
-		m_text.setString("INCREASE ARMOR");
+		m_text.setString("DMG REDUCTION -10%");
+		break;
+	case ButtonType::UpgradeMagnet:
+		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
+		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
+		m_bgSprite.setScale(t_scale.x, t_scale.y);
+
+		m_text.setString("MAGNET RANGE +50%");
 		break;
 #pragma endregion
 

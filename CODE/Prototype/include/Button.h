@@ -30,6 +30,7 @@ enum ButtonType
 	UpgradeSpeed,
 	UpgradeXP,
 	UpgradeArmor,
+	UpgradeMagnet,
 
 	//CAREPACKAGE BUTTONS
 	GetPistol,

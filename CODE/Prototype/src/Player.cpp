@@ -47,9 +47,10 @@ Player::Player()
 	m_xpRequired = 10.0f;
 
 	//Upgrade modifiers
-	m_speedModifier = 1;
-	m_xpModifier = 1;
-	m_armorModifier = 1;
+	m_speedModifier = 1.0f;
+	m_xpModifier = 1.0f;
+	m_armorModifier = 1.0f;
+	m_magnetModifier = 1.0f;
 
 	m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 
@@ -61,6 +62,7 @@ Player::Player()
 	m_currentDashCharges = 0;
 	m_dashDistance = 150.0f;
 	m_dashHasAOE = false;
+	m_magnetDistance = 100.0f;
 
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
@@ -760,17 +762,23 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 	switch (t_type)
 	{
 	case PlayerUpgrade::Health:
-		m_maxHealth += 50;
+		m_maxHealth *= 1.25;
 		//m_health += 50;
 		break;
 	case PlayerUpgrade::Speed:
-		m_speedModifier += 0.5f;
+		m_speedModifier *= 1.25f;
 		break;
 	case PlayerUpgrade::XP:
-		m_xpModifier += 0.5f;
+		m_xpModifier *= 1.25f;
 		break;
 	case PlayerUpgrade::Armor:
-		m_armorModifier -= 0.1;
+		if (m_armorModifier > 0.2)
+		{
+			m_armorModifier -= 0.1f;
+		}
+		break;
+	case PlayerUpgrade::Magnet:
+		m_magnetModifier += 0.5f;
 		break;
 	default:
 		break;
@@ -938,6 +946,11 @@ void Player::increaseHealth()
 	{
 		m_health += m_maxHealth / 8.0f;
 	}
+}
+
+float Player::getMagnetDistance()
+{
+	return m_magnetDistance * m_magnetModifier;
 }
 
 void Player::dash()

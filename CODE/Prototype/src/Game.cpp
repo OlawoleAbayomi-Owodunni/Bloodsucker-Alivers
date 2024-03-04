@@ -214,6 +214,9 @@ void Game::init()
 	InfoTxtBGSprite.setOrigin(125.0f, 125.0f);
 	InfoTxtBGSprite.setPosition(m_playerCamera.getCenter());
 
+	m_gunInfoCurrentFrame = 0;
+	m_gunInfoTime = seconds(0.1f);
+
 #pragma region dash
 	dashInfoImgSprite.setTexture(m_holder["starterAtlas"]);
 	dashInfoImgSprite.setTextureRect(IntRect({ 0, 1778, 200, 160 }));
@@ -491,6 +494,10 @@ void Game::startGame()
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Tree, m_player.getPosition()));
 		m_obstacles.push_back(new Obstacle(m_holder["obstacleAtlas"], ObstacleType::Building, m_player.getPosition()));
 	}
+
+	m_gunInfoCurrentFrame = 0;
+	m_gunInfoTime = seconds(0.1f);
+	m_gunInfoFrames.clear();
 
 	orbRumbleTimer.restart();
 	pickupRumbleTimer.restart();
@@ -797,30 +804,46 @@ void Game::processGameEvents(sf::Event& event)
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
+
+						if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
+							m_cursorPos = 0;
+							m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+							m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+						}
+						if (m_cursorPos < 0) {
+							m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1;
+							m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+							m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+						}
+
+						m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+						m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+
+						setGunInfo();
 					}
 					else if (event.joystickMove.position == 100) // Up
 					{
 						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
+
+						if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
+							m_cursorPos = 0;
+							m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+							m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+						}
+						if (m_cursorPos < 0) {
+							m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1;
+							m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+							m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+						}
+
+						m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
+						m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+
+						setGunInfo();
 					}
 				}
-
-				if (m_cursorPos > (static_cast<int>(m_weaponButtons.size()) - 1)) {
-					m_cursorPos = 0;
-					m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-					m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-				}
-				if (m_cursorPos < 0) {
-					m_cursorPos = static_cast<int>(m_weaponButtons.size()) - 1;
-					m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-					m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-				}
-
-				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
-				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
-
-				setGunInfo();
 			}
 
 			//Button pressed
@@ -1170,9 +1193,25 @@ void Game::update(double dt)
 		m_hudSprite.setPosition(m_playerCamera.getCenter());
 	}
 
-	if (m_currentGamemode == Gamemode::Upgrade) //setup upgrade screen here
+	if (m_currentGamemode == Gamemode::CarePackage) //setup upgrade screen here
 	{
-		//m_player.levelUp(m_currentGamemode);
+		if (m_gunInfoClock.getElapsedTime() > m_gunInfoTime)
+		{
+			if (m_gunInfoCurrentFrame + 1 < m_gunInfoFrames.size())
+			{
+				m_gunInfoCurrentFrame++;
+			}
+			else
+			{
+				m_gunInfoCurrentFrame = 0;
+			}
+			m_gunInfoClock.restart();
+
+			if (m_gunInfoFrames.size() == 11)
+			{
+				gunInfoImgSprite.setTextureRect(m_gunInfoFrames[m_gunInfoCurrentFrame]);
+			}
+		}
 	}
 }
 
@@ -1973,36 +2012,77 @@ void Game::setGunInfo()
 	}
 
 
-	switch (m_cursorButtonType) {
+	switch (m_cursorButtonType) 
+	{
 	case ButtonType::GetPistol:
 		heading = "Get Pistol";
 		description = "Fires one bullet at\nclosest enemy";
 		gunInfoImgSprite.setTextureRect({ 0,0,128,32 });
 		gunInfoImgSprite.setScale(1.8f, 1.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 128 * i,0,128,32 });
+		}
+		m_gunInfoTime = seconds(0.1f);
 		break;
 	case ButtonType::GetRifle:
 		heading = "Get AR";
 		description = "Fires burst in the\nfaced direction";
 		gunInfoImgSprite.setTextureRect({ 0,32,128,32 });
 		gunInfoImgSprite.setScale(1.8f, 1.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 128 * i,32,128,32 });
+		}
+		m_gunInfoTime = seconds(0.075f);
 		break;
 	case ButtonType::GetSniper:
 		heading = "Get Sniper";
 		description = "Fires one bullet at\nfurthest enemy";
 		gunInfoImgSprite.setTextureRect({ 1584, 784, 256, 64 });
 		gunInfoImgSprite.setScale(0.8f, 0.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 1584 + 256 * i,784, 256, 64 });
+		}
+		m_gunInfoTime = seconds(0.1f);
 		break;
 	case ButtonType::GetRPG:
 		heading = "Get RPG";
 		description = "Fires a rocket in\na random direction";
 		gunInfoImgSprite.setTextureRect({ 1648, 994, 256, 64 });
 		gunInfoImgSprite.setScale(0.8f, 0.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 1648 + 256 * i,994, 256, 64 });
+		}
+		m_gunInfoTime = seconds(0.08f);
 		break;
 
 	case ButtonType::UpgradePistol:
 		heading = "PISTOL LVL " + to_string(gunLevel + 1);
 		gunInfoImgSprite.setTextureRect({ 0,0,128,32 });
 		gunInfoImgSprite.setScale(1.8f, 1.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 128 * i,0,128,32 });
+		}
+		m_gunInfoTime = seconds(0.1f);
 		switch (gunLevel) {
 		case 1:
 			description = "Increase Fire Rate";
@@ -2025,6 +2105,14 @@ void Game::setGunInfo()
 		heading = "RIFLE LVL " + to_string(gunLevel + 1);
 		gunInfoImgSprite.setTextureRect({ 0,32,128,32 });
 		gunInfoImgSprite.setScale(1.8f, 1.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 128 * i,32,128,32 });
+		}
+		m_gunInfoTime = seconds(0.075f);
 		switch (gunLevel) {
 		case 1:
 			description = "Increase mag size +1";
@@ -2047,6 +2135,14 @@ void Game::setGunInfo()
 		heading = "SNIPER LVL " + to_string(gunLevel + 1);
 		gunInfoImgSprite.setTextureRect({ 1584, 784, 256, 64 });
 		gunInfoImgSprite.setScale(0.8f, 0.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 1584 + 256 * i,784, 256, 64 });
+		}
+		m_gunInfoTime = seconds(0.1f);
 		switch (gunLevel) {
 		case 1:
 			description = "Increase Fire Rate";
@@ -2069,6 +2165,14 @@ void Game::setGunInfo()
 		heading = "RPG LVL " + to_string(gunLevel + 1);
 		gunInfoImgSprite.setTextureRect({ 1648, 994, 256, 64 });
 		gunInfoImgSprite.setScale(0.8f, 0.8f);
+
+		m_gunInfoCurrentFrame = 0;
+		m_gunInfoFrames.clear();
+		for (int i = 0; i < 11; i++)
+		{
+			m_gunInfoFrames.push_back(IntRect{ 1648 + 256 * i,994, 256, 64 });
+		}
+		m_gunInfoTime = seconds(0.08f);
 		switch (gunLevel) {
 		case 1:
 			description = "Increase Fire Rate";

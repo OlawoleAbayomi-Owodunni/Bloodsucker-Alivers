@@ -1,5 +1,8 @@
 #include "Bullet.h"
+#include "Player.h"
 #include <iostream>
+
+enum class CharacterState;
 
 Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction)
 {
@@ -51,24 +54,28 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		for (auto enemy : t_enemies)
 		{
-			displacement.x = enemy->getPosition().x - t_playerPos.x;
-			displacement.y = enemy->getPosition().y - t_playerPos.y;
-
-			distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
-
-			if (enemy == t_enemies.at(0))
+			if (enemy->getState() != CharacterState::DeadState)
 			{
-				targetDistance = distance;
-				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
-			}
+				displacement.x = enemy->getPosition().x - t_playerPos.x;
+				displacement.y = enemy->getPosition().y - t_playerPos.y;
 
-			if (distance < targetDistance)
-			{
-				targetDistance = distance;
-				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+				if (enemy == t_enemies.at(0))
+				{
+					targetDistance = distance;
+					targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+					targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				}
+
+				if (distance < targetDistance)
+				{
+					targetDistance = distance;
+					targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+					targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				}
 			}
+			
 		}
 
 		targetDisplacement = targetDisplacement / targetDistance;
@@ -119,23 +126,26 @@ Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_p
 
 		for (auto enemy : t_enemies)
 		{
-			displacement.x = enemy->getPosition().x - t_playerPos.x;
-			displacement.y = enemy->getPosition().y - t_playerPos.y;
-
-			distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
-
-			if (enemy == t_enemies.at(0))
+			if (enemy->getState() != CharacterState::DeadState)
 			{
-				targetDistance = distance;
-				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
-			}
+				displacement.x = enemy->getPosition().x - t_playerPos.x;
+				displacement.y = enemy->getPosition().y - t_playerPos.y;
 
-			if (distance > targetDistance)
-			{
-				targetDistance = distance;
-				targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
-				targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				distance = std::sqrtf(displacement.x * displacement.x + displacement.y * displacement.y);
+
+				if (enemy == t_enemies.at(0))
+				{
+					targetDistance = distance;
+					targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+					targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				}
+
+				if (distance > targetDistance)
+				{
+					targetDistance = distance;
+					targetDisplacement.x = enemy->getPosition().x - t_playerPos.x;
+					targetDisplacement.y = enemy->getPosition().y - t_playerPos.y;
+				}
 			}
 		}
 

@@ -57,7 +57,7 @@ void XPOrb::update(double dt, Player& t_player)
 			}
 
 			m_movementVector = displacement / distance;
-			m_position += m_movementVector * magnetDistance / 100.0f * 3.0f;
+			m_position += m_movementVector * magnetDistance / 100.0f * 4.0f;
 		}
 
 		m_sprite.setScale(scale, scale);

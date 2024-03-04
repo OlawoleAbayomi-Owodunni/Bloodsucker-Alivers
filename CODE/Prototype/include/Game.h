@@ -137,6 +137,11 @@ protected:
 	Text dashDescriptionText;
 	vector<IntRect> dashInfoFrames;
 
+	vector<sf::IntRect> m_gunInfoFrames;
+	int m_gunInfoCurrentFrame;
+	Time m_gunInfoTime;
+	Clock m_gunInfoClock;
+
 	Sprite gunInfoImgSprite;
 	Text gunLvlInfoTxt;
 	Text gunDescriptionText;

@@ -374,6 +374,8 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 		for (auto weapon : m_weapons)
 		{
 			weapon->update(dt, m_position, t_enemies, m_direction);
+
+			weapon->setSpritePosition(t_view);
 		}
 
 		m_dashRectBounds.setFillColor(sf::Color::Transparent);
@@ -463,6 +465,11 @@ void Player::renderHUD(sf::RenderWindow& t_window)
 		t_window.draw(m_emptyDashBarRight);
 		t_window.draw(m_dashBarRight);
 		t_window.draw(m_dashBarRightSprite);
+	}
+
+	for (auto weapon : m_weapons)
+	{
+		weapon->renderSprite(t_window);
 	}
 }
 

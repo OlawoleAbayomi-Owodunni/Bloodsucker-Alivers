@@ -27,6 +27,13 @@ Player::Player()
 	m_dashSound.setBuffer(m_dashSoundBuffer);
 	m_dashSound.setVolume(3.0f);
 
+	if (!m_deathSoundBuffer.loadFromFile("resources/sounds/player_death.wav"))
+	{
+		std::cout << "error loading death sound";
+	}
+	m_deathSound.setBuffer(m_deathSoundBuffer);
+	m_deathSound.setVolume(5.0f);
+
 	//FONT & TEXT
 	if (!m_font.loadFromFile("resources/BebasNeue.otf"))
 	{
@@ -47,9 +54,10 @@ Player::Player()
 	m_xpRequired = 10.0f;
 
 	//Upgrade modifiers
-	m_speedModifier = 1;
-	m_xpModifier = 1;
-	m_armorModifier = 1;
+	m_speedModifier = 1.0f;
+	m_xpModifier = 1.0f;
+	m_armorModifier = 1.0f;
+	m_magnetModifier = 1.0f;
 
 	m_weapons.push_back(new Weapon(WeaponType::Pistol, m_holder["starterAtlas"])); // all we need to do to player to add a new weapon
 
@@ -61,6 +69,7 @@ Player::Player()
 	m_currentDashCharges = 0;
 	m_dashDistance = 150.0f;
 	m_dashHasAOE = false;
+	m_magnetDistance = 100.0f;
 
 	m_playerState = CharacterState::IdleState;
 	m_previousState = CharacterState::None;
@@ -72,9 +81,9 @@ Player::Player()
 	{
 		m_haloFrames.push_back(IntRect{ 160 * i,1351,160,64 });
 	}
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 7; i++)
 	{
-		m_slashFrames.push_back(IntRect{ 1560 + 400 * i, 484, 400, 200 });
+		m_slashFrames.push_back(IntRect{ 1712 + 400 * i, 464, 400, 200 });
 	}
 
 	m_currentPlayerFrame = 0;
@@ -83,7 +92,7 @@ Player::Player()
 
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
-	m_slashTime = seconds(0.1f);
+	m_slashTime = seconds(0.05f);
 
 	m_dashStateTime = seconds(1.0f);
 	m_dashCooldownTime = seconds(4.0f);
@@ -247,9 +256,10 @@ void Player::initialise()
 	m_previousPosition = m_position;
 	m_movementVector = sf::Vector2f(0.0f, 0.0f);
 
-	m_speedModifier = 1;
-	m_xpModifier = 1;
-	m_armorModifier = 1;
+	m_speedModifier = 1.0f;
+	m_xpModifier = 1.0f;
+	m_armorModifier = 1.0f;
+	m_magnetModifier = 1.0f;
 
 	m_direction = Direction::East;
 	m_canDash = false;
@@ -285,11 +295,11 @@ void Player::initialise()
 
 	m_playerTime = seconds(0.1f);
 	m_haloTime = seconds(0.2f);
-	m_slashTime = seconds(0.1f);
+	m_slashTime = seconds(0.05f);
 
-	m_dashStateTime = seconds(1.0f);
+	m_dashStateTime = seconds(0.6f);
 	m_dashCooldownTime = seconds(4.0f);
-	m_dashAOETime = seconds(0.5f);
+	m_dashAOETime = seconds(0.1f);
 
 	//RUMBLE TIMERS
 	isDashRumbling = false;
@@ -373,7 +383,8 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 		m_dashRectBounds.setPosition(m_dashRect.getPosition());
 		m_dashRectBounds.setSize(sf::Vector2f(m_dashRect.getGlobalBounds().width, m_dashRect.getGlobalBounds().height));
 
-		if (m_damageClock.getElapsedTime().asSeconds() > 0.1f)
+		if (m_damageClock.getElapsedTime().asSeconds() > 0.1f &&
+			m_healClock.getElapsedTime().asSeconds() > 0.3f)
 		{
 			m_playerSprite.setColor(sf::Color::White);
 		}
@@ -760,17 +771,23 @@ void Player::upgradePlayer(PlayerUpgrade t_type)
 	switch (t_type)
 	{
 	case PlayerUpgrade::Health:
-		m_maxHealth += 50;
+		m_maxHealth *= 1.25;
 		//m_health += 50;
 		break;
 	case PlayerUpgrade::Speed:
-		m_speedModifier += 0.5f;
+		m_speedModifier *= 1.25f;
 		break;
 	case PlayerUpgrade::XP:
-		m_xpModifier += 0.5f;
+		m_xpModifier *= 1.25f;
 		break;
 	case PlayerUpgrade::Armor:
-		m_armorModifier -= 0.1;
+		if (m_armorModifier > 0.2)
+		{
+			m_armorModifier -= 0.1f;
+		}
+		break;
+	case PlayerUpgrade::Magnet:
+		m_magnetModifier += 0.5f;
 		break;
 	default:
 		break;
@@ -799,6 +816,23 @@ void Player::upgradeGun(WeaponType t_type)
 				cout << "Weapon Actually upgraded\n";
 			}
 		}
+		break;
+	case WeaponType::Sniper:
+		for (int i = 0; i < m_weapons.size(); i++) {
+			if (m_weapons[i]->getType() == t_type) {
+				m_weapons[i]->upgradeWeapon(t_type);
+				cout << "Weapon Actually upgraded\n";
+			}
+		}
+		break;
+	case WeaponType::RPG:
+		for (int i = 0; i < m_weapons.size(); i++) {
+			if (m_weapons[i]->getType() == t_type) {
+				m_weapons[i]->upgradeWeapon(t_type);
+				cout << "Weapon Actually upgraded\n";
+			}
+		}
+		break;
 	}
 }
 #pragma endregion
@@ -938,6 +972,11 @@ void Player::increaseHealth()
 	{
 		m_health += m_maxHealth / 8.0f;
 	}
+}
+
+float Player::getMagnetDistance()
+{
+	return m_magnetDistance * m_magnetModifier;
 }
 
 void Player::dash()
@@ -1197,6 +1236,7 @@ void Player::setFrames()
 		addFrame(IntRect{ 5200, 2176, 400, 200 });
 		addFrame(IntRect{ 5600, 2176, 400, 200 });
 		m_playerSprite.setOrigin(200.0f, 100.0f);
+		m_deathSound.play();
 		break;
 	default:
 		break;
@@ -1215,4 +1255,10 @@ void Player::setDamageIndicator(sf::Color t_colour)
 {
 	m_playerSprite.setColor(t_colour);
 	m_damageClock.restart();
+}
+
+void Player::setHealIndicator(sf::Color t_colour)
+{
+	m_playerSprite.setColor(t_colour);
+	m_healClock.restart();
 }

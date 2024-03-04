@@ -1,5 +1,8 @@
 #include "Bullet.h"
+#include "Player.h"
 #include <iostream>
+
+enum class CharacterState;
 
 Bullet::Bullet(WeaponType t_weaponType, sf::Texture& t_texture, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction)
 {

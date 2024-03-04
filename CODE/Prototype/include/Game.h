@@ -85,8 +85,17 @@ protected:
 	std::vector<Pickup*> m_pickups;
 	std::vector<Obstacle*> m_obstacles;
 
-	sf::SoundBuffer m_pickupSoundBuffer;
-	sf::Sound m_pickupSound;
+	sf::SoundBuffer m_orbPickupSoundBuffer;
+	sf::Sound m_orbPickupSound;
+
+	sf::SoundBuffer m_healthPickupSoundBuffer;
+	sf::Sound m_healthPickupSound;
+
+	sf::SoundBuffer m_levelupSoundBuffer;
+	sf::Sound m_levelupSound;
+
+	sf::SoundBuffer m_explosionSoundBuffer;
+	sf::Sound m_explosionSound;
 
 	sf::SoundBuffer m_menuMusicBuffer;
 	sf::Sound m_menuMusic;
@@ -137,6 +146,11 @@ protected:
 	Text dashDescriptionText;
 	vector<IntRect> dashInfoFrames;
 
+	vector<sf::IntRect> m_gunInfoFrames;
+	int m_gunInfoCurrentFrame;
+	Time m_gunInfoTime;
+	Clock m_gunInfoClock;
+
 	Sprite gunInfoImgSprite;
 	Text gunLvlInfoTxt;
 	Text gunDescriptionText;
@@ -175,6 +189,8 @@ protected:
 	int totalEK;
 	int updateCount;
 	int timeSurvived;
+	int timeSurvivedSeconds;
+	int timeSurvivedMinutes;
 	int highScore;
 
 	Text m_scoreText;
@@ -186,4 +202,6 @@ protected:
 	Text m_playerLevelText;
 	Text m_timeSurvivedText;
 	Text m_statsText;
+	Text m_inGameTimerText;
+	Text m_currentLevelText;
 };

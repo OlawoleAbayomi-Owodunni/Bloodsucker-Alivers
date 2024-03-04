@@ -20,7 +20,7 @@ enum class ObstacleType
 class Obstacle
 {
 public:
-	Obstacle(sf::Texture& t_texture, ObstacleType t_type);
+	Obstacle(sf::Texture& t_texture, ObstacleType t_type, sf::Vector2f t_playerPos);
 	~Obstacle();
 
 	void update(double dt);

@@ -26,6 +26,7 @@ enum class PlayerUpgrade
 	XP,
 	Armor,
 	Weapon,
+	Magnet,
 
 	Count
 };
@@ -69,6 +70,8 @@ public:
 	void decreaseHealth(float t_damage);
 	void increaseHealth();
 
+	float getMagnetDistance();
+
 	void dash();
 	void updateDashbar();
 	int getDashLevel();
@@ -97,6 +100,7 @@ public:
 	bool& getAliveState();
 
 	void setDamageIndicator(sf::Color t_colour);
+	void setHealIndicator(sf::Color t_colour);
 
 private:
 	const float AFTERIMAGE_COUNT{ 16.0f };
@@ -117,12 +121,16 @@ private:
 	float m_xpRequired;
 	sf::Text m_xpBarText;
 
+	float m_magnetDistance;
+
 	float m_speedModifier;
 	float m_xpModifier;
 	float m_armorModifier;
+	float m_magnetModifier;
 
 	Direction m_direction;
 	Clock m_damageClock;
+	Clock m_healClock;
 
 	float m_dashDistance;
 	bool m_canDash;
@@ -181,6 +189,9 @@ private:
 
 	SoundBuffer m_dashSoundBuffer;
 	Sound m_dashSound;
+
+	SoundBuffer m_deathSoundBuffer;
+	Sound m_deathSound;
 
 	Sprite m_playerSprite;
 	Sprite m_dashSprite;

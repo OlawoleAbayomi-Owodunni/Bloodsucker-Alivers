@@ -2,43 +2,35 @@
 
 std::vector<Obstacle*> Obstacle::m_allObstacles{};
 
-Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
+Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type, sf::Vector2f t_playerPos)
 {
-	m_allObstacles.push_back(this);
-
 	m_type = t_type;
 
-	m_position.x = rand() % 3200 + 1;
-	m_position.y = rand() % 1800 + 1;
-	
-	//for (int i = 0; i < m_allObstacles.size();)
-//{
-//	while ((m_position.x > 500.0f && m_position.x < 1100.0f) &&
-//		(m_position.y > 150.0f && m_position.y < 750.0f) ||
-//		(m_position.x > m_allObstacles[i]->m_position.x - 400.0f && m_position.x < m_allObstacles[i]->m_position.x + 400.0f) &&
-//		(m_position.y > m_allObstacles[i]->m_position.y - 400.0f && m_position.y < m_allObstacles[i]->m_position.y + 400.0f))
-//	{
-//		m_position.x = rand() % 3200 + 1;
-//		m_position.y = rand() % 1800 + 1;
-//		i = 0;
-//	}
-//	i++;
-//}
+	float shortestDistance;
+	float distance;
 
-	for (Obstacle const* other : m_allObstacles)
+	do
 	{
-		if (this != other)
+		shortestDistance = 6000000.0f;
+		m_position.x = rand() % 3200 + 1;
+		m_position.y = rand() % 1800 + 1;
+
+		// * STEP 1: Get the closest obstacle and it's distance from this spawning point
+		for (Obstacle const* other : m_allObstacles)
 		{
-			while (m_position.x > 500.0f && m_position.x < 1100.0f &&
-				m_position.y > 150.0f && m_position.y < 750.0f ||
-				m_position.x > other->m_position.x - 400.0f && m_position.x < other->m_position.x + 400.0f &&
-				m_position.y > other->m_position.y - 400.0f && m_position.y < other->m_position.y + 400.0f)
-			{
-				m_position.x = rand() % 3200 + 1;
-				m_position.y = rand() % 1800 + 1;
-			}
+			const sf::Vector2f difference = other->m_position - m_position;
+			const float distanceToObject = std::sqrt(difference.x * difference.x + difference.y * difference.y);
+
+			if (shortestDistance > distanceToObject)
+				shortestDistance = distanceToObject;
 		}
-	}
+
+		// * STEP 2: Get the distance to the player spawn 
+		const sf::Vector2f difference = t_playerPos - m_position;
+		distance = std::sqrt(difference.x * difference.x + difference.y * difference.y);
+
+	} 
+	while ((distance < 400.0f) || (shortestDistance < 400.0f)); // Loop while obstacle's position is within 400 pixels of player
 	
 	m_topSprite.setTexture(t_texture);
 	m_bottomSprite.setTexture(t_texture);
@@ -92,6 +84,8 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 
 	m_topSprite.setPosition(m_position.x, m_position.y - 160.0f);
 	m_bottomSprite.setPosition(m_position);
+
+	m_allObstacles.push_back(this);
 }
 
 Obstacle::~Obstacle()

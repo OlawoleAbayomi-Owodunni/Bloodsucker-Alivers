@@ -11,6 +11,20 @@ Obstacle::Obstacle(sf::Texture& t_texture, ObstacleType t_type)
 	m_position.x = rand() % 3200 + 1;
 	m_position.y = rand() % 1800 + 1;
 	
+	//for (int i = 0; i < m_allObstacles.size();)
+//{
+//	while ((m_position.x > 500.0f && m_position.x < 1100.0f) &&
+//		(m_position.y > 150.0f && m_position.y < 750.0f) ||
+//		(m_position.x > m_allObstacles[i]->m_position.x - 400.0f && m_position.x < m_allObstacles[i]->m_position.x + 400.0f) &&
+//		(m_position.y > m_allObstacles[i]->m_position.y - 400.0f && m_position.y < m_allObstacles[i]->m_position.y + 400.0f))
+//	{
+//		m_position.x = rand() % 3200 + 1;
+//		m_position.y = rand() % 1800 + 1;
+//		i = 0;
+//	}
+//	i++;
+//}
+
 	for (Obstacle const* other : m_allObstacles)
 	{
 		if (this != other)

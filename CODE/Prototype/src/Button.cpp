@@ -1,6 +1,6 @@
 #include "Button.h"
 
-Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_pos, Vector2f t_scale) :m_pos(t_pos), m_type(t_type)
+Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_pos, Vector2f t_scale) :m_pos(t_pos), m_type(t_type), m_scale(t_scale)
 {
 	m_bgSprite.setTexture(t_texture);
 	m_bgSprite.setPosition(t_pos);
@@ -72,28 +72,24 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 	case ButtonType::UpgradeHealth:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("INCREASE HEALTH");
 		break;
 	case ButtonType::UpgradeSpeed:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("INCREASE SPEED");
 		break;
 	case ButtonType::UpgradeXP:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("XP X2");
 		break;
 	case ButtonType::UpgradeArmor:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("INCREASE ARMOR");
 		break;
@@ -103,28 +99,24 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 	case ButtonType::GetPistol:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("Pistol");
 		break;
 	case ButtonType::GetRifle:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("Assault Rifle");
 		break;
 	case ButtonType::GetSniper:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("Sniper");
 		break;
 	case ButtonType::GetRPG:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("RPG");
 		break;
@@ -133,28 +125,24 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 	case ButtonType::UpgradePistol:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("PISTOL UPGRADE +");
 		break;
 	case ButtonType::UpgradeAR:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("RIFLE UPGRADE +");
 		break;
 	case ButtonType::UpgradeSniper:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("SNIPER UPGRADE +");
 		break;
 	case ButtonType::UpgradeRPG:
 		m_bgSprite.setTextureRect(IntRect{ 0, 150, 550, 150 });
 		m_bgSprite.setOrigin(550.0f / 2.0f, 150.0f / 2.0f); //based off of texture rect size
-		m_bgSprite.setScale(t_scale.x, t_scale.y);
 
 		m_text.setString("RPG UPGRADE +");
 		break;
@@ -167,6 +155,7 @@ Button::Button(ButtonType t_type, Texture& t_texture, Font& t_font, Vector2f t_p
 
 	//move back into each switch for accurate calculation
 	m_text.setOrigin(m_text.getGlobalBounds().width / 2.0f, m_text.getGlobalBounds().height / 2.0f);
+	m_bgSprite.setScale(t_scale.x, t_scale.y);
 	m_text.setPosition(m_pos);
 }
 
@@ -181,6 +170,24 @@ void Button::setPosition(Vector2f t_pos)
 	m_pos = t_pos;
 	m_bgSprite.setPosition(t_pos);
 	m_text.setPosition(t_pos);
+}
+
+void Button::scaleUp()
+{
+	m_text.setOrigin(m_text.getGlobalBounds().width / 2.0f, m_text.getGlobalBounds().height / 2.0f);
+	m_bgSprite.setScale((m_scale.x + 0.05), (m_scale.y + 0.05));
+	//m_text.setScale((m_scale.x + 0.1), (m_scale.y + 0.1));
+	m_bgSprite.setPosition(m_pos);
+	m_text.setPosition(m_pos);
+}
+
+void Button::scaleDown()
+{
+	m_text.setOrigin(m_text.getGlobalBounds().width / 2.0f, m_text.getGlobalBounds().height / 2.0f);
+	m_bgSprite.setScale(m_scale);
+	//m_text.setScale(m_scale);
+	m_bgSprite.setPosition(m_pos);
+	m_text.setPosition(m_pos);
 }
 
 

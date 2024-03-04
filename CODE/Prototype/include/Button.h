@@ -21,10 +21,6 @@ enum ButtonType
 	Resume,
 	ToMenu,
 
-	//Game over menu buttons
-	NewGame, //new game will eventually be moved to main menu section
-	BackToMenu, //eventually to be removed cuz it exists in pause menu
-
 	//UPGRADE BUTTONS
 	UpgradeHealth,
 	UpgradeSpeed,
@@ -53,8 +49,12 @@ public:
 
 	void setPosition(Vector2f t_pos);
 
+	void scaleUp();
+	void scaleDown();
+
 	Vector2f getPositon();
 	ButtonType getType();
+
 
 private:
 	Sprite m_bgSprite;
@@ -62,5 +62,7 @@ private:
 
 	Vector2f m_pos;
 	ButtonType m_type;
+
+	Vector2f m_scale;
 };
 

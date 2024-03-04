@@ -161,6 +161,8 @@ void Game::init()
 	m_menuButtons.push_back(new Button(ButtonType::Tutorial, UITexture, m_arialFont, Vector2f(550, 440), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Credits, UITexture, m_arialFont, Vector2f(550, 560), Vector2f(1.0f, 1.0f)));
 	m_menuButtons.push_back(new Button(ButtonType::Exit, UITexture, m_arialFont, Vector2f(550, 680), Vector2f(1.0f, 1.0f)));
+	m_menuButtons[0]->scaleUp();
+
 
 	m_highscoreSprite.setTexture(UITexture);
 	m_highscoreSprite.setTextureRect(IntRect{ 89, 2366, 627, 118 });
@@ -535,17 +537,34 @@ void Game::processGameEvents(sf::Event& event)
 				{
 					if (event.joystickMove.position == -100) // Down
 					{ 
+						m_menuButtons[m_cursorPos]->scaleDown();
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
 					else if (event.joystickMove.position == 100) // Up
 					{
+						m_menuButtons[m_cursorPos]->scaleDown();
 						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
 				}
+				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
+				{
+					if (m_cursorButtonType == ButtonType::Tutorial)
+					{
+						if (event.joystickMove.position == -100) // left
+						{
+							//
+						}
+						else if (event.joystickMove.position == 100) // right
+						{
+							//
+						}
+					}
+				}
+
 
 				if (m_cursorPos > (static_cast<int>(m_menuButtons.size()) - 1)) {
 					m_cursorPos = 0;
@@ -560,6 +579,7 @@ void Game::processGameEvents(sf::Event& event)
 
 				m_cursorSprite.setPosition(m_menuButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_menuButtons[m_cursorPos]->getType();
+				m_menuButtons[m_cursorPos]->scaleUp();
 			}
 
 			//Button pressed
@@ -619,12 +639,14 @@ void Game::processGameEvents(sf::Event& event)
 				{
 					if (event.joystickMove.position == -100) // Left
 					{
+						m_pauseButtons[m_cursorPos]->scaleDown();
 						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
 					else if (event.joystickMove.position == 100) // Right
 					{
+						m_pauseButtons[m_cursorPos]->scaleDown();
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
@@ -644,6 +666,7 @@ void Game::processGameEvents(sf::Event& event)
 
 				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				m_pauseButtons[m_cursorPos]->scaleUp();
 			}
 
 			//Button pressed
@@ -688,12 +711,14 @@ void Game::processGameEvents(sf::Event& event)
 				{
 					if (event.joystickMove.position == -100) // Down
 					{
+						m_upgradeButtons[m_cursorPos]->scaleDown();
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}	
 					else if (event.joystickMove.position == 100) // Up
 					{
+						m_upgradeButtons[m_cursorPos]->scaleDown();
 						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
@@ -713,6 +738,7 @@ void Game::processGameEvents(sf::Event& event)
 
 				m_cursorSprite.setPosition(m_upgradeButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_upgradeButtons[m_cursorPos]->getType();
+				m_upgradeButtons[m_cursorPos]->scaleUp();
 			}
 
 			//Button pressed
@@ -765,12 +791,14 @@ void Game::processGameEvents(sf::Event& event)
 				{
 					if (event.joystickMove.position == -100) // Down
 					{
+						m_weaponButtons[m_cursorPos]->scaleDown();
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
 					else if (event.joystickMove.position == 100) // Up
 					{
+						m_weaponButtons[m_cursorPos]->scaleDown();
 						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
@@ -790,6 +818,7 @@ void Game::processGameEvents(sf::Event& event)
 
 				m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+				m_weaponButtons[m_cursorPos]->scaleUp();
 
 				setGunInfo();
 			}
@@ -863,12 +892,14 @@ void Game::processGameEvents(sf::Event& event)
 				{
 					if (event.joystickMove.position == -100) // Left
 					{
+						m_gameoverButtons[m_cursorPos]->scaleDown();
 						m_cursorPos--;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
 					}
 					else if (event.joystickMove.position == 100) // Right
 					{
+						m_gameoverButtons[m_cursorPos]->scaleDown();
 						m_cursorPos++;
 						m_menuScrollSound.stop();
 						m_menuScrollSound.play();
@@ -888,6 +919,7 @@ void Game::processGameEvents(sf::Event& event)
 
 				m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
+				m_gameoverButtons[m_cursorPos]->scaleUp();
 			}
 
 			//Button pressed
@@ -918,6 +950,7 @@ void Game::processGameEvents(sf::Event& event)
 			}
 
 #pragma endregion
+
 #pragma endregion
 
 		}

@@ -586,19 +586,22 @@ void Game::processGameEvents(sf::Event& event)
 			{
 				if (event.joystickMove.axis == sf::Joystick::PovY) // D-pad up/down
 				{
-					if (event.joystickMove.position == -100) // Down
-					{ 
-						m_menuButtons[m_cursorPos]->scaleDown();
-						m_cursorPos++;
-						m_menuScrollSound.stop();
-						m_menuScrollSound.play();
-					}
-					else if (event.joystickMove.position == 100) // Up
+					if (!inMenu)
 					{
-						m_menuButtons[m_cursorPos]->scaleDown();
-						m_cursorPos--;
-						m_menuScrollSound.stop();
-						m_menuScrollSound.play();
+						if (event.joystickMove.position == -100) // Down
+						{ 
+							m_menuButtons[m_cursorPos]->scaleDown();
+							m_cursorPos++;
+							m_menuScrollSound.stop();
+							m_menuScrollSound.play();
+						}
+						else if (event.joystickMove.position == 100) // Up
+						{
+							m_menuButtons[m_cursorPos]->scaleDown();
+							m_cursorPos--;
+							m_menuScrollSound.stop();
+							m_menuScrollSound.play();
+						}
 					}
 				}
 				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
@@ -650,6 +653,7 @@ void Game::processGameEvents(sf::Event& event)
 								m_currentGamemode = Gamemode::Gameplay;
 								m_menuMusic.stop();
 								m_gameplayMusic.play();
+								m_menuButtons[m_cursorPos]->scaleDown();
 							}
 							break;
 						case ButtonType::Tutorial:
@@ -863,6 +867,7 @@ void Game::processGameEvents(sf::Event& event)
 
 						m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
 						m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+						m_weaponButtons[m_cursorPos]->scaleUp();
 
 						setGunInfo();
 					}
@@ -886,6 +891,7 @@ void Game::processGameEvents(sf::Event& event)
 
 						m_cursorSprite.setPosition(m_weaponButtons[m_cursorPos]->getPositon());
 						m_cursorButtonType = m_weaponButtons[m_cursorPos]->getType();
+						m_weaponButtons[m_cursorPos]->scaleUp();
 
 						setGunInfo();
 					}
@@ -945,6 +951,8 @@ void Game::processGameEvents(sf::Event& event)
 				m_cursorPos = 0;
 				m_cursorSprite.setPosition(m_pauseButtons[m_cursorPos]->getPositon());
 				m_cursorButtonType = m_pauseButtons[m_cursorPos]->getType();
+				m_pauseButtons[m_cursorPos]->scaleUp();
+				m_pauseButtons[m_cursorPos + 1]->scaleDown();
 				m_player.rumbleStop();
 			}
 #pragma endregion

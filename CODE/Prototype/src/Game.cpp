@@ -1121,7 +1121,7 @@ void Game::update(double dt)
 #pragma endregion
 
 
-		if (!m_bossSpawned && m_bossTimer.getElapsedTime().asSeconds() > 120.0f)
+		if (!m_bossSpawned && timeSurvived > 120)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
 			m_bossSpawned = true;
@@ -1158,6 +1158,11 @@ void Game::update(double dt)
 		{
 			timeSurvivedMinutes++;
 			timeSurvivedSeconds = 0;
+
+			if (m_bossSpawned && timeSurvived > 300 && timeSurvivedMinutes % 2 == 0)
+			{
+				m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Boss));
+			}
 		}
 
 		if (timeSurvivedSeconds < 10)
@@ -1475,33 +1480,11 @@ void Game::checkCollisions()
 				{
 				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
-					switch (enemy->getType()) {
-					case EnemyType::Small:
-						smallEK++;
-						break;
-					case EnemyType::Big:
-						bigEK++;
-						break;
-					case EnemyType::Boss:
-						bossEK++;
-						break;
-					}
-					totalEK++;
+					smallEK++;
 					break;
 				case EnemyType::Big:
 					enemy->setState(CharacterState::DeadState);
-					switch (enemy->getType()) {
-					case EnemyType::Small:
-						smallEK++;
-						break;
-					case EnemyType::Big:
-						bigEK++;
-						break;
-					case EnemyType::Boss:
-						bossEK++;
-						break;
-					}
-					totalEK++;
+					bigEK++;
 					break;
 				case EnemyType::Boss:
 					enemy->decreaseHealth(5.0f);
@@ -1510,19 +1493,8 @@ void Game::checkCollisions()
 
 					if (enemy->getHealth() < 0)
 					{
-						switch (enemy->getType()) {
-						case EnemyType::Small:
-							smallEK++;
-							break;
-						case EnemyType::Big:
-							bigEK++;
-							break;
-						case EnemyType::Boss:
-							bossEK++;
-							break;
-						}
+						bossEK++;
 						enemy->setState(CharacterState::DeadState);
-						totalEK++;
 					}
 					break;
 				default:
@@ -1539,33 +1511,11 @@ void Game::checkCollisions()
 				{
 				case EnemyType::Small:
 					enemy->setState(CharacterState::DeadState);
-					switch (enemy->getType()) {
-					case EnemyType::Small:
-						smallEK++;
-						break;
-					case EnemyType::Big:
-						bigEK++;
-						break;
-					case EnemyType::Boss:
-						bossEK++;
-						break;
-					}
-					totalEK++;
+					smallEK++;
 					break;
 				case EnemyType::Big:
 					enemy->setState(CharacterState::DeadState);
-					switch (enemy->getType()) {
-					case EnemyType::Small:
-						smallEK++;
-						break;
-					case EnemyType::Big:
-						bigEK++;
-						break;
-					case EnemyType::Boss:
-						bossEK++;
-						break;
-					}
-					totalEK++;
+					bigEK++;
 					break;
 				case EnemyType::Boss:
 					enemy->decreaseHealth(10.0f);
@@ -1574,19 +1524,8 @@ void Game::checkCollisions()
 
 					if (enemy->getHealth() < 0)
 					{
-						switch (enemy->getType()) {
-						case EnemyType::Small:
-							smallEK++;
-							break;
-						case EnemyType::Big:
-							bigEK++;
-							break;
-						case EnemyType::Boss:
-							bossEK++;
-							enemy->setState(CharacterState::DeadState);
-							break;
-						}
-						totalEK++;
+						bossEK++;
+						enemy->setState(CharacterState::DeadState);
 					}
 					break;
 				default:
@@ -1610,34 +1549,12 @@ void Game::checkCollisions()
 							case EnemyType::Small:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
-								switch (enemy->getType()) {
-								case EnemyType::Small:
-									smallEK++;
-									break;
-								case EnemyType::Big:
-									bigEK++;
-									break;
-								case EnemyType::Boss:
-									bossEK++;
-									break;
-								}
-								totalEK++;
+								smallEK++;
 								break;
 							case EnemyType::Big:
 								enemy->playHitSound();
 								enemy->setState(CharacterState::DeadState);
-								switch (enemy->getType()) {
-								case EnemyType::Small:
-									smallEK++;
-									break;
-								case EnemyType::Big:
-									bigEK++;
-									break;
-								case EnemyType::Boss:
-									bossEK++;
-									break;
-								}
-								totalEK++;
+								bigEK++;
 								break;
 							case EnemyType::Boss:
 								enemy->playHitSound();
@@ -1648,18 +1565,7 @@ void Game::checkCollisions()
 								if (enemy->getHealth() < 0.0f)
 								{
 									enemy->setState(CharacterState::DeadState);
-									switch (enemy->getType()) {
-									case EnemyType::Small:
-										smallEK++;
-										break;
-									case EnemyType::Big:
-										bigEK++;
-										break;
-									case EnemyType::Boss:
-										bossEK++;
-										break;
-									}
-									totalEK++;
+									bossEK++;
 								}
 								break;
 							default:
@@ -1709,7 +1615,6 @@ void Game::checkCollisions()
 								enemy->setState(CharacterState::DeadState);
 								break;
 							case EnemyType::Boss:
-								bossEK++;
 								enemy->playHitSound();
 								enemy->decreaseHealth(bullet->getDamage() / 100.0f);
 								
@@ -1718,6 +1623,7 @@ void Game::checkCollisions()
 								if (enemy->getHealth() < 0)
 								{
 									enemy->setState(CharacterState::DeadState);
+									bossEK++;
 								}
 							default:
 								break;
@@ -1741,7 +1647,6 @@ void Game::checkCollisions()
 							enemy->setState(CharacterState::DeadState);
 							break;
 						case EnemyType::Boss:
-							bossEK++;
 							enemy->decreaseHealth(20.0f);
 
 							enemy->setColour(sf::Color::Red);
@@ -1749,6 +1654,7 @@ void Game::checkCollisions()
 							if (enemy->getHealth() < 0)
 							{
 								enemy->setState(CharacterState::DeadState);
+								bossEK++;
 							}
 						default:
 							break;

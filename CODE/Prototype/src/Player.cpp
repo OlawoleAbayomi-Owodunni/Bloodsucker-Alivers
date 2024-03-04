@@ -437,7 +437,7 @@ void Player::renderPlayer(sf::RenderWindow& t_window)
 		{
 			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
 			{
-				t_window.draw(m_slashCircle);
+				//t_window.draw(m_slashCircle);
 				t_window.draw(m_slashSprite);
 			}
 		}
@@ -733,7 +733,7 @@ void Player::setPosition(sf::View& t_view)
 			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
 			{
 				m_slashSprite.setPosition(m_position);
-				//m_slashCircle.setPosition(m_position);
+				m_slashCircle.setPosition(m_position);
 			}
 		}
 		else

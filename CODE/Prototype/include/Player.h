@@ -100,6 +100,7 @@ public:
 	bool& getAliveState();
 
 	void setDamageIndicator(sf::Color t_colour);
+	void setHealIndicator(sf::Color t_colour);
 
 private:
 	const float AFTERIMAGE_COUNT{ 16.0f };
@@ -129,6 +130,7 @@ private:
 
 	Direction m_direction;
 	Clock m_damageClock;
+	Clock m_healClock;
 
 	float m_dashDistance;
 	bool m_canDash;
@@ -187,6 +189,9 @@ private:
 
 	SoundBuffer m_dashSoundBuffer;
 	Sound m_dashSound;
+
+	SoundBuffer m_deathSoundBuffer;
+	Sound m_deathSound;
 
 	Sprite m_playerSprite;
 	Sprite m_dashSprite;

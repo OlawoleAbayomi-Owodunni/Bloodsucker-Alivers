@@ -27,6 +27,13 @@ Player::Player()
 	m_dashSound.setBuffer(m_dashSoundBuffer);
 	m_dashSound.setVolume(3.0f);
 
+	if (!m_deathSoundBuffer.loadFromFile("resources/sounds/player_death.wav"))
+	{
+		std::cout << "error loading death sound";
+	}
+	m_deathSound.setBuffer(m_deathSoundBuffer);
+	m_deathSound.setVolume(5.0f);
+
 	//FONT & TEXT
 	if (!m_font.loadFromFile("resources/BebasNeue.otf"))
 	{
@@ -242,7 +249,7 @@ void Player::initialise()
 	m_health = m_maxHealth;
 	m_speed = 2.0f;
 	m_level = 1;
-	m_xp = 8;
+	m_xp = 0;
 	m_xpRequired = 10.0f;
 
 	m_position = sf::Vector2f(ScreenSize::s_width / 2.0f, ScreenSize::s_height / 2.0f);
@@ -376,7 +383,8 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 		m_dashRectBounds.setPosition(m_dashRect.getPosition());
 		m_dashRectBounds.setSize(sf::Vector2f(m_dashRect.getGlobalBounds().width, m_dashRect.getGlobalBounds().height));
 
-		if (m_damageClock.getElapsedTime().asSeconds() > 0.1f)
+		if (m_damageClock.getElapsedTime().asSeconds() > 0.1f &&
+			m_healClock.getElapsedTime().asSeconds() > 0.3f)
 		{
 			m_playerSprite.setColor(sf::Color::White);
 		}
@@ -1211,6 +1219,7 @@ void Player::setFrames()
 		addFrame(IntRect{ 5200, 2176, 400, 200 });
 		addFrame(IntRect{ 5600, 2176, 400, 200 });
 		m_playerSprite.setOrigin(200.0f, 100.0f);
+		m_deathSound.play();
 		break;
 	default:
 		break;
@@ -1229,4 +1238,10 @@ void Player::setDamageIndicator(sf::Color t_colour)
 {
 	m_playerSprite.setColor(t_colour);
 	m_damageClock.restart();
+}
+
+void Player::setHealIndicator(sf::Color t_colour)
+{
+	m_playerSprite.setColor(t_colour);
+	m_healClock.restart();
 }

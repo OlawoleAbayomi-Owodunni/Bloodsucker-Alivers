@@ -85,8 +85,17 @@ protected:
 	std::vector<Pickup*> m_pickups;
 	std::vector<Obstacle*> m_obstacles;
 
-	sf::SoundBuffer m_pickupSoundBuffer;
-	sf::Sound m_pickupSound;
+	sf::SoundBuffer m_orbPickupSoundBuffer;
+	sf::Sound m_orbPickupSound;
+
+	sf::SoundBuffer m_healthPickupSoundBuffer;
+	sf::Sound m_healthPickupSound;
+
+	sf::SoundBuffer m_levelupSoundBuffer;
+	sf::Sound m_levelupSound;
+
+	sf::SoundBuffer m_explosionSoundBuffer;
+	sf::Sound m_explosionSound;
 
 	sf::SoundBuffer m_menuMusicBuffer;
 	sf::Sound m_menuMusic;

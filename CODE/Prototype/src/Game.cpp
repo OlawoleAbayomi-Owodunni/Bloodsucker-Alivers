@@ -49,12 +49,33 @@ void Game::init()
 
 #pragma region SOUND
 	//SOUND
-	if (!m_pickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
+	if (!m_orbPickupSoundBuffer.loadFromFile("resources/sounds/orb_pickup.wav"))
 	{
 		std::cout << "error loading orb pick up sound";
 	}
-	m_pickupSound.setBuffer(m_pickupSoundBuffer);
-	m_pickupSound.setVolume(15.0f);
+	m_orbPickupSound.setBuffer(m_orbPickupSoundBuffer);
+	m_orbPickupSound.setVolume(15.0f);
+
+	if (!m_healthPickupSoundBuffer.loadFromFile("resources/sounds/health_pickup.wav"))
+	{
+		std::cout << "error loading health pick up sound";
+	}
+	m_healthPickupSound.setBuffer(m_healthPickupSoundBuffer);
+	m_healthPickupSound.setVolume(3.0f);
+	
+	if (!m_levelupSoundBuffer.loadFromFile("resources/sounds/levelup.wav"))
+	{
+		std::cout << "error loading level up sound";
+	}
+	m_levelupSound.setBuffer(m_levelupSoundBuffer);
+	m_levelupSound.setVolume(2.0f);
+
+	if (!m_explosionSoundBuffer.loadFromFile("resources/sounds/rpg_explosion.wav"))
+	{
+		std::cout << "error loading explosion sound";
+	}
+	m_explosionSound.setBuffer(m_explosionSoundBuffer);
+	m_explosionSound.setVolume(4.0f);
 
 	if (!m_menuMusicBuffer.loadFromFile("resources/sounds/menu_music.wav"))
 	{
@@ -1591,6 +1612,7 @@ void Game::checkCollisions()
 
 							if (weapon->getType() == WeaponType::RPG)
 							{
+								m_explosionSound.play();
 								weapon->getExplosion().currentFrame = 0;
 								weapon->getExplosion().animationOver = false;
 
@@ -1714,7 +1736,7 @@ void Game::checkCollisions()
 			orbRumbleTimer.restart();
 			oIsRumbling = true; //Orb has rumbled = ohr
 
-			m_player.playSound(m_pickupSound);
+			m_player.playSound(m_orbPickupSound);
 			m_player.increaseXP();
 
 			delete* it; // Delete the orb object
@@ -1734,7 +1756,9 @@ void Game::checkCollisions()
 	{
 		if (CollisionDetection::playerPickupCollision(m_player, *it))
 		{
+			m_player.playSound(m_healthPickupSound);
 			m_player.increaseHealth();
+			m_player.setHealIndicator(sf::Color::Green);
 
 			m_player.rumbleStart();
 			pickupRumbleTimer.restart();
@@ -2208,6 +2232,8 @@ void Game::levelUpSpawner()
 {
 	if (m_player.getLevel() > m_currentLevel)
 	{
+		m_levelupSound.play();
+
 		for (int i = 0; i < 10; i++)
 		{
 			m_enemies.push_back(new Enemy(m_holder["starterAtlas"], m_player.getPosition(), EnemyType::Small));

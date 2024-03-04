@@ -1180,6 +1180,7 @@ void Game::update(double dt)
 			isGameOver = false;
 			//switch to game over game mode here
 			m_currentGamemode = Gamemode::GameOver;
+
 			m_cursorPos = 0;
 			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
 			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
@@ -1202,7 +1203,7 @@ void Game::update(double dt)
 			if (highScore >= 10000) { m_playerRank = 5; }
 			m_rankBadgeSprite.setTextureRect(IntRect{ (2192 + (136 * (m_playerRank))), 1472, 136, 33 });
 
-
+			m_player.rumbleStop();
 #pragma region Menu UI setup
 #pragma region Sprites
 			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);

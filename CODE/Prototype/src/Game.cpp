@@ -6,10 +6,13 @@ static double const FPS{ 60.0f };
 
 ////////////////////////////////////////////////////////////
 Game::Game()
-	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Prototype", sf::Style::Default),
+	: m_window(sf::VideoMode(ScreenSize::s_width, ScreenSize::s_height, 32), "Codename: Reclaim", sf::Style::Default),
 	m_playerCamera(sf::FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y)),
 	m_menuCamera(FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y))
 {
+	//sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+	//m_window.create(desktopMode, "Fullscreen SFML");
+
 	srand(time(nullptr));
 	init();
 
@@ -151,6 +154,7 @@ void Game::init()
 	bgSprite.setOrigin(800, 500);
 	bgSprite.setPosition(800, 500);
 
+	m_playerRank = 1;
 	score = 0;
 	smallEK = 0;
 	bigEK = 0;
@@ -189,10 +193,10 @@ void Game::init()
 
 
 	m_highscoreSprite.setTexture(UITexture);
-	m_highscoreSprite.setTextureRect(IntRect{ 89, 2366, 627, 118 });
+	m_highscoreSprite.setTextureRect(IntRect{ 89, 2367, 627, 155 });
 	m_highscoreSprite.setOrigin(627.0f / 2.0f, 118.0f / 2.0f);
-	m_highscoreSprite.setScale(0.75f, 0.75f);
-	m_highscoreSprite.setPosition(m_menuCamera.getCenter().x + 250, 190);
+	m_highscoreSprite.setPosition(m_menuCamera.getCenter().x + 375, 150);
+	m_highscoreSprite.setScale(1.0f, 1.0f);
 
 	m_highscoreText.setFont(m_arialFont);
 	m_highscoreText.setStyle(sf::Text::Bold);
@@ -202,7 +206,14 @@ void Game::init()
 	m_highscoreText.setOutlineThickness(2.0f);
 	m_highscoreText.setString(to_string(highScore));
 	m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
-	m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
+	m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 190, m_highscoreSprite.getPosition().y + 10.0f);
+
+
+	m_rankBadgeSprite.setTexture(m_holder["starterAtlas"]);
+	m_rankBadgeSprite.setTextureRect(IntRect{ (2192 + (136 * (m_currentLevel - 1))), 1472, 136, 33 });
+	m_rankBadgeSprite.setOrigin(136.0f / 2.0f, 33.0f / 2.0f); 
+	m_rankBadgeSprite.setPosition(m_highscoreSprite.getPosition().x - 41.0f, m_highscoreSprite.getPosition().y + 72.5f);
+	m_rankBadgeSprite.setScale(1.0f, 1.0f);
 #pragma endregion
 
 #pragma region pause menu
@@ -424,6 +435,8 @@ void Game::init()
 
 #pragma endregion
 
+
+
 }
 
 void Game::startGame()
@@ -603,11 +616,15 @@ void Game::processGameEvents(sf::Event& event)
 						{
 							menuBgSprite.setTexture(m_holder["tutorialMenu"]);
 							isFirstPage = true;
+							m_menuScrollSound.stop();
+							m_menuScrollSound.play();
 						}
 						if (event.joystickMove.position == 100 && isFirstPage) // right
 						{
 							menuBgSprite.setTexture(m_holder["rankedScreen"]);
 							isFirstPage = false;
+							m_menuScrollSound.stop();
+							m_menuScrollSound.play();
 						}
 					}
 				}
@@ -670,6 +687,8 @@ void Game::processGameEvents(sf::Event& event)
 					if (event.joystickButton.button == 1) {
 						inMenu = false;
 						menuBgSprite.setTexture(m_holder["mainMenuBG"]);
+						m_menuSelectSound.stop();
+						m_menuSelectSound.play();
 					}
 				}
 			}
@@ -1180,6 +1199,15 @@ void Game::update(double dt)
 				m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
 			}
 
+			if (highScore < 500) { m_playerRank = 0; }
+			if (highScore >= 1000) { m_playerRank = 1; }
+			if (highScore >= 2500) { m_playerRank = 2; }
+			if (highScore >= 5000) { m_playerRank = 3; }
+			if (highScore >= 7500) { m_playerRank = 4; }
+			if (highScore >= 10000) { m_playerRank = 5; }
+			m_rankBadgeSprite.setTextureRect(IntRect{ (2192 + (136 * (m_playerRank))), 1472, 136, 33 });
+
+
 #pragma region Menu UI setup
 #pragma region Sprites
 			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
@@ -1395,13 +1423,6 @@ void Game::render()
 			m_window.draw(m_playerLevelText);
 			m_window.draw(m_timeSurvivedText);
 			m_window.draw(m_scoreText);
-			//RectangleShape rect;
-			//rect.setSize(m_smallEKText.getGlobalBounds().getSize());
-			//rect.setOutlineColor(Color::Red);
-			//rect.setOutlineThickness(2.0f);
-			//rect.setOrigin(m_smallEKText.getOrigin());
-			//rect.setPosition(m_smallEKText.getPosition());
-			//m_window.draw(rect);
 			m_window.draw(m_cursorSprite);
 		}
 
@@ -1420,6 +1441,7 @@ void Game::render()
 			}
 			m_window.draw(m_highscoreSprite);
 			m_window.draw(m_highscoreText);
+			if (!firstStart) { m_window.draw(m_rankBadgeSprite); } 
 			m_window.draw(m_cursorSprite);
 		}
 

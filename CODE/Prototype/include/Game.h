@@ -204,4 +204,7 @@ protected:
 	Text m_statsText;
 	Text m_inGameTimerText;
 	Text m_currentLevelText;
+
+	Sprite m_rankBadgeSprite;
+	int m_playerRank;
 };

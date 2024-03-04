@@ -114,8 +114,9 @@ protected:
 	Clock orbRumbleTimer;
 	Clock pickupRumbleTimer;
 	Clock enemyHitRumbleTimer;
+	Clock levelUpRumbleTimer;
 
-	bool oIsRumbling, pIsRumbling, eIsRumbling;
+	bool oIsRumbling, pIsRumbling, eIsRumbling, luIsRumbling;
 
 #ifdef TEST_FPS
 	sf::Text x_updateFPS;					// text used to display updates per second.

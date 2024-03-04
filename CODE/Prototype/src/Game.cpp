@@ -10,8 +10,8 @@ Game::Game()
 	m_playerCamera(sf::FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y)),
 	m_menuCamera(FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y))
 {
-	//sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-	//m_window.create(desktopMode, "Fullscreen SFML");
+	sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+	m_window.create(desktopMode, "Fullscreen SFML");
 
 	srand(time(nullptr));
 	init();
@@ -529,10 +529,12 @@ void Game::startGame()
 	orbRumbleTimer.restart();
 	pickupRumbleTimer.restart();
 	enemyHitRumbleTimer.restart();
+	levelUpRumbleTimer.restart();
 
 	oIsRumbling = false;
 	pIsRumbling = false;
 	eIsRumbling = false;
+	luIsRumbling = false;
 
 	m_cursorPos = 0;
 }
@@ -1132,19 +1134,7 @@ void Game::update(double dt)
 		//levelUpSpawner();
 		//checkCollisions();
 
-		//Rumble timer logic
-		if (orbRumbleTimer.getElapsedTime().asSeconds() > 0.1f && oIsRumbling) {
-			oIsRumbling = false;
-		}
-		if (pickupRumbleTimer.getElapsedTime().asSeconds() > 0.01f && pIsRumbling) {
-			pIsRumbling = false;
-		}
-		if (enemyHitRumbleTimer.getElapsedTime().asSeconds() > 0.05f && eIsRumbling) {
-			eIsRumbling = false;
-		}
-		if (!oIsRumbling && !pIsRumbling && !eIsRumbling && !m_player.getRumbleState()) {
-			m_player.rumbleStop();
-		}
+
 
 		//time in game
 		if (updateCount > 60) {
@@ -1301,6 +1291,23 @@ void Game::update(double dt)
 				gunInfoImgSprite.setTextureRect(m_gunInfoFrames[m_gunInfoCurrentFrame]);
 			}
 		}
+	}
+
+	//Rumble timer logic
+	if (orbRumbleTimer.getElapsedTime().asSeconds() > 0.1f && oIsRumbling) {
+		oIsRumbling = false;
+	}
+	if (pickupRumbleTimer.getElapsedTime().asSeconds() > 0.01f && pIsRumbling) {
+		pIsRumbling = false;
+	}
+	if (enemyHitRumbleTimer.getElapsedTime().asSeconds() > 0.05f && eIsRumbling) {
+		eIsRumbling = false;
+	}
+	if (levelUpRumbleTimer.getElapsedTime().asSeconds() > 1.0f && luIsRumbling) {
+		luIsRumbling = false;
+	}
+	if (!oIsRumbling && !pIsRumbling && !eIsRumbling && !luIsRumbling && !m_player.getRumbleState()) {
+		m_player.rumbleStop();
 	}
 }
 
@@ -2198,6 +2205,10 @@ void Game::levelUpSpawner()
 	if (m_player.getLevel() > m_currentLevel)
 	{
 		m_levelupSound.play();
+
+		m_player.strongRumbleStart();
+		levelUpRumbleTimer.restart();
+		luIsRumbling = true; //level up has rumbled = luhr
 
 		for (int i = 0; i < 10; i++)
 		{

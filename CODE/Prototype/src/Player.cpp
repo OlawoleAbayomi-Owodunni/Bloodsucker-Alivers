@@ -297,9 +297,9 @@ void Player::initialise()
 	m_haloTime = seconds(0.2f);
 	m_slashTime = seconds(0.05f);
 
-	m_dashStateTime = seconds(1.0f);
+	m_dashStateTime = seconds(0.6f);
 	m_dashCooldownTime = seconds(4.0f);
-	m_dashAOETime = seconds(0.5f);
+	m_dashAOETime = seconds(0.1f);
 
 	//RUMBLE TIMERS
 	isDashRumbling = false;
@@ -437,7 +437,7 @@ void Player::renderPlayer(sf::RenderWindow& t_window)
 		{
 			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
 			{
-				//t_window.draw(m_slashCircle);
+				t_window.draw(m_slashCircle);
 				t_window.draw(m_slashSprite);
 			}
 		}

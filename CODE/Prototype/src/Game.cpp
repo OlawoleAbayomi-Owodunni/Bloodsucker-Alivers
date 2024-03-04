@@ -1061,7 +1061,14 @@ void Game::update(double dt)
 			m_playerLevelText.setOrigin(0.0f, m_playerLevelText.getGlobalBounds().height / 2.0f);
 			m_playerLevelText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 220);
 
-			m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
+			if (timeSurvivedSeconds < 10)
+			{
+				m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":0" + to_string(timeSurvivedSeconds));
+			}
+			else
+			{
+				m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
+			}
 			m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
 			m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 250);
 

@@ -732,7 +732,7 @@ void Player::setPosition(sf::View& t_view)
 		{
 			if (m_dashAOEClock.getElapsedTime() > m_dashAOETime)
 			{
-				m_slashSprite.setPosition(m_position);
+				//m_slashSprite.setPosition(m_position);
 				m_slashCircle.setPosition(m_position);
 			}
 		}

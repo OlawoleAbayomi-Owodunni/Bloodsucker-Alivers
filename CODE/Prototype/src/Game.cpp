@@ -34,6 +34,7 @@ void Game::init()
 	inMenu = false;
 	m_bossSpawned = false;
 	highScore = 0;
+	isFirstPage = true;
 
 #pragma region THOR
 	//THOR
@@ -45,6 +46,7 @@ void Game::init()
 	m_holder.acquire("tutorialMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/InformationScreen.png"));
 	m_holder.acquire("creditsMenu", thor::Resources::fromFile<sf::Texture>("resources/sprites/credits.png"));
 	m_holder.acquire("screenVignette", thor::Resources::fromFile<sf::Texture>("resources/sprites/bigblackbox.png"));
+	m_holder.acquire("rankedScreen", thor::Resources::fromFile<sf::Texture>("resources/sprites/Rank.png"));
 #pragma endregion
 
 #pragma region SOUND
@@ -151,7 +153,6 @@ void Game::init()
 
 	score = 0;
 	smallEK = 0;
-	normalEK = 0;
 	bigEK = 0;
 	bossEK = 0;
 	updateCount = 0;
@@ -202,7 +203,6 @@ void Game::init()
 	m_highscoreText.setString(to_string(highScore));
 	m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
 	m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
-
 #pragma endregion
 
 #pragma region pause menu
@@ -327,16 +327,6 @@ void Game::init()
 	m_smallEKText.setOrigin(0.0f, m_smallEKText.getGlobalBounds().height / 2.0f);
 	m_smallEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 70);
 
-	m_normalEKText.setFont(m_arialFont);
-	m_normalEKText.setStyle(sf::Text::Bold);
-	m_normalEKText.setCharacterSize(25U);
-	m_normalEKText.setOutlineColor(sf::Color::Black);
-	m_normalEKText.setFillColor(sf::Color::White);
-	m_normalEKText.setOutlineThickness(2.0f);
-	m_normalEKText.setString("Normal enemies killed: " + to_string(normalEK));
-	m_normalEKText.setOrigin(0.0f, m_normalEKText.getGlobalBounds().height / 2.0f);
-	m_normalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 100);
-
 	m_bigEKText.setFont(m_arialFont);
 	m_bigEKText.setStyle(sf::Text::Bold);
 	m_bigEKText.setCharacterSize(25U);
@@ -442,6 +432,8 @@ void Game::startGame()
 	m_bossTimer.restart();
 	m_bossSpawned = false;
 
+	isFirstPage = true;
+
 	m_player.initialise();
 	m_currentLevel = 1;
 	hasGameOverTimerStarted = false;
@@ -451,7 +443,6 @@ void Game::startGame()
 
 	score = 0;
 	smallEK = 0;
-	normalEK = 0;
 	bigEK = 0;
 	bossEK = 0;
 	updateCount = 0;
@@ -608,13 +599,15 @@ void Game::processGameEvents(sf::Event& event)
 				{
 					if (m_cursorButtonType == ButtonType::Tutorial)
 					{
-						if (event.joystickMove.position == -100) // left
+						if (event.joystickMove.position == -100 && !isFirstPage)// left
 						{
-							//
+							menuBgSprite.setTexture(m_holder["tutorialMenu"]);
+							isFirstPage = true;
 						}
-						else if (event.joystickMove.position == 100) // right
+						if (event.joystickMove.position == 100 && isFirstPage) // right
 						{
-							//
+							menuBgSprite.setTexture(m_holder["rankedScreen"]);
+							isFirstPage = false;
 						}
 					}
 				}
@@ -1039,87 +1032,6 @@ void Game::update(double dt)
 #pragma region Gameplay Gamemode logic
 	if (m_currentGamemode == Gamemode::Gameplay) //switching between screens
 	{
-#pragma region Gameover logic
-		if (!m_player.getAliveState() && !hasGameOverTimerStarted) {
-			m_gameOverTimer.restart();
-			hasGameOverTimerStarted = true;
-		}
-		if (m_gameOverTimer.getElapsedTime().asSeconds() > 1.5f && !m_player.getAliveState()) {
-			isGameOver = false;
-			//switch to game over game mode here
-			m_currentGamemode = Gamemode::GameOver;
-			m_cursorPos = 0;
-			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
-			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
-			score = (((1 * smallEK) + (1.5 * normalEK) + (5 * bigEK) + (200 * bossEK)) / 100) * timeSurvived;
-
-			if (score > highScore) {
-				highScore = score;
-				m_highscoreText.setString(to_string(highScore));
-				m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
-				m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
-			}
-
-
-#pragma region Menu UI setup
-#pragma region Sprites
-			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
-			m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
-			gameOverBGSprite.setPosition(m_playerCamera.getCenter());
-			m_vignetteSprite.setPosition(m_playerCamera.getCenter());
-			m_gameoverButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 275, m_playerCamera.getCenter().y + 365));
-			m_gameoverButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 275, m_playerCamera.getCenter().y + 365));
-#pragma endregion
-
-#pragma region Text
-			m_statsText.setPosition(m_scoreVarBGSprite.getPosition().x, m_scoreVarBGSprite.getPosition().y - 105);
-
-			m_smallEKText.setString("Small enemies killed: " + to_string(smallEK));
-			m_smallEKText.setOrigin(0.0f, m_smallEKText.getGlobalBounds().height / 2.0f);
-			m_smallEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 70);
-
-			m_normalEKText.setString("Normal enemies killed: " + to_string(normalEK));
-			m_normalEKText.setOrigin(0.0f, m_normalEKText.getGlobalBounds().height / 2.0f);
-			m_normalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 100);
-
-			m_bigEKText.setString("Big enemies killed: " + to_string(bigEK));
-			m_bigEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
-			m_bigEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 130);
-
-			m_bossEKText.setString("Boss enemies killed: " + to_string(bossEK));
-			m_bossEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
-			m_bossEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 160);
-
-			m_totalEKText.setString("TOTAL ENEMIES KILLED: " + to_string(totalEK));
-			m_totalEKText.setOrigin(0.0f, m_totalEKText.getGlobalBounds().height / 2.0f);
-			m_totalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 190);
-
-			m_playerLevelText.setString("Player Level: " + to_string(m_currentLevel));
-			m_playerLevelText.setOrigin(0.0f, m_playerLevelText.getGlobalBounds().height / 2.0f);
-			m_playerLevelText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 220);
-
-			if (timeSurvivedSeconds < 10)
-			{
-				m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":0" + to_string(timeSurvivedSeconds));
-			}
-			else
-			{
-				m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
-			}
-			m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
-			m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 250);
-
-			m_scoreText.setString(to_string(score));
-			m_scoreText.setOrigin(m_scoreText.getGlobalBounds().width / 2.0f, m_scoreText.getGlobalBounds().height / 2.0f);
-			m_scoreText.setPosition(m_scoreSprite.getPosition().x + 150, m_scoreSprite.getPosition().y);
-
-#pragma endregion
-
-#pragma endregion
-
-
-		}
-#pragma endregion		
 
 #pragma region camera movement
 		sf::Vector2f targetPosition = m_player.getPosition();
@@ -1244,6 +1156,85 @@ void Game::update(double dt)
 		m_currentLevelText.setString("Level: " + to_string(m_currentLevel));
 		m_currentLevelText.setOrigin(0.0f, m_currentLevelText.getGlobalBounds().height / 2.0f);
 		m_currentLevelText.setPosition(m_playerCamera.getCenter().x - 450.0f, m_playerCamera.getCenter().y - 412.0f);
+
+#pragma region Gameover logic
+		if (!m_player.getAliveState() && !hasGameOverTimerStarted) {
+			m_gameOverTimer.restart();
+			hasGameOverTimerStarted = true;
+		}
+		if (m_gameOverTimer.getElapsedTime().asSeconds() > 1.5f && !m_player.getAliveState()) {
+			isGameOver = false;
+			//switch to game over game mode here
+			m_currentGamemode = Gamemode::GameOver;
+			m_cursorPos = 0;
+			m_cursorSprite.setPosition(m_gameoverButtons[m_cursorPos]->getPositon());
+			m_cursorButtonType = m_gameoverButtons[m_cursorPos]->getType();
+			float multiplier = 1.0f + (0.2f * m_currentLevel);
+			totalEK = smallEK + bigEK + bossEK;
+			score = ((smallEK * 1.0f) + (bigEK * 2.0f) + (bossEK * 100.0f)) * multiplier;
+
+			if (score > highScore) {
+				highScore = score;
+				m_highscoreText.setString(to_string(highScore));
+				m_highscoreText.setOrigin(m_highscoreText.getGlobalBounds().width / 2.0f, m_highscoreText.getGlobalBounds().height / 2.0f);
+				m_highscoreText.setPosition(m_highscoreSprite.getPosition().x + 140, m_highscoreSprite.getPosition().y + 7.5f);
+			}
+
+#pragma region Menu UI setup
+#pragma region Sprites
+			m_scoreSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 250);
+			m_scoreVarBGSprite.setPosition(m_playerCamera.getCenter().x, m_playerCamera.getCenter().y + 50);
+			gameOverBGSprite.setPosition(m_playerCamera.getCenter());
+			m_vignetteSprite.setPosition(m_playerCamera.getCenter());
+			m_gameoverButtons[0]->setPosition(Vector2f(m_playerCamera.getCenter().x - 275, m_playerCamera.getCenter().y + 365));
+			m_gameoverButtons[1]->setPosition(Vector2f(m_playerCamera.getCenter().x + 275, m_playerCamera.getCenter().y + 365));
+#pragma endregion
+
+#pragma region Text
+			m_statsText.setPosition(m_scoreVarBGSprite.getPosition().x, m_scoreVarBGSprite.getPosition().y - 105);
+
+			m_smallEKText.setString("Normal enemies killed: " + to_string(smallEK));
+			m_smallEKText.setOrigin(0.0f, m_smallEKText.getGlobalBounds().height / 2.0f);
+			m_smallEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 70);
+
+			m_bigEKText.setString("Big enemies killed: " + to_string(bigEK));
+			m_bigEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
+			m_bigEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 100);
+
+			m_bossEKText.setString("Boss enemies killed: " + to_string(bossEK));
+			m_bossEKText.setOrigin(0.0f, m_bigEKText.getGlobalBounds().height / 2.0f);
+			m_bossEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 130);
+
+			m_totalEKText.setString("TOTAL ENEMIES KILLED: " + to_string(totalEK));
+			m_totalEKText.setOrigin(0.0f, m_totalEKText.getGlobalBounds().height / 2.0f);
+			m_totalEKText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 160);
+
+			m_playerLevelText.setString("Player Level: " + to_string(m_currentLevel));
+			m_playerLevelText.setOrigin(0.0f, m_playerLevelText.getGlobalBounds().height / 2.0f);
+			m_playerLevelText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 190);
+
+			if (timeSurvivedSeconds < 10)
+			{
+				m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":0" + to_string(timeSurvivedSeconds));
+			}
+			else
+			{
+				m_timeSurvivedText.setString("Time Survived: " + to_string(timeSurvivedMinutes) + ":" + to_string(timeSurvivedSeconds));
+			}
+			m_timeSurvivedText.setOrigin(0.0f, m_timeSurvivedText.getGlobalBounds().height / 2.0f);
+			m_timeSurvivedText.setPosition(m_scoreVarBGSprite.getPosition().x - 205, (m_scoreVarBGSprite.getPosition().y - 125) + 220);
+
+			m_scoreText.setString(to_string(score));
+			m_scoreText.setOrigin(m_scoreText.getGlobalBounds().width / 2.0f, m_scoreText.getGlobalBounds().height / 2.0f);
+			m_scoreText.setPosition(m_scoreSprite.getPosition().x + 150, m_scoreSprite.getPosition().y);
+
+#pragma endregion
+
+#pragma endregion
+
+		}
+#pragma endregion		
+
 	}
 
 #pragma endregion
@@ -1398,7 +1389,6 @@ void Game::render()
 
 			m_window.draw(m_statsText);
 			m_window.draw(m_smallEKText);
-			m_window.draw(m_normalEKText);
 			m_window.draw(m_bigEKText);
 			m_window.draw(m_bossEKText);
 			m_window.draw(m_totalEKText);
@@ -1721,12 +1711,15 @@ void Game::checkCollisions()
 						switch (enemy->getType())
 						{
 						case EnemyType::Small:
+							smallEK++;
 							enemy->setState(CharacterState::DeadState);
 							break;
 						case EnemyType::Big:
+							bigEK++;
 							enemy->setState(CharacterState::DeadState);
 							break;
 						case EnemyType::Boss:
+							bossEK++;
 							enemy->decreaseHealth(20.0f);
 
 							enemy->setColour(sf::Color::Red);

@@ -181,9 +181,10 @@ protected:
 	bool isGameOver;
 	bool firstStart;
 
+	bool isFirstPage;
+
 	int score;
 	int smallEK;
-	int normalEK;
 	int bigEK;
 	int bossEK;
 	int totalEK;
@@ -195,7 +196,6 @@ protected:
 
 	Text m_scoreText;
 	Text m_smallEKText;
-	Text m_normalEKText;
 	Text m_bigEKText;
 	Text m_bossEKText;
 	Text m_totalEKText;

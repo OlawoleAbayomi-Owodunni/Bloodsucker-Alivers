@@ -24,6 +24,7 @@ public:
 
 	void update(double dt, sf::Vector2f t_playerPos, std::vector<Enemy*> t_enemies, Direction t_direction);
 	void render(sf::RenderWindow& t_window);
+	void renderSprite(sf::RenderWindow& t_window);
 
 	std::vector<Bullet*>& getBullets();
 	WeaponType getType();
@@ -32,6 +33,8 @@ public:
 	void equipWeapon();
 	bool isWeaponEquipped();
 	void upgradeWeapon(WeaponType t_type);
+
+	void setSpritePosition(sf::View& t_view);
 
 	void animateExplosion();
 	Explosion& getExplosion();

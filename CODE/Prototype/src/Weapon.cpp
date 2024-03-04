@@ -24,6 +24,8 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 	case WeaponType::Pistol:
 		m_fireRate = 2.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,0,128,32 });
+		m_weaponSprite.setOrigin(64, 16);
+		m_weaponSprite.setScale(1.0f, 1.0f);
 
 		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/pistol_shoot.wav"))
 		{
@@ -39,6 +41,8 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 	case WeaponType::AssaultRifle:
 		m_fireRate = 3.0f / m_fireRateModifier;
 		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 });
+		m_weaponSprite.setOrigin(64, 16);
+		m_weaponSprite.setScale(1.0f, 1.0f);
 
 		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/ar_shoot.wav"))
 		{
@@ -53,7 +57,9 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 #pragma region Sniper
 	case WeaponType::Sniper:
 		m_fireRate = 4.0f / m_fireRateModifier;
-		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when sniper sprite is added
+		m_weaponSprite.setTextureRect(IntRect{ 1584, 784, 256, 64 });
+		m_weaponSprite.setOrigin(128, 32);
+		m_weaponSprite.setScale(0.5f, 0.5f);
 
 		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/sniper_shoot.wav"))
 		{
@@ -69,7 +75,9 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 	case WeaponType::RPG:
 		m_fireRate = 6.0f / m_fireRateModifier;
 		m_dmgRadius = 50.0f * m_dmgRadiusModifier;
-		m_weaponSprite.setTextureRect(IntRect{ 0,32,128,32 }); // needs to change when rpg sprite is added
+		m_weaponSprite.setTextureRect(IntRect{ 1648, 994, 256, 64 });
+		m_weaponSprite.setOrigin(128, 32);
+		m_weaponSprite.setScale(0.5f, 0.5f);
 
 		if (!m_shootingSoundBuffer.loadFromFile("resources/sounds/rpg_shoot.wav"))
 		{
@@ -108,9 +116,6 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 	default:
 		break;
 	}
-
-	m_weaponSprite.setOrigin(64, 16);
-	m_weaponSprite.setScale(5.0f, 5.0f);
 	//CHECK SNIPER AND RPG AS THEY ARE DIFFERENT
 
 	//WE WILL BE DOING ANIMATIONS LOCALLY IN THIS CLASS THEN RENDERING IN GAME.CPP USING GETWEAPON()[var that checked cursorType against gunType]
@@ -275,6 +280,11 @@ void Weapon::render(sf::RenderWindow& t_window)
 	}
 }
 
+void Weapon::renderSprite(sf::RenderWindow& t_window)
+{
+	t_window.draw(m_weaponSprite);
+}
+
 #pragma region Getters
 std::vector<Bullet*>& Weapon::getBullets()
 {
@@ -412,6 +422,28 @@ void Weapon::upgradeWeapon(WeaponType t_type) //probably pass in which weapon ID
 
 	}
 
+}
+
+void Weapon::setSpritePosition(sf::View& t_view)
+{
+	sf::Vector2f viewPos = t_view.getCenter();
+	switch (m_type)
+	{
+	case WeaponType::Pistol:
+		m_weaponSprite.setPosition(viewPos.x - 720.0f, viewPos.y - 430.0f);
+		break;
+	case WeaponType::AssaultRifle:
+		m_weaponSprite.setPosition(viewPos.x - 600.0f, viewPos.y - 430.0f);
+		break;
+	case WeaponType::Sniper:
+		m_weaponSprite.setPosition(viewPos.x - 730.0f, viewPos.y - 400.0f);
+		break;
+	case WeaponType::RPG:
+		m_weaponSprite.setPosition(viewPos.x - 620.0f, viewPos.y - 400.0f);
+		break;
+	default:
+		break;
+	}
 }
 
 void Weapon::animateExplosion()

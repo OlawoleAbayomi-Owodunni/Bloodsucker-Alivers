@@ -11,7 +11,7 @@ Game::Game()
 	m_menuCamera(FloatRect(0, 0, m_window.getSize().x, m_window.getSize().y))
 {
 	sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-	m_window.create(desktopMode, "Fullscreen SFML");
+	m_window.create(desktopMode, "Codename: Reclaim", sf::Style::Fullscreen);
 
 	srand(time(nullptr));
 	init();
@@ -1303,7 +1303,7 @@ void Game::update(double dt)
 	if (enemyHitRumbleTimer.getElapsedTime().asSeconds() > 0.05f && eIsRumbling) {
 		eIsRumbling = false;
 	}
-	if (levelUpRumbleTimer.getElapsedTime().asSeconds() > 1.0f && luIsRumbling) {
+	if (levelUpRumbleTimer.getElapsedTime().asSeconds() > 0.65f && luIsRumbling) {
 		luIsRumbling = false;
 	}
 	if (!oIsRumbling && !pIsRumbling && !eIsRumbling && !luIsRumbling && !m_player.getRumbleState()) {

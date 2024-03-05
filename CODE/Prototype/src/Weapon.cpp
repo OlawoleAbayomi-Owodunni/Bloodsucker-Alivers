@@ -32,7 +32,7 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 			std::cout << "error loading pistl shooting sound";
 		}
 		m_shootingSound.setBuffer(m_shootingSoundBuffer);
-		m_shootingSound.setVolume(2.0f);
+		m_shootingSound.setVolume(2.0f * 3.0f);
 		break;
 
 #pragma endregion
@@ -49,7 +49,7 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 			std::cout << "error loading ar shooting sound";
 		}
 		m_shootingSound.setBuffer(m_shootingSoundBuffer);
-		m_shootingSound.setVolume(1.5f);
+		m_shootingSound.setVolume(1.5f * 3.0f);
 		break;
 
 #pragma endregion
@@ -66,7 +66,7 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 			std::cout << "error loading sniper shooting sound";
 		}
 		m_shootingSound.setBuffer(m_shootingSoundBuffer);
-		m_shootingSound.setVolume(5.0f);
+		m_shootingSound.setVolume(5.0f * 3.0f);
 		break;
 
 #pragma endregion
@@ -84,7 +84,7 @@ Weapon::Weapon(WeaponType t_type, sf::Texture& t_texture)
 			std::cout << "error loading rpg shooting sound";
 		}
 		m_shootingSound.setBuffer(m_shootingSoundBuffer);
-		m_shootingSound.setVolume(10.0f);
+		m_shootingSound.setVolume(10.0f * 3.0f);
 
 		m_explosion.position = sf::Vector2f(-1000.0f, -1000.0f);
 		

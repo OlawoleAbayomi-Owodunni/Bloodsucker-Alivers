@@ -62,28 +62,28 @@ void Game::init()
 		std::cout << "error loading orb pick up sound";
 	}
 	m_orbPickupSound.setBuffer(m_orbPickupSoundBuffer);
-	m_orbPickupSound.setVolume(15.0f);
+	m_orbPickupSound.setVolume(15.0f * 4.0f);
 
 	if (!m_healthPickupSoundBuffer.loadFromFile("resources/sounds/health_pickup.wav"))
 	{
 		std::cout << "error loading health pick up sound";
 	}
 	m_healthPickupSound.setBuffer(m_healthPickupSoundBuffer);
-	m_healthPickupSound.setVolume(3.0f);
+	m_healthPickupSound.setVolume(3.0f * 4.0f);
 	
 	if (!m_levelupSoundBuffer.loadFromFile("resources/sounds/levelup.wav"))
 	{
 		std::cout << "error loading level up sound";
 	}
 	m_levelupSound.setBuffer(m_levelupSoundBuffer);
-	m_levelupSound.setVolume(2.0f);
+	m_levelupSound.setVolume(2.0f * 4.0f);
 
 	if (!m_explosionSoundBuffer.loadFromFile("resources/sounds/rpg_explosion.wav"))
 	{
 		std::cout << "error loading explosion sound";
 	}
 	m_explosionSound.setBuffer(m_explosionSoundBuffer);
-	m_explosionSound.setVolume(4.0f);
+	m_explosionSound.setVolume(4.0f * 4.0f);
 
 	if (!m_menuMusicBuffer.loadFromFile("resources/sounds/menu_music.wav"))
 	{
@@ -91,7 +91,7 @@ void Game::init()
 	}
 	m_menuMusic.setBuffer(m_menuMusicBuffer);
 	m_menuMusic.setLoop(true);
-	m_menuMusic.setVolume(1.0f);
+	m_menuMusic.setVolume(1.0f * 4.0f);
 
 	if (!m_gameplayMusicBuffer.loadFromFile("resources/sounds/gameplay_music.wav"))
 	{
@@ -99,7 +99,7 @@ void Game::init()
 	}
 	m_gameplayMusic.setBuffer(m_gameplayMusicBuffer);
 	m_gameplayMusic.setLoop(true);
-	m_gameplayMusic.setVolume(2.0f);
+	m_gameplayMusic.setVolume(2.0f * 4.0f);
 
 	m_menuMusic.play();
 
@@ -108,14 +108,14 @@ void Game::init()
 		std::cout << "error loading select sound";
 	}
 	m_menuSelectSound.setBuffer(m_menuSelectBuffer);
-	m_menuSelectSound.setVolume(3.0f);
+	m_menuSelectSound.setVolume(3.0f * 4.0f);
 
 	if (!m_menuScrollBuffer.loadFromFile("resources/sounds/button_scroll.wav"))
 	{
 		std::cout << "error loading scroll sound";
 	}
 	m_menuScrollSound.setBuffer(m_menuScrollBuffer);
-	m_menuScrollSound.setVolume(1.5f);
+	m_menuScrollSound.setVolume(1.5f * 4.0f);
 
 #pragma endregion
 

@@ -25,14 +25,14 @@ Player::Player()
 		std::cout << "error loading dash sound";
 	}
 	m_dashSound.setBuffer(m_dashSoundBuffer);
-	m_dashSound.setVolume(3.0f);
+	m_dashSound.setVolume(3.0f * 4.0f);
 
 	if (!m_deathSoundBuffer.loadFromFile("resources/sounds/player_death.wav"))
 	{
 		std::cout << "error loading death sound";
 	}
 	m_deathSound.setBuffer(m_deathSoundBuffer);
-	m_deathSound.setVolume(5.0f);
+	m_deathSound.setVolume(5.0f * 4.0f);
 
 	//FONT & TEXT
 	if (!m_font.loadFromFile("resources/BebasNeue.otf"))

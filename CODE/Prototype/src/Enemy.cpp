@@ -14,7 +14,7 @@ Enemy::Enemy(sf::Texture& t_texture, sf::Vector2f t_playerPos, EnemyType t_type)
 		std::cout << "error loading enemy hit sound";
 	}
 	m_hitSound.setBuffer(m_hitSoundBuffer);
-	m_hitSound.setVolume(2.0f);
+	m_hitSound.setVolume(2.0f * 4.0f);
 
 	initialisePosition(t_playerPos);
 

@@ -615,7 +615,7 @@ void Game::processGameEvents(sf::Event& event)
 				}
 				if (event.joystickMove.axis == sf::Joystick::PovX) // D-pad left/right
 				{
-					if (m_cursorButtonType == ButtonType::Tutorial)
+					if (m_cursorButtonType == ButtonType::Tutorial && inMenu)
 					{
 						if (event.joystickMove.position == -100 && !isFirstPage)// left
 						{
@@ -673,6 +673,7 @@ void Game::processGameEvents(sf::Event& event)
 							break;
 						case ButtonType::Tutorial:
 							inMenu = true;
+							isFirstPage = true;
 							menuBgSprite.setTexture(m_holder["tutorialMenu"]);
 							break;
 						case ButtonType::Credits:

@@ -53,7 +53,7 @@ public:
 	void initialise();
 
 	void update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies);
-	void renderPlayer(sf::RenderWindow& t_window);
+	void renderPlayer(sf::RenderWindow& t_window, sf::Shader& shader);
 	void renderHUD(sf::RenderWindow& t_window);
 	
 	void handleKeyInput();

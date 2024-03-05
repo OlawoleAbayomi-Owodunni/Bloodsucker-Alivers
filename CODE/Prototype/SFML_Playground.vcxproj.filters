@@ -96,4 +96,8 @@
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.vert" />
+    <None Include="shader.frag" />
+  </ItemGroup>
 </Project>

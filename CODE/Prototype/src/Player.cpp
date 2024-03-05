@@ -405,7 +405,7 @@ void Player::update(double dt, sf::View& t_view, std::vector<Enemy*> t_enemies)
 	animate();
 }
 
-void Player::renderPlayer(sf::RenderWindow& t_window)
+void Player::renderPlayer(sf::RenderWindow& t_window, sf::Shader& shader)
 {
 	for (auto weapon : m_weapons)
 	{
@@ -431,7 +431,8 @@ void Player::renderPlayer(sf::RenderWindow& t_window)
 
 	//t_window.draw(m_rectangle);
 
-	t_window.draw(m_playerSprite);
+	t_window.draw(m_playerSprite, &shader);
+	
 
 	if (m_dashHasAOE)
 	{

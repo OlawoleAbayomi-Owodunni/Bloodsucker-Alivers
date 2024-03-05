@@ -208,4 +208,8 @@ protected:
 
 	Sprite m_rankBadgeSprite;
 	int m_playerRank;
+
+
+	sf::RenderTexture m_renderTexture;
+	sf::Shader m_outlineShader;
 };

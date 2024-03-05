@@ -13,6 +13,9 @@ Game::Game()
 	sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
 	m_window.create(desktopMode, "Codename: Reclaim", sf::Style::Fullscreen);
 
+	m_renderTexture.create(ScreenSize::s_width, ScreenSize::s_height);
+	m_outlineShader.loadFromFile("shader.vert", "shader.frag");
+		
 	srand(time(nullptr));
 	init();
 
@@ -1314,7 +1317,6 @@ void Game::update(double dt)
 
 void Game::render()
 {
-	m_window.clear(sf::Color(0, 0, 0, 0));
 
 #pragma region GAMEPLAY
 	if (m_currentGamemode == Gamemode::Gameplay || m_currentGamemode == Gamemode::Pause ||
@@ -1343,7 +1345,7 @@ void Game::render()
 			enemy->render(m_window);
 		}
 
-		m_player.renderPlayer(m_window);
+		m_player.renderPlayer(m_window, m_outlineShader);
 
 		for (auto obstacle : m_obstacles)
 		{
